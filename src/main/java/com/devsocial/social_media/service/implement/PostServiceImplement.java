@@ -1,9 +1,6 @@
 package com.devsocial.social_media.service.implement;
 
-import com.devsocial.social_media.core.configuration.ThreadContext;
 import com.devsocial.social_media.entity.Posts;
-import com.devsocial.social_media.entity.Subjects;
-import com.devsocial.social_media.entity.UserInfo;
 import com.devsocial.social_media.model.dto.PostDTO;
 import com.devsocial.social_media.repository.PostsRepository;
 import com.devsocial.social_media.repository.SubjectRepository;
@@ -12,7 +9,6 @@ import com.devsocial.social_media.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -38,7 +34,7 @@ public class PostServiceImplement implements PostService {
         posts.setContent(dto.getContent());
 //        String userCurr= ThreadContext.getUserDetail().getUsername();
         String userCurr="";
-        Long userId=userInfoRepository.findByUserName(userCurr).orElse(null);
+        Long userId=userInfoRepository.findIdByUserName(userCurr).orElse(null);
         posts.setUserId(userId);
 
         Long subjectId=subjectRepository.findByName(dto.getSubject()).orElse(null);
