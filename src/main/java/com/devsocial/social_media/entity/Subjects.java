@@ -10,4 +10,8 @@ import jakarta.persistence.Table;
 public class Subjects extends EntityBase {
     @Column(name = "SUBJECT_NAME")
     private String subjectName;
+
+    public String getSubjectName() {
+        return subjectName;
+    }
 }

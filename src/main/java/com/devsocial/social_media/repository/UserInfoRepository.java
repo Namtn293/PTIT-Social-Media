@@ -14,5 +14,11 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Long> {
     @Query(value = "select s.id " +
             "from UserInfo s " +
             "where s.userName= :user_name", nativeQuery = false)
-    Optional<Long> findByUserName(@Param("user_name") String userName);
+    Optional<Long> findIdByUserName(@Param("user_name") String userName);
+
+    @Query(value = "select s.userName " +
+            "from UserInfo s " +
+            "where s.id= :id", nativeQuery = false)
+    Optional<String> findUserNameById(@Param("id") Long id);
+
 }

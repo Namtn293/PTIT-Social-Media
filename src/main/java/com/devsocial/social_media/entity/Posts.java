@@ -5,12 +5,16 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "MAIN_POSTS")
+@Getter
+@Setter
 public class Posts extends EntityBase {
     @Column(name = "TITLE")
     private String title;
@@ -46,5 +50,25 @@ public class Posts extends EntityBase {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public Long getSubjectId() {
+        return subjectId;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 }
