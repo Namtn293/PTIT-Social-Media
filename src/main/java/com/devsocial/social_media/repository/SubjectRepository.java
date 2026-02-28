@@ -13,5 +13,10 @@ public interface SubjectRepository extends JpaRepository<Subjects,Long> {
     @Query(value = "select s.id " +
             "from Subjects s " +
             "where s.subjectName= :subject_name",nativeQuery = false)
+    Optional<Long> findIdByName(@Param("subject_name") String subject);
+
+    @Query(value = "select s " +
+            "from Subjects s " +
+            "where s.subjectName= :subject_name",nativeQuery = false)
     Optional<Long> findByName(@Param("subject_name") String subject);
 }
