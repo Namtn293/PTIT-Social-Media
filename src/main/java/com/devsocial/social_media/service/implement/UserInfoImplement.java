@@ -5,18 +5,26 @@ import com.devsocial.social_media.model.dto.UserInfoDTO;
 import com.devsocial.social_media.model.vo.UserInfoAdminVO;
 import com.devsocial.social_media.model.vo.UserInfoVO;
 import com.devsocial.social_media.repository.UserInfoRepository;
+import com.devsocial.social_media.service.ImageService;
 import com.devsocial.social_media.service.UserInfoService;
 import lombok.Builder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 @Service
 public class UserInfoImplement implements UserInfoService {
     private final UserInfoRepository userInfoRepository;
+    private final CloudinaryImplement cloudinaryImplement;
+    private final ImageImplement imageImplement;
 
-    public UserInfoImplement(UserInfoRepository userInfoRepository) {
+    public UserInfoImplement(UserInfoRepository userInfoRepository, CloudinaryImplement cloudinaryImplement, ImageImplement imageImplement) {
         this.userInfoRepository = userInfoRepository;
+        this.cloudinaryImplement = cloudinaryImplement;
+        this.imageImplement = imageImplement;
     }
 
     @Override
@@ -31,17 +39,17 @@ public class UserInfoImplement implements UserInfoService {
         return convertToUserInfoVO(userInfoRepository.findByUserName(userName)
                 .orElseThrow(()->new RuntimeException("user not found"))) ;
     }
-
+    @Transactional
     @Override
-    public UserInfoVO updateInfo(String userName, UserInfoDTO userInfoDTO) {
+    public UserInfoVO updateInfo(String userName, UserInfoDTO userInfoDTO, MultipartFile file) throws IOException {
         UserInfo userInfo = userInfoRepository.findByUserName(userName)
                 .orElseThrow(()->new RuntimeException("user not found"));
         if(userInfoDTO.getFullName()!=null)
             userInfo.setFullName(userInfoDTO.getFullName());
         if(userInfoDTO.getEmail()!=null)
             userInfo.setEmail(userInfoDTO.getEmail());
-        if(userInfoDTO.getAvatar()!=null)
-            userInfo.setAvatar(userInfoDTO.getAvatar());
+        imageImplement.updateImage(userInfo,file);
+
         userInfoRepository.save(userInfo);
         return convertToUserInfoVO(userInfo);
     }
@@ -77,6 +85,7 @@ public class UserInfoImplement implements UserInfoService {
                 .id(userInfo.getId())
                 .userName(userInfo.getUserName())
                 .fullName(userInfo.getFullName())
+                .avatar(userInfo.getAvatar())
                 .email(userInfo.getEmail())
                 .status(userInfo.getStatus())
                 .build();
