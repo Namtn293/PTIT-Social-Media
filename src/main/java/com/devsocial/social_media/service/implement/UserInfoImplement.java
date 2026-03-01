@@ -6,11 +6,11 @@ import com.devsocial.social_media.model.vo.UserInfoAdminVO;
 import com.devsocial.social_media.model.vo.UserInfoVO;
 import com.devsocial.social_media.repository.UserInfoRepository;
 import com.devsocial.social_media.service.UserInfoService;
+import lombok.Builder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
 @Service
 public class UserInfoImplement implements UserInfoService {
     private final UserInfoRepository userInfoRepository;

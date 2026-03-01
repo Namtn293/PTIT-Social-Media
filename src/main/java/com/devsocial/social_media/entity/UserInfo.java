@@ -27,4 +27,5 @@ public class UserInfo extends EntityBase {
 
     @Column(name = "STATUS")
     private String status;
+
 }

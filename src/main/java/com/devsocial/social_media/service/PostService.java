@@ -20,4 +20,10 @@ public interface PostService {
     List<PostVO> convertToVo(List<Posts> posts) throws RuntimeException;
 
     void updatePost(PostUpdateDTO dto) throws RuntimeException;
+
+    List<PostVO> getLikePosts();
+
+    List<PostVO> getReportPosts();
+
+    List<PostVO> getSavePosts();
 }

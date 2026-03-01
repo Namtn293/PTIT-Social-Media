@@ -14,4 +14,20 @@ public interface PostsRepository extends JpaRepository<Posts,Long> {
             " from Posts s " +
             "where s.userId= :user_id")
     List<Posts> findByUserId(@Param("user_id") Long userId);
+
+    @Query(value = "select s" +
+            " from Posts s, PostLikes a " +
+            "where s.id=a.postId and a.userId=:user_id")
+    List<Posts> findLikePosts(@Param("user_id")Long userId);
+
+    @Query(value = "select s" +
+            " from Posts s, PostReport a " +
+            "where s.id=a.postId and a.userId=:user_id")
+    List<Posts> findReportPosts(@Param("user_id")Long userId);
+
+    @Query(value = "select s" +
+            " from Posts s, PostSaves a " +
+            "where s.id=a.postId and a.userId=:user_id")
+    List<Posts> findSavePosts(@Param("user_id")Long userId);
+
 }
