@@ -14,7 +14,7 @@ public class PostLikes extends EntityBase {
     private Long postId;
 
     @Column(name = "USER_ID")
-    private String userId;
+    private Long userId;
 
     @Column(name = "CREATED_AT")
     private LocalDateTime createdAt;
