@@ -5,10 +5,15 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 @Entity
 @Table(name = "MAIN_POST_LIKES")
+@Data
+@NoArgsConstructor
 public class PostLikes extends EntityBase {
     @Column(name = "POST_ID")
     private Long postId;

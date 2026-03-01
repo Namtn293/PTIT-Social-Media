@@ -1,5 +1,6 @@
 package com.devsocial.social_media.repository;
 
+import com.devsocial.social_media.entity.Posts;
 import com.devsocial.social_media.entity.UserInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -24,5 +25,6 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Long> {
             "from UserInfo s " +
             "where s.id= :id", nativeQuery = false)
     Optional<String> findUserNameById(@Param("id") Long id);
+
 
 }

@@ -7,6 +7,7 @@ import com.devsocial.social_media.model.vo.UserInfoVO;
 import com.devsocial.social_media.repository.UserInfoRepository;
 import com.devsocial.social_media.service.ImageService;
 import com.devsocial.social_media.service.UserInfoService;
+import lombok.Builder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 @Service
 public class UserInfoImplement implements UserInfoService {
     private final UserInfoRepository userInfoRepository;

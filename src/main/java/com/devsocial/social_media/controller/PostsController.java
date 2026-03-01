@@ -2,13 +2,11 @@ package com.devsocial.social_media.controller;
 
 import com.devsocial.social_media.core.util.ResponseUtil;
 import com.devsocial.social_media.core.util.SuccessResponse;
-import com.devsocial.social_media.entity.Posts;
 import com.devsocial.social_media.model.dto.PostDTO;
 import com.devsocial.social_media.model.dto.PostUpdateDTO;
 import com.devsocial.social_media.model.vo.PostVO;
 import com.devsocial.social_media.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,7 +39,7 @@ public class PostsController {
     }
 
     @GetMapping("/get-my-posts")
-    public SuccessResponse<List<PostVO>> getMyPosts(@PathVariable int number) throws RuntimeException{
+    public SuccessResponse<List<PostVO>> getMyPosts() throws RuntimeException{
         return ResponseUtil.ok("Get success",postService.getMyPosts());
     }
 
@@ -51,4 +49,18 @@ public class PostsController {
         return ResponseUtil.ok("Update success");
     }
 
+    @GetMapping("/get-my-like-posts")
+    public SuccessResponse<List<PostVO>> getMyLikePosts(){
+        return ResponseUtil.ok("Get My Like Post Success",postService.getLikePosts());
+    }
+
+    @GetMapping("/get-my-report-posts")
+    public SuccessResponse<List<PostVO>> getMyReportPosts(){
+        return ResponseUtil.ok("Get My Like Post Success",postService.getReportPosts());
+    }
+
+    @GetMapping("/get-my-save-posts")
+    public SuccessResponse<List<PostVO>> getMySavePosts(){
+        return ResponseUtil.ok("Get My Like Post Success",postService.getSavePosts());
+    }
 }
