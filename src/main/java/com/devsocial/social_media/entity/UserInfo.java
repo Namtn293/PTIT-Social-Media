@@ -4,8 +4,10 @@ import com.devsocial.social_media.core.util.EntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import lombok.Data;
 
 @Entity
+@Data
 @Table(name = "MAIN_USER_INFO")
 public class UserInfo extends EntityBase {
     @Column(name = "USERNAME")
@@ -22,4 +24,7 @@ public class UserInfo extends EntityBase {
 
     @Column(name = "CLASS_ID")
     private String classId;
+
+    @Column(name = "STATUS")
+    private String status;
 }

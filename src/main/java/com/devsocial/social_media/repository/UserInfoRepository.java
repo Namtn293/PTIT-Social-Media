@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,6 +16,9 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Long> {
             "from UserInfo s " +
             "where s.userName= :user_name", nativeQuery = false)
     Optional<Long> findIdByUserName(@Param("user_name") String userName);
+
+    List<UserInfo> findAll();
+    Optional<UserInfo> findByUserName(String userName);
 
     @Query(value = "select s.userName " +
             "from UserInfo s " +
