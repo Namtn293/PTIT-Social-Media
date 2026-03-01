@@ -7,9 +7,12 @@ import com.devsocial.social_media.model.dto.UserInfoDTO;
 import com.devsocial.social_media.model.vo.UserInfoAdminVO;
 import com.devsocial.social_media.model.vo.UserInfoVO;
 import com.devsocial.social_media.service.UserInfoService;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -37,11 +40,19 @@ public class UserInfoController {
         );
     };
 
-    @PostMapping("update/{userName}")
-    public SuccessResponse<UserInfoVO> updateUserInfo(@PathVariable String userName,@RequestBody UserInfoDTO userInfoDTO){
+    @PostMapping(
+            value = "update/{userName}",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public SuccessResponse<UserInfoVO> updateUserInfo(
+            @PathVariable String userName,
+            @RequestPart("data") UserInfoDTO userInfoDTO,
+            @RequestPart(value = "file",required = false) MultipartFile file
+    ) throws IOException {
+        System.out.println(file.getName());
         return ResponseUtil.ok(
                 "Update UserInfo Success",
-                userInfoService.updateInfo(userName,userInfoDTO)
+                userInfoService.updateInfo(userName,userInfoDTO,file)
         );
     }
 
