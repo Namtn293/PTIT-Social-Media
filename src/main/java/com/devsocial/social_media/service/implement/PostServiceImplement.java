@@ -1,14 +1,11 @@
 package com.devsocial.social_media.service.implement;
 
 import com.devsocial.social_media.core.configuration.ThreadContext;
-import com.devsocial.social_media.entity.Posts;
-import com.devsocial.social_media.entity.Subjects;
+import com.devsocial.social_media.entity.*;
 import com.devsocial.social_media.model.dto.PostDTO;
 import com.devsocial.social_media.model.dto.PostUpdateDTO;
 import com.devsocial.social_media.model.vo.PostVO;
-import com.devsocial.social_media.repository.PostsRepository;
-import com.devsocial.social_media.repository.SubjectRepository;
-import com.devsocial.social_media.repository.UserInfoRepository;
+import com.devsocial.social_media.repository.*;
 import com.devsocial.social_media.service.PostService;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -28,13 +25,19 @@ public class PostServiceImplement implements PostService {
     private final ModelMapper modelMapper;
     private final SubjectRepository subjectRepository;
     private final UserInfoRepository userInfoRepository;
+    private final PostLikesRepository postLikesRepository;
+    private final PostReportRepository postReportRepository;
+    private final PostSavesRepository postSavesRepository;
 
     @Autowired
-    public PostServiceImplement(PostsRepository postsRepository,ModelMapper modelMapper,SubjectRepository subjectRepository,UserInfoRepository userInfoRepository) {
+    public PostServiceImplement(PostSavesRepository postSavesRepository,PostReportRepository postReportRepository,PostLikesRepository postLikesRepository,PostsRepository postsRepository,ModelMapper modelMapper,SubjectRepository subjectRepository,UserInfoRepository userInfoRepository) {
         this.postsRepository = postsRepository;
         this.modelMapper = modelMapper;
         this.subjectRepository = subjectRepository;
         this.userInfoRepository = userInfoRepository;
+        this.postLikesRepository = postLikesRepository;
+        this.postReportRepository = postReportRepository;
+        this.postSavesRepository = postSavesRepository;
     }
 
     @Override
@@ -42,8 +45,7 @@ public class PostServiceImplement implements PostService {
         Posts posts=new Posts();
         posts.setTitle(dto.getTitle());
         posts.setContent(dto.getContent());
-//        String userCurr= ThreadContext.getUserDetail().getUsername();
-        String userCurr="";
+        String userCurr= ThreadContext.getUserDetail().getUsername();
         Long userId=userInfoRepository.findIdByUserName(userCurr).orElse(null);
         posts.setUserId(userId);
 
@@ -57,6 +59,21 @@ public class PostServiceImplement implements PostService {
     public void deletePost(Long postId) throws RuntimeException{
         Posts post=postsRepository.findById(postId).orElseThrow(()->new RuntimeException("Post not already exist"));
         postsRepository.delete(post);
+
+        List<PostLikes> postLikes=postLikesRepository.findByPostId(postId);
+        postLikes.forEach(c->{
+            postLikesRepository.delete(c);
+        });
+
+        List<PostReport> postReports=postReportRepository.findByPostId(postId);
+        postReports.forEach(c->{
+            postReportRepository.delete(c);
+        });
+
+        List<PostSaves> postSaves=postSavesRepository.findByPostId(postId);
+        postSaves.forEach(c->{
+            postSavesRepository.delete(c);
+        });
     }
 
     @Override
@@ -99,5 +116,24 @@ public class PostServiceImplement implements PostService {
         postsRepository.save(post);
     }
 
+    @Override
+    public List<PostVO> getLikePosts() {
+        Long id=userInfoRepository.findIdByUserName(ThreadContext.getUserDetail().getUsername()).orElse(null);
+        List<Posts> list=postsRepository.findLikePosts(id);
+        return convertToVo(list);
+    }
 
+    @Override
+    public List<PostVO> getReportPosts() {
+        Long id=userInfoRepository.findIdByUserName(ThreadContext.getUserDetail().getUsername()).orElse(null);
+        List<Posts> list=postsRepository.findReportPosts(id);
+        return convertToVo(list);
+    }
+
+    @Override
+    public List<PostVO> getSavePosts() {
+        Long id=userInfoRepository.findIdByUserName(ThreadContext.getUserDetail().getUsername()).orElse(null);
+        List<Posts> list=postsRepository.findSavePosts(id);
+        return convertToVo(list);
+    }
 }
