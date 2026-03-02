@@ -20,7 +20,7 @@ public class PostLikesServiceImplement implements PostLikesService {
     }
 
     @Override
-    public void interactPost(Long postId) throws RuntimeException {
+    public String interactPost(Long postId) throws RuntimeException {
         Long userId=userInfoRepository.findIdByUserName(ThreadContext.getUserDetail().getUsername()).orElse(null);
         PostLikes postLikes=postLikesRepository.findByPostIdAndUserId(postId,userId).orElse(null);
         if (postLikes==null){
@@ -28,8 +28,10 @@ public class PostLikesServiceImplement implements PostLikesService {
             postLikes1.setPostId(postId);
             postLikes1.setUserId(userId);
             postLikesRepository.save(postLikes1);
+            return "Like Success";
         }else{
             postLikesRepository.delete(postLikes);
+            return "Dislike Success";
         }
     }
 }
