@@ -1,9 +1,7 @@
 package com.devsocial.social_media.service.implement;
 
 import com.devsocial.social_media.core.configuration.ThreadContext;
-import com.devsocial.social_media.entity.PostLikes;
-import com.devsocial.social_media.entity.Posts;
-import com.devsocial.social_media.entity.Subjects;
+import com.devsocial.social_media.entity.*;
 import com.devsocial.social_media.model.dto.PostDTO;
 import com.devsocial.social_media.model.dto.PostUpdateDTO;
 import com.devsocial.social_media.model.vo.PostVO;
@@ -29,15 +27,17 @@ public class PostServiceImplement implements PostService {
     private final UserInfoRepository userInfoRepository;
     private final PostLikesRepository postLikesRepository;
     private final PostReportRepository postReportRepository;
+    private final PostSavesRepository postSavesRepository;
 
     @Autowired
-    public PostServiceImplement(PostReportRepository postReportRepository,PostLikesRepository postLikesRepository,PostsRepository postsRepository,ModelMapper modelMapper,SubjectRepository subjectRepository,UserInfoRepository userInfoRepository) {
+    public PostServiceImplement(PostSavesRepository postSavesRepository,PostReportRepository postReportRepository,PostLikesRepository postLikesRepository,PostsRepository postsRepository,ModelMapper modelMapper,SubjectRepository subjectRepository,UserInfoRepository userInfoRepository) {
         this.postsRepository = postsRepository;
         this.modelMapper = modelMapper;
         this.subjectRepository = subjectRepository;
         this.userInfoRepository = userInfoRepository;
         this.postLikesRepository = postLikesRepository;
         this.postReportRepository = postReportRepository;
+        this.postSavesRepository = postSavesRepository;
     }
 
     @Override
@@ -45,8 +45,7 @@ public class PostServiceImplement implements PostService {
         Posts posts=new Posts();
         posts.setTitle(dto.getTitle());
         posts.setContent(dto.getContent());
-//        String userCurr= ThreadContext.getUserDetail().getUsername();
-        String userCurr="";
+        String userCurr= ThreadContext.getUserDetail().getUsername();
         Long userId=userInfoRepository.findIdByUserName(userCurr).orElse(null);
         posts.setUserId(userId);
 
@@ -66,8 +65,15 @@ public class PostServiceImplement implements PostService {
             postLikesRepository.delete(c);
         });
 
+        List<PostReport> postReports=postReportRepository.findByPostId(postId);
+        postReports.forEach(c->{
+            postReportRepository.delete(c);
+        });
 
-
+        List<PostSaves> postSaves=postSavesRepository.findByPostId(postId);
+        postSaves.forEach(c->{
+            postSavesRepository.delete(c);
+        });
     }
 
     @Override
@@ -130,6 +136,4 @@ public class PostServiceImplement implements PostService {
         List<Posts> list=postsRepository.findSavePosts(id);
         return convertToVo(list);
     }
-
-
 }
