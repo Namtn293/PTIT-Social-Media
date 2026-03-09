@@ -14,12 +14,12 @@ import java.io.IOException;
 import java.util.Map;
 
 @Service
-public class ImageImplement implements ImageService {
+public class ImagesServiceImplement implements ImageService {
     private final Cloudinary cloudinary;
     private final ImageRepository imageRepository;
     private final UserInfoRepository userInfoRepository;
 
-    public ImageImplement(Cloudinary cloudinary, ImageRepository imageRepository, UserInfoRepository userInfoRepository) {
+    public ImagesServiceImplement(Cloudinary cloudinary, ImageRepository imageRepository, UserInfoRepository userInfoRepository) {
         this.cloudinary = cloudinary;
         this.imageRepository = imageRepository;
         this.userInfoRepository = userInfoRepository;

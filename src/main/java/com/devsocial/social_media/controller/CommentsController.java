@@ -1,5 +1,6 @@
 package com.devsocial.social_media.controller;
 
+import com.devsocial.social_media.core.util.BusinessException;
 import com.devsocial.social_media.core.util.ResponseUtil;
 import com.devsocial.social_media.core.util.SuccessResponse;
 import com.devsocial.social_media.entity.Comments;
@@ -44,7 +45,7 @@ public class CommentsController {
     }
 
     @PostMapping("/get/{postId}")
-    SuccessResponse<List<Comments>> getAllByPostId(@PathVariable Long postId){
+    SuccessResponse<List<Comments>> getAllByPostId(@PathVariable Long postId) throws BusinessException {
         return ResponseUtil.ok(
                 "get all comment success",
                 commentsService.getAllByPostId(postId)

@@ -15,14 +15,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 @Service
-public class UserInfoImplement implements UserInfoService {
+public class UserInfoServiceImplement implements UserInfoService {
     private final UserInfoRepository userInfoRepository;
-    private final CloudinaryImplement cloudinaryImplement;
-    private final ImageImplement imageImplement;
+    private final CloudinaryServiceImplement cloudinaryServiceImplement;
+    private final ImagesServiceImplement imageImplement;
 
-    public UserInfoImplement(UserInfoRepository userInfoRepository, CloudinaryImplement cloudinaryImplement, ImageImplement imageImplement) {
+    public UserInfoServiceImplement(UserInfoRepository userInfoRepository, CloudinaryServiceImplement cloudinaryServiceImplement, ImagesServiceImplement imageImplement) {
         this.userInfoRepository = userInfoRepository;
-        this.cloudinaryImplement = cloudinaryImplement;
+        this.cloudinaryServiceImplement = cloudinaryServiceImplement;
         this.imageImplement = imageImplement;
     }
 
