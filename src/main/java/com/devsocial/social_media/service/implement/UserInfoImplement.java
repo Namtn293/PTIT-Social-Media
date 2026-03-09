@@ -1,13 +1,12 @@
 package com.devsocial.social_media.service.implement;
 
 import com.devsocial.social_media.entity.UserInfo;
+import com.devsocial.social_media.enumration.StatusEnum;
 import com.devsocial.social_media.model.dto.UserInfoDTO;
 import com.devsocial.social_media.model.vo.UserInfoAdminVO;
 import com.devsocial.social_media.model.vo.UserInfoVO;
 import com.devsocial.social_media.repository.UserInfoRepository;
-import com.devsocial.social_media.service.ImageService;
 import com.devsocial.social_media.service.UserInfoService;
-import lombok.Builder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -58,7 +57,7 @@ public class UserInfoImplement implements UserInfoService {
     public void banUser(String userName) {
         UserInfo userInfo = userInfoRepository.findByUserName(userName)
                 .orElseThrow(()->new RuntimeException("user not found"));
-        userInfo.setStatus("Banned");
+        userInfo.setStatus(StatusEnum.BANNED);
         userInfoRepository.save(userInfo);
     }
 
@@ -66,7 +65,7 @@ public class UserInfoImplement implements UserInfoService {
     public void activeUser(String userName) {
         UserInfo userInfo = userInfoRepository.findByUserName(userName)
                 .orElseThrow(()->new RuntimeException("user not found"));
-        userInfo.setStatus("Active");
+        userInfo.setStatus(StatusEnum.ACTIVE);
         userInfoRepository.save(userInfo);
     }
 
