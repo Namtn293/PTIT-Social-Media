@@ -1,5 +1,6 @@
 package com.devsocial.social_media.model.vo;
 
+import com.devsocial.social_media.enumration.StatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,5 +16,5 @@ public class UserInfoAdminVO {
     private String fullName;
     private String avatar;
     private String email;
-    private String status;
+    private StatusEnum status;
 }
