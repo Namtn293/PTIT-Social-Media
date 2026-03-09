@@ -1,9 +1,8 @@
 package com.devsocial.social_media.entity;
 
 import com.devsocial.social_media.core.util.EntityBase;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import com.devsocial.social_media.enumration.StatusEnum;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -25,7 +24,8 @@ public class UserInfo extends EntityBase {
     @Column(name = "CLASS_ID")
     private String classId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "STATUS")
-    private String status;
+    private StatusEnum status;
 
 }

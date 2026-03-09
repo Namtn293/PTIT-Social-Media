@@ -3,6 +3,8 @@ package com.devsocial.social_media.core.auth.entity;
 import com.devsocial.social_media.core.util.EntityBase;
 import com.devsocial.social_media.enumration.RoleEnum;
 import jakarta.persistence.*;
+import lombok.Builder;
+import lombok.Data;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,6 +15,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "AUTH_USER")
+@Data
 public class User extends EntityBase implements UserDetails {
     @Column(name = "USERNAME")
     private String userName;
