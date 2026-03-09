@@ -5,6 +5,7 @@ import com.devsocial.social_media.enumration.RoleEnum;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Data;
 import org.jspecify.annotations.Nullable;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
