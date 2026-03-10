@@ -9,6 +9,7 @@ import com.devsocial.social_media.repository.MessageRepository;
 import com.devsocial.social_media.service.MessagesService;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -44,7 +45,9 @@ public class MessagesServiceImplement implements MessagesService {
 
     @Override
     public List<Messages> getAll() {
-        return messageRepository.findAll();
+        List<Messages> messages = messageRepository.findAll();
+        messages.sort(Comparator.comparing(Messages::getCreatedAt));
+        return messages;
     }
 
     @Override

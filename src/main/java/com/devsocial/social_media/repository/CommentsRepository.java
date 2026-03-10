@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CommentsRepository extends JpaRepository<Comments,Long> {
-    Optional<List<Comments>> findAllByPostId(Long postId);
+    List<Comments> findAllByPostId(Long postId);
     Optional<Comments> findById(Long id) throws RuntimeException;
 }
