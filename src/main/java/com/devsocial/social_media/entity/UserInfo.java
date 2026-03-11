@@ -27,5 +27,4 @@ public class UserInfo extends EntityBase {
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS")
     private StatusEnum status;
-
 }
