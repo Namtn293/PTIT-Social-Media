@@ -2,7 +2,6 @@ package com.devsocial.social_media.service.implement;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.devsocial.social_media.repository.ImageRepository;
 import com.devsocial.social_media.repository.UserInfoRepository;
 import com.devsocial.social_media.service.CloudinaryService;
 import com.devsocial.social_media.service.ImageService;
@@ -13,12 +12,12 @@ import java.io.IOException;
 import java.util.Map;
 
 @Service
-public class CloudinaryImplement implements CloudinaryService {
+public class CloudinaryServiceImplement implements CloudinaryService {
     private final Cloudinary cloudinary;
     private final UserInfoRepository userInfoRepository;
     private final ImageService imageService;
 
-    public CloudinaryImplement(Cloudinary cloudinary, UserInfoRepository userInfoRepository, ImageService imageService) {
+    public CloudinaryServiceImplement(Cloudinary cloudinary, UserInfoRepository userInfoRepository, ImageService imageService) {
         this.cloudinary = cloudinary;
         this.userInfoRepository = userInfoRepository;
         this.imageService = imageService;
