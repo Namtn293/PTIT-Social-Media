@@ -18,13 +18,13 @@ import java.util.function.Function;
 
 @Service
 public class JwtService {
-    @Value("$application.security.jwt.secret-key")
+    @Value("${spring.application.security.jwt.secret-key}")
     private String SECRET_KEY;
 
-    @Value("$application.security.jwt.access-token")
+    @Value("${spring.application.security.jwt.access-token}")
     private long jwtExpiration;
 
-    @Value("$application.security.jwt.refresh-token")
+    @Value("${spring.application.security.jwt.refresh-token}")
     private long refreshExpiration;
 
     //create key with secret_key
