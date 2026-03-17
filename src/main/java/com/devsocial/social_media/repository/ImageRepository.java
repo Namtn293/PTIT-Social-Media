@@ -1,10 +1,7 @@
 package com.devsocial.social_media.repository;
 
-import com.devsocial.social_media.core.util.BusinessException;
 import com.devsocial.social_media.entity.Images;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -15,5 +12,5 @@ public interface ImageRepository extends JpaRepository<Images,Long> {
 //    String findPublicIdByUrl(@Param("url") String url);
 
     Optional<Images> findByUrl(String url);
-    Optional<Images> findById(Long id) throws BusinessException;
+    Optional<Images> findById(Long id);
 }

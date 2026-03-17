@@ -9,6 +9,7 @@ import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.enumration.RoleEnum;
 import com.devsocial.social_media.enumration.StatusEnum;
 import com.devsocial.social_media.repository.UserInfoRepository;
+import com.devsocial.social_media.service.ImageService;
 import com.devsocial.social_media.service.UserInfoService;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,14 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserInfoRepository userInfoRepository;
+    private final ImageService imageService;
 
     @Autowired
-    public AuthenticationService(UserRepository userRepository,PasswordEncoder passwordEncoder,UserInfoRepository userInfoRepository) {
+    public AuthenticationService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserInfoRepository userInfoRepository, ImageService imageService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.userInfoRepository = userInfoRepository;
+        this.imageService = imageService;
     }
 
     @Transactional
@@ -44,6 +47,9 @@ public class AuthenticationService {
         userInfo.setEmail(registerDTO.getEmail());
         userInfo.setFullName(registerDTO.getFullName());
         userInfo.setStatus(StatusEnum.ACTIVE);
+
+//        imageService.createImage(null,null);
+
         userInfoRepository.save(userInfo);
     }
 }

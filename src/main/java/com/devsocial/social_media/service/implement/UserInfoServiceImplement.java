@@ -47,7 +47,9 @@ public class UserInfoServiceImplement implements UserInfoService {
             userInfo.setFullName(userInfoDTO.getFullName());
         if(userInfoDTO.getEmail()!=null)
             userInfo.setEmail(userInfoDTO.getEmail());
-        imageImplement.updateImage(userInfo,file);
+        if(file!=null && !file.isEmpty()){
+            imageImplement.updateImage(userInfo,file);
+        }
 
         userInfoRepository.save(userInfo);
         return convertToUserInfoVO(userInfo);
