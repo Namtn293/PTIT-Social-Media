@@ -13,5 +13,5 @@ import lombok.experimental.FieldDefaults;
 public class UserInfoVO {
     private String fullName;
     private String email;
-    private String avatar;
+    private Long imageId;
 }
