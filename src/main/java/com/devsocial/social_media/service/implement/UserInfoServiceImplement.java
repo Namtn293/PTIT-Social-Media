@@ -15,14 +15,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 @Service
-public class UserInfoImplement implements UserInfoService {
+public class UserInfoServiceImplement implements UserInfoService {
     private final UserInfoRepository userInfoRepository;
-    private final CloudinaryImplement cloudinaryImplement;
-    private final ImageImplement imageImplement;
+    private final CloudinaryServiceImplement cloudinaryServiceImplement;
+    private final ImagesServiceImplement imageImplement;
 
-    public UserInfoImplement(UserInfoRepository userInfoRepository, CloudinaryImplement cloudinaryImplement, ImageImplement imageImplement) {
+    public UserInfoServiceImplement(UserInfoRepository userInfoRepository, CloudinaryServiceImplement cloudinaryServiceImplement, ImagesServiceImplement imageImplement) {
         this.userInfoRepository = userInfoRepository;
-        this.cloudinaryImplement = cloudinaryImplement;
+        this.cloudinaryServiceImplement = cloudinaryServiceImplement;
         this.imageImplement = imageImplement;
     }
 
@@ -74,7 +74,7 @@ public class UserInfoImplement implements UserInfoService {
         return UserInfoVO.builder()
                 .fullName(userInfo.getFullName())
                 .email(userInfo.getEmail())
-                .avatar(userInfo.getAvatar())
+                .imageId(userInfo.getImageId())
                 .build();
     }
 
@@ -84,7 +84,7 @@ public class UserInfoImplement implements UserInfoService {
                 .id(userInfo.getId())
                 .userName(userInfo.getUserName())
                 .fullName(userInfo.getFullName())
-                .avatar(userInfo.getAvatar())
+                .imageId(userInfo.getImageId())
                 .email(userInfo.getEmail())
                 .status(userInfo.getStatus())
                 .build();

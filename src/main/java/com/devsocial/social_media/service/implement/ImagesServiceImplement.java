@@ -2,8 +2,10 @@ package com.devsocial.social_media.service.implement;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.devsocial.social_media.core.util.BusinessException;
 import com.devsocial.social_media.entity.Images;
 import com.devsocial.social_media.entity.UserInfo;
+import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.repository.ImageRepository;
 import com.devsocial.social_media.repository.UserInfoRepository;
 import com.devsocial.social_media.service.ImageService;
@@ -14,12 +16,12 @@ import java.io.IOException;
 import java.util.Map;
 
 @Service
-public class ImageImplement implements ImageService {
+public class ImagesServiceImplement implements ImageService {
     private final Cloudinary cloudinary;
     private final ImageRepository imageRepository;
     private final UserInfoRepository userInfoRepository;
 
-    public ImageImplement(Cloudinary cloudinary, ImageRepository imageRepository, UserInfoRepository userInfoRepository) {
+    public ImagesServiceImplement(Cloudinary cloudinary, ImageRepository imageRepository, UserInfoRepository userInfoRepository) {
         this.cloudinary = cloudinary;
         this.imageRepository = imageRepository;
         this.userInfoRepository = userInfoRepository;
@@ -36,24 +38,23 @@ public class ImageImplement implements ImageService {
     }
 
     @Override
-    public void deleteImage(String url) {
-        Images img = imageRepository.findByUrl(url).orElseThrow(()->new RuntimeException("Img not found"));
+    public void deleteImage(String publicId) {
         try {
             Map result = cloudinary.uploader().destroy(
-                    img.getPublicId(),
+                    publicId,
                     ObjectUtils.emptyMap()
             );
 
             System.out.println(result);
-            imageRepository.delete(img);
         }catch(Exception e){
-            throw new RuntimeException("Can't delete img");
+            throw new BusinessException(ErrorCode.FORBIDDEN);
         }
     }
 
     @Override
     public void updateImage(UserInfo userInfo, MultipartFile file) throws IOException {
-        String oldUrl = userInfo.getAvatar();
+        Images oldImg = imageRepository.findById(userInfo.getImageId())
+                .orElseThrow(()->new BusinessException(ErrorCode.IMAGE_NOT_EXIST));
 
         if(file!=null && !file.isEmpty()){
             Map uploadResult = cloudinary.uploader().upload(
@@ -62,11 +63,14 @@ public class ImageImplement implements ImageService {
             );
             String url = uploadResult.get("url").toString();
             String publicId = uploadResult.get("public_id").toString();
-            userInfo.setAvatar(url);
 
-            createImage(url,publicId);
+            Images newImg = createImage(url,publicId);
+            userInfo.setImageId(newImg.getId());
 
-            if(oldUrl!=null)deleteImage(oldUrl);
+            if(oldImg.getPublicId()!=null) {
+                deleteImage(oldImg.getPublicId());
+                imageRepository.delete(oldImg);
+            }
             System.out.println("Delete complete");
         }
     }
