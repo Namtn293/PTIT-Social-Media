@@ -14,7 +14,7 @@ public class UserInfoAdminVO {
     private Long id;
     private String userName;
     private String fullName;
-    private String avatar;
+    private Long imageId;
     private String email;
     private StatusEnum status;
 }
