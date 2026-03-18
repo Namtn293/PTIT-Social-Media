@@ -6,6 +6,7 @@ import com.devsocial.social_media.repository.UserInfoRepository;
 import com.devsocial.social_media.service.CloudinaryService;
 import com.devsocial.social_media.service.ImageService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -22,25 +23,30 @@ public class CloudinaryServiceImplement implements CloudinaryService {
         this.userInfoRepository = userInfoRepository;
         this.imageService = imageService;
     }
-
+    @Transactional
     @Override
     public String uploadFile(MultipartFile file) throws IOException {
+        String type = file.getContentType();
+        System.out.println(file.getContentType()+" "+type.equals("application/pdf"));
+        if(!type.equals("application/pdf") &&
+                !type.equals("application/vnd.openxmlformats-officedocument.wordprocessingml.document") &&
+                !type.equals("application/msword")){
+            throw new RuntimeException("Chỉ cho phép PDF, DOC, DOCX");
+        }
+
+        String originalName = file.getOriginalFilename();
+
         Map uploadResult = cloudinary.uploader().upload(
                 file.getBytes(),
-                ObjectUtils.emptyMap()
-        );
-        imageService.createImage(
-                uploadResult.get("url").toString(),
-                uploadResult.get("public_id").toString()
+                ObjectUtils.asMap(
+                        "resource_type", "raw",
+                        "folder","documents",
+                        "public_id", originalName,
+                        "use_filename", true,
+                        "unique_filename", false
+                )
         );
 
         return uploadResult.get("url").toString();
-    }
-
-    @Override
-    public String getFile(String userName) throws IOException {
-        return userInfoRepository.findByUserName(userName).
-                orElseThrow(()->new RuntimeException("user not found"))
-                .getAvatar();
     }
 }

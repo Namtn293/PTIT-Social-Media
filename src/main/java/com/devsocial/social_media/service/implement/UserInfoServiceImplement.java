@@ -74,7 +74,7 @@ public class UserInfoServiceImplement implements UserInfoService {
         return UserInfoVO.builder()
                 .fullName(userInfo.getFullName())
                 .email(userInfo.getEmail())
-                .avatar(userInfo.getAvatar())
+                .imageId(userInfo.getImageId())
                 .build();
     }
 
@@ -84,7 +84,7 @@ public class UserInfoServiceImplement implements UserInfoService {
                 .id(userInfo.getId())
                 .userName(userInfo.getUserName())
                 .fullName(userInfo.getFullName())
-                .avatar(userInfo.getAvatar())
+                .imageId(userInfo.getImageId())
                 .email(userInfo.getEmail())
                 .status(userInfo.getStatus())
                 .build();

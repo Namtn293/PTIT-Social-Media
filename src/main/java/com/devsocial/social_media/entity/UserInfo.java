@@ -18,8 +18,8 @@ public class UserInfo extends EntityBase {
     @Column(name = "EMAIL")
     private String email;
 
-    @Column(name = "AVATAR")
-    private String avatar;
+    @Column(name = "IMAGE_ID")
+    private Long imageId;
 
     @Column(name = "CLASS_ID")
     private String classId;
