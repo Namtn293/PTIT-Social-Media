@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Data
-@Table(name = "MAIN_DOCUMENTS")
+@Table(name = "MAIN_MESSAGES")
 public class Messages extends EntityBase {
     @Column(name = "USER_ID")
     private Long userId;

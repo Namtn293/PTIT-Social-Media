@@ -1,9 +1,13 @@
 package com.devsocial.social_media.core.auth.controller;
 
+import com.devsocial.social_media.core.auth.model.dto.LoginDTO;
 import com.devsocial.social_media.core.auth.model.dto.RegisterDTO;
 import com.devsocial.social_media.core.auth.service.AuthenticationService;
+import com.devsocial.social_media.core.util.BusinessException;
 import com.devsocial.social_media.core.util.ResponseUtil;
 import com.devsocial.social_media.core.util.SuccessResponse;
+import com.devsocial.social_media.enumration.ErrorCode;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,5 +28,22 @@ public class AuthenticationController {
     public SuccessResponse<String> register(@RequestBody RegisterDTO dto){
         authenticationService.register(dto);
         return ResponseUtil.ok("Register success");
+    }
+
+    @PostMapping("/login")
+    public SuccessResponse<String> login(@RequestBody LoginDTO dto){
+        return ResponseUtil.ok(authenticationService.login(dto));
+    }
+
+
+    @PostMapping("/logout")
+    public SuccessResponse<String> logout(HttpServletRequest request){
+        String authHeader=request.getHeader("Authorization");
+        if (authHeader==null || !authHeader.contains("Bearer")) {
+            throw new BusinessException(ErrorCode.TOKEN_NOT_CORRECT);
+        }
+        authHeader=authHeader.substring(7);
+        authenticationService.logout(authHeader);
+        return ResponseUtil.ok("Logout success");
     }
 }
