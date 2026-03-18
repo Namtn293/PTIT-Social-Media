@@ -24,7 +24,7 @@ public class UserInfoController {
         this.userInfoService = userInfoService;
     }
 
-    @PostMapping("get/all")
+    @GetMapping("get/all")
     public SuccessResponse<List<UserInfoAdminVO>> getAllUserInfo(){
         return ResponseUtil.ok(
                 "Get All UserInfo Success",

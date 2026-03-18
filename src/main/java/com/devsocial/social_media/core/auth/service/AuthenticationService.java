@@ -61,8 +61,11 @@ public class AuthenticationService {
         if (!passwordEncoder.matches(dto.getPassword(),user.getPassword())){
             throw new BusinessException(ErrorCode.PASSWORD_NOT_CORRECT);
         }
+        System.out.println("1");
         String token=jwtService.buildAccessToken(user);
         revokedToken(user.getId());
+        System.out.println("2");
+
         Token token1=Token.builder()
                 .token(token)
                 .userId(user.getId())
