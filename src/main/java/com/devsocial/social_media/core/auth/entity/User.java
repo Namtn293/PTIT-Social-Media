@@ -42,4 +42,8 @@ public class User extends EntityBase implements UserDetails {
     public String getUsername() {
         return this.userName;
     }
+
+    public RoleEnum getRole(){
+        return this.roleEnum;
+    }
 }
