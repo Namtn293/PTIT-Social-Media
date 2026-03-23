@@ -52,6 +52,9 @@ public class AuthenticationService {
         userInfo.setEmail(registerDTO.getEmail());
         userInfo.setFullName(registerDTO.getFullName());
         userInfo.setStatus(StatusEnum.ACTIVE);
+
+//        imageService.createImage(null,null);
+
         userInfoRepository.save(userInfo);
     }
 
