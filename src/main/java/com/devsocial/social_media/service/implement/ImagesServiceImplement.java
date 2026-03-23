@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class ImagesServiceImplement implements ImageService {
@@ -53,24 +54,25 @@ public class ImagesServiceImplement implements ImageService {
 
     @Override
     public void updateImage(UserInfo userInfo, MultipartFile file) throws IOException {
-        Images oldImg = imageRepository.findById(userInfo.getImageId())
-                .orElseThrow(()->new BusinessException(ErrorCode.IMAGE_NOT_EXIST));
+        if (file == null || file.isEmpty()) return;
 
-        if(file!=null && !file.isEmpty()){
-            Map uploadResult = cloudinary.uploader().upload(
-                    file.getBytes(),
-                    ObjectUtils.emptyMap()
-            );
-            String url = uploadResult.get("url").toString();
-            String publicId = uploadResult.get("public_id").toString();
+        Images oldImg = Optional.ofNullable(userInfo.getImageId())
+                .flatMap(imageRepository::findById)
+                .orElseGet(() -> new Images(null, null));
 
-            Images newImg = createImage(url,publicId);
-            userInfo.setImageId(newImg.getId());
+        Map uploadResult = cloudinary.uploader().upload(
+                file.getBytes(),
+                ObjectUtils.emptyMap()
+        );
+        String url = uploadResult.get("url").toString();
+        String publicId = uploadResult.get("public_id").toString();
 
-            if(oldImg.getPublicId()!=null) {
-                deleteImage(oldImg.getPublicId());
-                imageRepository.delete(oldImg);
-            }
+        Images newImg = createImage(url,publicId);
+        userInfo.setImageId(newImg.getId());
+
+        if(oldImg.getPublicId()!=null) {
+            deleteImage(oldImg.getPublicId());
+            imageRepository.delete(oldImg);
             System.out.println("Delete complete");
         }
     }
