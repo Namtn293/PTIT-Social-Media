@@ -40,7 +40,7 @@ public class UserInfoServiceImplement implements UserInfoService {
     }
     @Transactional
     @Override
-    public UserInfoVO updateInfo(String userName, UserInfoDTO userInfoDTO, MultipartFile file) throws IOException {
+    public void updateInfo(String userName, UserInfoDTO userInfoDTO, MultipartFile file) throws IOException {
         UserInfo userInfo = userInfoRepository.findByUserName(userName)
                 .orElseThrow(()->new RuntimeException("user not found"));
         if(userInfoDTO.getFullName()!=null)
@@ -52,7 +52,6 @@ public class UserInfoServiceImplement implements UserInfoService {
         }
 
         userInfoRepository.save(userInfo);
-        return convertToUserInfoVO(userInfo);
     }
 
     @Override

@@ -40,7 +40,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request,response);
             return;
         }
-
         String header=request.getHeader("Authorization");
         if (header==null || !header.startsWith("Bearer")){
             filterChain.doFilter(request,response);
@@ -70,6 +69,5 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 ThreadContext.setUserDetail(userDetails);
             }
         }
-        filterChain.doFilter(request,response);
-    }
+        filterChain.doFilter(request,response);}
 }
