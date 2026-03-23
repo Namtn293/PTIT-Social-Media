@@ -9,7 +9,7 @@ public class ThreadContext {
         return userHolder.get();
     }
 
-    public static void set(UserDetails userDetails){
+    public static void setUserDetail(UserDetails userDetails){
         userHolder.set(userDetails);
     }
 }
