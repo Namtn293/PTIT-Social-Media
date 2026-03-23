@@ -17,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/user-info")
+@CrossOrigin(origins = "http://localhost:5173")
 public class UserInfoController {
     private final UserInfoService userInfoService;
 
@@ -44,15 +45,16 @@ public class UserInfoController {
             value = "update/{userName}",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public SuccessResponse<UserInfoVO> updateUserInfo(
+    public SuccessResponse<String> updateUserInfo(
             @PathVariable String userName,
             @RequestPart("data") UserInfoDTO userInfoDTO,
             @RequestPart(value = "file",required = false) MultipartFile file
     ) throws IOException {
         System.out.println(file.getName());
+        userInfoService.updateInfo(userName,userInfoDTO,file);
         return ResponseUtil.ok(
                 "Update UserInfo Success",
-                userInfoService.updateInfo(userName,userInfoDTO,file)
+                null
         );
     }
 
