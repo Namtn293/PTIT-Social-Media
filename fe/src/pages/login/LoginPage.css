@@ -1,0 +1,31 @@
+.login{
+    background-size:cover;
+    width:100vw;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center
+}
+
+.form_login{
+    height:550px;
+    width: 400px;
+    background-color:white;
+    display: flex;
+    flex-direction: column;
+    border-radius:10px;
+    background:rgba(255, 255, 255, 0.95);
+    text-align: center;
+    padding: 40px;
+}
+.ant-input,
+.ant-input-password {
+    background-color: white !important;
+}
+
+.ant-input:focus,
+.ant-input:hover,
+.ant-input-password:focus,
+.ant-input-password:hover {
+    background-color: white !important;
+}
