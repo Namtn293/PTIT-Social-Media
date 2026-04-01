@@ -6,7 +6,7 @@ function PageContent(){
         <Routes>
             {/* Dành cho home của admin và user */}
             <Route path="/" element={<HomeContent/>}/>
-
+            
             
         </Routes>
     )

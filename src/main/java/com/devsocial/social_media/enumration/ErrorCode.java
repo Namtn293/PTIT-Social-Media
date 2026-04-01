@@ -17,7 +17,6 @@ public enum ErrorCode {
     TOKEN_EXPIRED("401","Token expired"),
     TOKEN_INVAlID("401","Token invalid"),
 
-
     ;
 
     private final String code;

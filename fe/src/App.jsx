@@ -3,10 +3,10 @@ import './App.css'
 import LoginPage from "./pages/login/LoginPage"
 import { BrowserRouter, Route, Routes,Navigate } from 'react-router-dom';
 import RegisterPage from './pages/register/RegisterPage';
-import HomeContent from './pages/home/HomeContent';
-import Header from './components/header/Header';
+import Header from './components/header/HeaderUser';
 import SideBar from './components/sidebar/SideBar';
 import PageContent from './components/pagecontent/PageContent';
+import HeaderAdmin from './components/header/HeaderAdmin';
 function App() {
 const theme={
     token:{
@@ -29,7 +29,11 @@ return (
                             height:"100vh"
                         }}>
                             <SideBar/>
-                            <PageContent/>
+                            <div className='in-content'>
+                                <HeaderAdmin/>
+                                <PageContent/>
+                            </div>
+                            
                         </div>
                     ):(
                         <div style={{

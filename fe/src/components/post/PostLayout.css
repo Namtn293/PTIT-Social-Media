@@ -1,0 +1,95 @@
+.post-card {
+    background: #ffffff;
+    border-radius: 16px;
+    margin-top:20px;
+    padding:16px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    max-width: 810px;
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-info {
+    flex: 1;
+    margin-left: 12px;
+}
+
+.name-time {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.name-post {
+    font-weight: bold;
+    font-size: 18px;
+}
+
+
+.time-post {
+    color: gray;
+    font-size: 14px;
+}
+
+.post-title {
+    display: inline-block;
+    margin-top: 6px;
+    background: #fcd5d5;
+    color: #c0392b;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.post-content {
+    margin-top: 12px;
+    font-size: 18px;
+    line-height: 1.5;
+}
+
+.post-content span {
+    color: #1e40af;
+    font-weight: 600;
+}
+
+/* DIVIDER */
+.divider {
+    height: 1px;
+    background: #ddd;
+    margin: 12px 0;
+}
+
+.post-actions {
+    display: flex;
+    justify-content: first baseline;
+    color: #555;
+}
+
+.action {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: 0.2s;
+}
+
+.action:hover {
+    color: black;
+}
+
+.action.active {
+    color: #2563eb;
+    font-weight: bold;
+}
