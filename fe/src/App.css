@@ -76,3 +76,9 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+.in-content{
+    display: flex;
+    flex-direction: column;
+    flex:1;
+}
