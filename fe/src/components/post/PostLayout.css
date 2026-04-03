@@ -4,7 +4,6 @@
     margin-top:20px;
     padding:16px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-    max-width: 810px;
 }
 
 .post-header {
@@ -45,8 +44,8 @@
 .post-title {
     display: inline-block;
     margin-top: 6px;
-    background: #fcd5d5;
-    color: #c0392b;
+    background: #caffd5;
+    color: #6c8b7b;
     padding: 4px 10px;
     border-radius: 20px;
     font-size: 14px;
