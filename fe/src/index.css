@@ -1,0 +1,14 @@
+:root{
+    --main-background-color: linear-gradient(135deg, #fdfdfd, #9881ff);
+    --main-text-color: black;
+    --main-text-color-active: black;
+    --main-text-color-hover: rgb(1, 11, 200);
+}
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px white inset !important;
+    -webkit-text-fill-color: #333 !important; /* Màu chữ sau khi điền */
+    transition: background-color 5000s ease-in-out 0s;
+}
