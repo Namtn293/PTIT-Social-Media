@@ -6,7 +6,6 @@ import PostLayout from "../../components/post/PostLayout"
 import MessageContent from "../../components/message/MessageContent"
 import { jwtDecode } from "jwt-decode"
 import { Client } from "@stomp/stompjs"
-import MessageApi from "../../api/MessageApi"
 import SockJS from "sockjs-client"
 
 
