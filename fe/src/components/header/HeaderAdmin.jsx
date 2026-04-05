@@ -19,6 +19,8 @@ function HeaderAdmin(){
     const title=titleMap[location.pathname];
 
     const onFinish=()=>{
+        localStorage.removeItem("token");
+        localStorage.removeItem("role"); 
         navigate("/login");
     }
 
