@@ -134,9 +134,9 @@ function Community(){
 
     return(
         <div className="community-container">
-            <div style={{marginLeft:"20px",fontWeight:"600",fontSize:"22px"}}>Góc trao đổi thảo luận dành cho tất cả sinh viên</div>
             <div className="main-message-position">
                 <div className="message-position">
+                    <div style={{marginLeft:"10px",fontWeight:"600",fontSize:"22px",padding:"10px"}}>Góc thông tin PTIT</div>
                     <div className="message-content">
                         {onlineMessage.map((item,index) =>{
                             return <MessageContent
