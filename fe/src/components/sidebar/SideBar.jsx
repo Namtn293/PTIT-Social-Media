@@ -3,9 +3,10 @@ import { Layout,Menu } from "antd";
 const {Sider}=Layout;
 import logo from "../../assets/logo.png"
 import { AuditOutlined, FormOutlined, HomeOutlined, LogoutOutlined, MessageOutlined, UserOutlined }  from "@ant-design/icons"
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 function SideBar(){
     const navigate=useNavigate();
+    const location=useLocation();
     const menuItems=[
         {
             key:"/",
@@ -40,6 +41,7 @@ function SideBar(){
             <Sider>
                 <Menu 
                 mode="inline"
+                selectedKeys={[location.pathname]}
                 items={menuItems} style={{width:"250px",display:"flex",flexDirection:"column",textAlign:"left"}} onClick={(e)=>{navigate(e.key)}}>
                 </Menu>
             </Sider>

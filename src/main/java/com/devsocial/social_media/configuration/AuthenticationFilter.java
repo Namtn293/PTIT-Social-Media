@@ -40,6 +40,10 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request,response);
             return;
         }
+        if (request.getServletPath().contains("/ws")){
+            filterChain.doFilter(request,response);
+            return;
+        }
         String header=request.getHeader("Authorization");
         if (header==null || !header.startsWith("Bearer")){
             filterChain.doFilter(request,response);

@@ -43,6 +43,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/save/**").hasAnyRole("STUDENT","ADMIN")
                                 .requestMatchers("/api/posts/**").hasAnyRole("STUDENT","ADMIN")
                                 .requestMatchers("/api/document/**").hasAnyRole("STUDENT","ADMIN")
+                                .requestMatchers("/ws/**").permitAll()
                                 .anyRequest()
                                 .authenticated()
 //                        .anyRequest().permitAll()
