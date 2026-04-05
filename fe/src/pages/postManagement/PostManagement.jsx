@@ -7,9 +7,9 @@ function PostManagement(){
     const [posts, setPosts] = useState([]);
     const columns = [
         {
-            title: "ID",
-            dataIndex: "id",
-            key: "id",
+            title: "STT",
+            dataIndex: "idx",
+            key: "idx",
             width: 70
         },
         {
@@ -73,15 +73,21 @@ function PostManagement(){
         fetchPosts();
     },[]);
 
-    useEffect(()=>{
-        const token = localStorage.getItem("token");
-        console.log("Token",token);
-    })
+    // useEffect(()=>{
+    //     const token = localStorage.getItem("token");
+    //     console.log("Token",token);
+    // })
 
     const fetchPosts = async ()=>{
         try{
             const response = await postApi.getAll();
-            setPosts(response.data.data);
+
+            const postsWithIndex = response.data.data.map((post,index)=>({
+                ...post,
+                idx: index + 1
+            }))
+
+            setPosts(postsWithIndex);
         }catch(error){
             console.error("Lỗi gọi API:", error);
         }
