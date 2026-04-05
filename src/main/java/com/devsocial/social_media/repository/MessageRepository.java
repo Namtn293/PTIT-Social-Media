@@ -10,5 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Messages,Long> {
-    Optional<Messages> findById(Long id) throws BusinessException;
+    List<Messages> findAllByOrderByCreatedAtAsc();
+
 }

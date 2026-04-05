@@ -5,12 +5,19 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "MAIN_MESSAGES")
 public class Messages extends EntityBase {
     @Column(name = "USER_ID")
@@ -20,10 +27,11 @@ public class Messages extends EntityBase {
     private String content;
 
     @Column(name = "CREATED_AT")
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     @PrePersist
     public void prePersist(){
-        this.createdAt=LocalDateTime.now();
+        DateTimeFormatter dateTimeFormatter=DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy");
+        this.createdAt= LocalDateTime.now().format(dateTimeFormatter);
     }
 }

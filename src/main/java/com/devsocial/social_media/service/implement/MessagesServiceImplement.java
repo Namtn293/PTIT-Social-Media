@@ -2,61 +2,87 @@ package com.devsocial.social_media.service.implement;
 
 import com.devsocial.social_media.core.util.BusinessException;
 import com.devsocial.social_media.entity.Messages;
+import com.devsocial.social_media.entity.UserInfo;
 import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.model.dto.MessageDTO;
-import com.devsocial.social_media.model.dto.MessageUpdateDTO;
+import com.devsocial.social_media.model.vo.MessageVO;
+import com.devsocial.social_media.repository.ImageRepository;
 import com.devsocial.social_media.repository.MessageRepository;
+import com.devsocial.social_media.repository.UserInfoRepository;
 import com.devsocial.social_media.service.MessagesService;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class MessagesServiceImplement implements MessagesService {
     private final MessageRepository messageRepository;
+    private final UserInfoRepository userInfoRepository;
+    private final ImageRepository imageRepository;
 
-    public MessagesServiceImplement(MessageRepository messageRepository) {
+    public MessagesServiceImplement(ImageRepository imageRepository, UserInfoRepository userInfoRepository,
+            MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
-    }
-
-
-    @Override
-    public Messages createMessage(MessageDTO messageDTO) {
-        Messages message = new Messages();
-        message.setContent(messageDTO.getContent());
-        message.setUserId(messageDTO.getUserId());
-        message.prePersist();
-        messageRepository.save(message);
-        return message;
+        this.userInfoRepository = userInfoRepository;
+        this.imageRepository = imageRepository;
     }
 
     @Override
-    public Messages updateMessage(Long id, MessageUpdateDTO messageUpdateDTO) throws BusinessException {
-        Messages message = messageRepository.findById(id)
-                .orElseThrow(()->new BusinessException(ErrorCode.MESSAGE_NOT_EXIST));
-        if(!message.getUserId().equals(messageUpdateDTO.getUserId())){
-            throw new BusinessException(ErrorCode.FORBIDDEN);
+    public MessageVO saveMessage(MessageDTO messageDTO) {
+        Messages messages = Messages.builder()
+                .userId(messageDTO.getUserId())
+                .content(messageDTO.getContent())
+                .build();
+        messageRepository.save(messages);
+
+        String fullName = "Cộng đồng";
+        String avatar = null;
+        if (messageDTO.getUserId() != null) {
+            UserInfo userInfo = userInfoRepository.findById(messageDTO.getUserId()).orElse(null);
+            if (userInfo != null) {
+                if (userInfo.getFullName() != null) fullName = userInfo.getFullName();
+                if (userInfo.getImageId() != null) {
+                    avatar = imageRepository.findAvatarById(userInfo.getImageId());
+                }
+            }
         }
-        message.setContent(messageUpdateDTO.getContent());
-        messageRepository.save(message);
-        return message;
+
+        return MessageVO.builder()
+                .userId(messageDTO.getUserId() == null ? 0L : messageDTO.getUserId())
+                .content(messageDTO.getContent())
+                .timestamp(messages.getCreatedAt())
+                .fullName(fullName)
+                .avatar(avatar)
+                .build();
     }
 
     @Override
-    public List<Messages> getAll() {
-        List<Messages> messages = messageRepository.findAll();
-        messages.sort(Comparator.comparing(Messages::getCreatedAt));
-        return messages;
-    }
-
-    @Override
-    public void deleteMessage(Long id,Long userId) throws BusinessException {
-        Messages message = messageRepository.findById(id)
-                .orElseThrow(()->new BusinessException(ErrorCode.MESSAGE_NOT_EXIST));
-        if(!message.getUserId().equals(userId)){
-            throw new BusinessException(ErrorCode.FORBIDDEN);
-        }
-        messageRepository.delete(message);
+    public List<MessageVO> getAllMessages() {
+        List<Messages> list = messageRepository.findAllByOrderByCreatedAtAsc();
+        List<MessageVO> messageVOS = new ArrayList<>();
+        list.forEach(c -> {
+            String fullName = "Cộng đồng";
+            String avatar = null;
+            if (c.getUserId() != null) {
+                UserInfo userInfo = userInfoRepository.findById(c.getUserId()).orElse(null);
+                if (userInfo != null) {
+                    if (userInfo.getFullName() != null) fullName = userInfo.getFullName();
+                    if (userInfo.getImageId() != null) {
+                        avatar = imageRepository.findAvatarById(userInfo.getImageId());
+                    }
+                }
+            }
+            
+            MessageVO messageVO = MessageVO.builder()
+                    .userId(c.getUserId() == null ? 0L : c.getUserId())
+                    .content(c.getContent())
+                    .timestamp(c.getCreatedAt())
+                    .fullName(fullName)
+                    .avatar(avatar)
+                    .build();
+            messageVOS.add(messageVO);
+        });
+        return messageVOS;
     }
 }
