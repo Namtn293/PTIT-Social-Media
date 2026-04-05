@@ -136,4 +136,9 @@ public class PostServiceImplement implements PostService {
         List<Posts> list=postsRepository.findSavePosts(id);
         return convertToVo(list);
     }
+
+    @Override
+    public List<PostVO> getAllPosts() {
+        return convertToVo(postsRepository.findAll());
+    }
 }
