@@ -1,0 +1,28 @@
+.ant-menu-inline {
+    border-right: none !important; 
+    padding: 10px; 
+}
+
+.sidebar{
+    width: 250px;
+    background-color: white;
+}
+
+.ant-menu-item {
+    height: 48px !important;
+    line-height: 48px !important;
+    margin-block: 4px !important; 
+    border-radius: 8px !important; 
+    font-weight: 550; 
+    font-size: 16px;
+}
+
+.ant-menu-item-selected {
+    background-color: #e6f4ff !important; 
+    color: #1677ff !important;
+}
+
+.ant-menu-item .anticon {
+    font-size: 18px; /* Icon to hơn một xíu */
+    margin-right: 12px;
+}
