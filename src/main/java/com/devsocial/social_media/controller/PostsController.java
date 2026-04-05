@@ -63,4 +63,12 @@ public class PostsController {
     public SuccessResponse<List<PostVO>> getMySavePosts(){
         return ResponseUtil.ok("Get My Like Post Success",postService.getSavePosts());
     }
+
+    @GetMapping("/all")
+    public SuccessResponse<List<PostVO>> getAllPost(){
+        return ResponseUtil.ok(
+                "get all post success",
+                postService.getAllPosts()
+        );
+    }
 }

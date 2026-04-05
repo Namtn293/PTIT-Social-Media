@@ -29,6 +29,7 @@ function LoginPage(){
             } else{
                 message.success("Đăng nhập thành công!");
                 const jwt=jwtDecode(response.data.message);
+                localStorage.setItem("token", response.data.message); 
                 localStorage.setItem("role",jwt.roles[0]);
                 navigate("/");
             }

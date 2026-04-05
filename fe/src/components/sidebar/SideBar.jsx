@@ -28,9 +28,9 @@ function SideBar(){
             label:"Quản lý cộng đồng",
         },
         {
-            key:"/bao-cao-bai-viet",
+            key:"/quan-ly-thong-bao",
             icon:<AuditOutlined/>,
-            label:"Quản lý báo cáo",
+            label:"Quản lý thông báo",
         },
 
     ]
