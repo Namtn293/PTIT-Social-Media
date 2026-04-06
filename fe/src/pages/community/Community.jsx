@@ -1,5 +1,5 @@
 import "./Community.css"
-import { Button, Input } from "antd"
+import { Button, Input,Spin } from "antd"
 import { useState, useEffect, useRef } from "react"
 import { PaperClipOutlined, SendOutlined } from "@ant-design/icons"
 import MessageContent from "../../components/message/MessageContent"
@@ -14,6 +14,7 @@ function Community() {
     const [inputValue, setInputValue] = useState("");
     const stompClientRef = useRef(null);
     const messageEndRef = useRef(null);
+    const [isLoading,setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -22,6 +23,8 @@ function Community() {
                 setMessages(response.data.data);
             } catch (err) {
                 console.log("Lỗi load tin nhắn " + err);
+            } finally {
+                setIsLoading(false);
             }
         }
         fetchData();
@@ -131,19 +134,27 @@ function Community() {
         <div className="community-container">
             <div className="main-message-position">
                 <div className="message-position">
-                    <div style={{ marginLeft: "10px", fontWeight: "600", fontSize: "22px", padding: "10px" }}>Góc thông tin PTIT</div>
+                    <div style={{ marginLeft: "10px",fontWeight:"600",fontSize:"22px",padding:"10px" }}>Góc thông tin PTIT</div>
                     <div className="message-content">
-                        {messages.map((item, index) => {
-                            return <MessageContent
-                                key={index}
-                                avatar={item.avatar || "https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-12.jpg"}
-                                name={item.fullName}
-                                message={item.content}
-                                timestamp={item.timestamp}
-                                check={item.userId == localStorage.getItem("userId")}
-                            />
-                        })}
-                        <div ref={messageEndRef} />
+                        {isLoading ? (
+                            <div style={{ display: "flex",justifyContent:"center",alignItems:"center",height: "100%" }}>
+                                <Spin tip="Đang tải tin nhắn..." size="large" />
+                            </div>
+                        ) : (
+                            <>
+                                {messages.map((item, index) => {
+                                    return <MessageContent
+                                        key={index}
+                                        avatar={item.avatar || "https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-12.jpg"}
+                                        name={item.fullName}
+                                        message={item.content}
+                                        timestamp={item.timestamp}
+                                        check={item.userId == localStorage.getItem("userId")}
+                                    />
+                                })}
+                                <div ref={messageEndRef} />
+                            </>
+                        )}
                     </div>
 
                     <div className="text-message">
