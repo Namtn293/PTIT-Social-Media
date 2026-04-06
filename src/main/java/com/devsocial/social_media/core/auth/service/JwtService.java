@@ -36,6 +36,7 @@ public class JwtService {
     public String buildToken(Map<String, Object> extraClaim, UserDetails userDetails, long expiration) {
         User user = (User) userDetails;
         extraClaim.put("roles", java.util.List.of("ROLE_" + user.getRoleEnum().name()));
+        extraClaim.put("userId",user.getId());
         return Jwts.builder()
                 .setClaims(extraClaim)
                 .setExpiration(new Date(System.currentTimeMillis() + expiration))

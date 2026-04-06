@@ -16,7 +16,8 @@ public enum ErrorCode {
     TOKEN_NOT_EXIST("404","Token not exist"),
     TOKEN_EXPIRED("401","Token expired"),
     TOKEN_INVAlID("401","Token invalid"),
-
+    CLASS_NOT_EXIST("404","Class not exist"),
+    MAJOR_NOT_EXIST("404","Major not exist"),
     ;
 
     private final String code;

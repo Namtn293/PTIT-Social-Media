@@ -15,4 +15,5 @@ public class MessageVO {
     private String fullName;
     private String content;
     private Long userId;
+    private String userName;
 }

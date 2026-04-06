@@ -1,5 +1,7 @@
 package com.devsocial.social_media.service.implement;
 
+import com.devsocial.social_media.core.auth.entity.User;
+import com.devsocial.social_media.core.auth.repository.UserRepository;
 import com.devsocial.social_media.core.util.BusinessException;
 import com.devsocial.social_media.entity.Messages;
 import com.devsocial.social_media.entity.UserInfo;
@@ -20,12 +22,14 @@ public class MessagesServiceImplement implements MessagesService {
     private final MessageRepository messageRepository;
     private final UserInfoRepository userInfoRepository;
     private final ImageRepository imageRepository;
+    private final UserRepository userRepository;
 
-    public MessagesServiceImplement(ImageRepository imageRepository, UserInfoRepository userInfoRepository,
+    public MessagesServiceImplement(UserRepository userRepository,ImageRepository imageRepository, UserInfoRepository userInfoRepository,
             MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
         this.userInfoRepository = userInfoRepository;
         this.imageRepository = imageRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -63,14 +67,16 @@ public class MessagesServiceImplement implements MessagesService {
         List<MessageVO> messageVOS = new ArrayList<>();
         list.forEach(c -> {
             String fullName = "Cộng đồng";
-            String avatar = null;
+            String avatar = null,userName="";
             if (c.getUserId() != null) {
-                UserInfo userInfo = userInfoRepository.findById(c.getUserId()).orElse(null);
+                User user=userRepository.findById(c.getUserId()).orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST));
+                UserInfo userInfo = userInfoRepository.findByUserName(user.getUsername()).orElse(null);
                 if (userInfo != null) {
                     if (userInfo.getFullName() != null) fullName = userInfo.getFullName();
                     if (userInfo.getImageId() != null) {
                         avatar = imageRepository.findAvatarById(userInfo.getImageId());
                     }
+                    userName=userInfo.getUserName();
                 }
             }
             
@@ -80,6 +86,7 @@ public class MessagesServiceImplement implements MessagesService {
                     .timestamp(c.getCreatedAt())
                     .fullName(fullName)
                     .avatar(avatar)
+                    .userName(userName)
                     .build();
             messageVOS.add(messageVO);
         });

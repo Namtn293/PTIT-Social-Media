@@ -1,10 +1,16 @@
 package com.devsocial.social_media.service.implement;
 
+import com.devsocial.social_media.core.util.BusinessException;
+import com.devsocial.social_media.entity.Classes;
+import com.devsocial.social_media.entity.Major;
 import com.devsocial.social_media.entity.UserInfo;
+import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.enumration.StatusEnum;
 import com.devsocial.social_media.model.dto.UserInfoDTO;
 import com.devsocial.social_media.model.vo.UserInfoAdminVO;
 import com.devsocial.social_media.model.vo.UserInfoVO;
+import com.devsocial.social_media.repository.ClassesRepository;
+import com.devsocial.social_media.repository.MajorRepository;
 import com.devsocial.social_media.repository.UserInfoRepository;
 import com.devsocial.social_media.service.UserInfoService;
 import org.springframework.stereotype.Service;
@@ -19,11 +25,15 @@ public class UserInfoServiceImplement implements UserInfoService {
     private final UserInfoRepository userInfoRepository;
     private final CloudinaryServiceImplement cloudinaryServiceImplement;
     private final ImagesServiceImplement imageImplement;
+    private final MajorRepository majorRepository;
+    private final ClassesRepository classesRepository;
 
-    public UserInfoServiceImplement(UserInfoRepository userInfoRepository, CloudinaryServiceImplement cloudinaryServiceImplement, ImagesServiceImplement imageImplement) {
+    public UserInfoServiceImplement(ClassesRepository classesRepository,MajorRepository majorRepository,UserInfoRepository userInfoRepository, CloudinaryServiceImplement cloudinaryServiceImplement, ImagesServiceImplement imageImplement) {
         this.userInfoRepository = userInfoRepository;
         this.cloudinaryServiceImplement = cloudinaryServiceImplement;
         this.imageImplement = imageImplement;
+        this.classesRepository = classesRepository;
+        this.majorRepository = majorRepository;
     }
 
     @Override
@@ -34,9 +44,9 @@ public class UserInfoServiceImplement implements UserInfoService {
     }
 
     @Override
-    public UserInfoVO getUserInfo(String userName) {
-        return convertToUserInfoVO(userInfoRepository.findByUserName(userName)
-                .orElseThrow(()->new RuntimeException("user not found"))) ;
+    public UserInfoAdminVO getUserInfo(String userName) {
+        return convertToUserInfoAdminVO(userInfoRepository.findByUserName(userName)
+                .orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST))) ;
     }
     @Transactional
     @Override
@@ -81,6 +91,8 @@ public class UserInfoServiceImplement implements UserInfoService {
 
     @Override
     public UserInfoAdminVO convertToUserInfoAdminVO(UserInfo userInfo) {
+        Classes classes=classesRepository.findById(userInfo.getClassId()).orElseThrow(()-> new BusinessException(ErrorCode.CLASS_NOT_EXIST));
+        Major major=majorRepository.findById(classes.getMajorId()).orElseThrow(()-> new BusinessException(ErrorCode.MAJOR_NOT_EXIST));
         return UserInfoAdminVO.builder()
                 .id(userInfo.getId())
                 .userName(userInfo.getUserName())
@@ -88,6 +100,7 @@ public class UserInfoServiceImplement implements UserInfoService {
                 .imageId(userInfo.getImageId())
                 .email(userInfo.getEmail())
                 .status(userInfo.getStatus())
+                .major(major.getMajorName())
                 .build();
     }
 

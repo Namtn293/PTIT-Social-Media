@@ -22,9 +22,10 @@ public class UserInfo extends EntityBase {
     private Long imageId;
 
     @Column(name = "CLASS_ID")
-    private String classId;
+    private Long classId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS")
     private StatusEnum status;
+
 }

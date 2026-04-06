@@ -57,6 +57,7 @@ function HomeContent() {
         "comments": 48,
         "saves": 30,
         "report": 0,
+        "userName":"admin",
         "content": "Có anh chị khóa trên nào còn bộ tài liệu ôn thi Giải tích 2 của thầy Tùng không ạ? Càng gần thi em càng thấy kiến thức bay màu dần đều, cứu em với! 😭"
     },
     {
@@ -69,6 +70,7 @@ function HomeContent() {
         "comments": 15,
         "saves": 5,
         "report": 2,
+        "userName":"admin",
         "content": "Mọi người ơi, hôm nay căng tin A2 có món sườn xào chua ngọt đỉnh lắm nhé. Mỗi tội phải xếp hàng hơi lâu từ cổng đỏ vào, ai đi ăn thì tranh thủ đi sớm nha."
     },
     {
@@ -81,6 +83,7 @@ function HomeContent() {
         "comments": 10,
         "saves": 2,
         "report": 0,
+        "userName":"admin",
         "content": "Mình có đánh rơi một chiếc thẻ sinh viên tên Lê Minh Đức ở khu vực sân bóng lúc 5h chiều nay. Ai nhặt được cho mình xin lại với ạ, mình xin cảm ơn và hậu tạ một chầu trà sữa!"
     },
     {
@@ -93,6 +96,7 @@ function HomeContent() {
         "comments": 85,
         "saves": 150,
         "report": 0,
+        "userName":"admin",
         "content": "Chào các em khóa dưới, mình vừa hoàn thành kỳ thực tập tại Viettel. Có vài tips về việc chuẩn bị CV và ôn tập kiến thức nền tảng (OOP, SQL, Data Structure) muốn chia sẻ cho các bạn D22, D23 đang lo lắng. Ai quan tâm không?"
     },
     {
@@ -105,6 +109,7 @@ function HomeContent() {
         "comments": 120,
         "saves": 45,
         "report": 0,
+        "userName":"admin",
         "content": "🔥 [RECRUITMENT] Bạn đam mê nhiếp ảnh? Bạn thích viết lách hay edit video? Đừng bỏ lỡ cơ hội trở thành một mẩu của gia đình S-Media trong đợt tuyển thành viên lớn nhất năm nay nhé!"
     },
     {
@@ -117,6 +122,7 @@ function HomeContent() {
         "comments": 60,
         "saves": 3,
         "report": 5,
+        "userName":"admin",
         "content": "Web trường mình lại 'nghẻo' rồi hả mọi người? Em canh từ 12h đêm đến giờ vẫn chưa vào được để đăng ký môn học phần. Có ai bị giống em không?"
     }
     ];

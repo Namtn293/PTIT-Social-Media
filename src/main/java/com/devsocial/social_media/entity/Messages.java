@@ -31,7 +31,7 @@ public class Messages extends EntityBase {
 
     @PrePersist
     public void prePersist(){
-        DateTimeFormatter dateTimeFormatter=DateTimeFormatter.ofPattern("HH:mm dd-MM-yyyy");
+        DateTimeFormatter dateTimeFormatter=DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy");
         this.createdAt= LocalDateTime.now().format(dateTimeFormatter);
     }
 }
