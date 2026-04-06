@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface UserInfoService {
     List<UserInfoAdminVO> getAllUserInfo();
-    UserInfoVO getUserInfo(String userName);
+    UserInfoAdminVO getUserInfo(String userName);
     void updateInfo(String userName, UserInfoDTO userInfoDTO, MultipartFile file) throws IOException;
     void banUser(String UserName);
     void activeUser(String UserName);

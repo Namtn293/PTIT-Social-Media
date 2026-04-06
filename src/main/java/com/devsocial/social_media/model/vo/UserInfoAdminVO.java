@@ -17,4 +17,5 @@ public class UserInfoAdminVO {
     private Long imageId;
     private String email;
     private StatusEnum status;
+    private String major;
 }

@@ -1,7 +1,6 @@
 import Header from "../../components/header/HeaderUser";
 import PageContent from "../../components/pagecontent/PageContent";
 import SideBar from "../../components/sidebar/SideBar";
-import HomeContent from "./HomeContent";
 
 function homePage(){
 return  (<BrowserRouter>

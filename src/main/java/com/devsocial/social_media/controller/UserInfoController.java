@@ -34,7 +34,7 @@ public class UserInfoController {
     }
 
     @PostMapping("get/{userName}")
-    public SuccessResponse<UserInfoVO> getUserInfo(@PathVariable String userName) {
+    public SuccessResponse<UserInfoAdminVO> getUserInfo(@PathVariable String userName) {
         return ResponseUtil.ok(
               "Get UserInfo Success",
                 userInfoService.getUserInfo(userName)

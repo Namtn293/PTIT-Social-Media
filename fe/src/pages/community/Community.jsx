@@ -150,6 +150,7 @@ function Community() {
                                         message={item.content}
                                         timestamp={item.timestamp}
                                         check={item.userId == localStorage.getItem("userId")}
+                                        userName={item.userName}
                                     />
                                 })}
                                 <div ref={messageEndRef} />
