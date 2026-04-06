@@ -24,15 +24,6 @@ public class WebSocketChatController {
     @MessageMapping("/chat-community")
     @SendTo("/topic/public")
     public MessageVO chatMessage(@Payload MessageDTO messageDTO, Principal principal){
-        if (principal instanceof UsernamePasswordAuthenticationToken) {
-            UsernamePasswordAuthenticationToken authToken = (UsernamePasswordAuthenticationToken) principal;
-            if (authToken.getPrincipal() instanceof com.devsocial.social_media.core.auth.entity.User) {
-                User user = (User) authToken.getPrincipal();
-
-                Long profileId = userInfoRepository.findIdByUserName(user.getUsername()).orElse(null);
-                messageDTO.setUserId(profileId);
-            }
-        }
         return messagesService.saveMessage(messageDTO);
     }
 }

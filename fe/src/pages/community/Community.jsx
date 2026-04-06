@@ -2,12 +2,11 @@ import "./Community.css"
 import { Button, Input } from "antd"
 import { useState, useEffect, useRef } from "react"
 import { PaperClipOutlined, SendOutlined } from "@ant-design/icons"
-import PostLayout from "../../components/post/PostLayout"
 import MessageContent from "../../components/message/MessageContent"
 import { jwtDecode } from "jwt-decode"
 import { Client } from "@stomp/stompjs"
 import SockJS from "sockjs-client"
-
+import MessageApi from "../../api/MessageApi"
 
 function Community() {
     const [messages, setMessages] = useState([])
@@ -15,12 +14,6 @@ function Community() {
     const [inputValue, setInputValue] = useState("");
     const stompClientRef = useRef(null);
     const messageEndRef = useRef(null);
-    const getUserId = () => {
-        const token = localStorage.getItem("token");
-        if (!token) return null;
-        const decoded = jwtDecode(token);
-        return decoded.userId;
-    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -71,7 +64,7 @@ function Community() {
     const sendMessage = () => {
         if (!inputValue.trim()) return;
         if (!stompClientRef.current?.connected) return;
-        const messageDTO = { userId: getUserId(), content: inputValue };
+        const messageDTO = { userId: localStorage.getItem("userId"), content: inputValue };
         stompClientRef.current.publish({
             destination: "/app/chat-community",
             body: JSON.stringify(messageDTO),
@@ -134,90 +127,6 @@ function Community() {
         },
     ];
 
-
-    const onlineMessage = [
-        {
-            id: "1",
-            avatar: "https://i.pravatar.cc/150?u=11",
-            name: "Nguyễn Văn Hùng",
-            classes: "D23CQCN03-A",
-            message: "Mọi người ơi, ai làm bài Java Spring chưa 😭",
-            timestamp: "12:30 04-04-2026",
-        },
-        {
-            id: "2",
-            avatar: "https://i.pravatar.cc/150?u=12",
-            name: "Trần Minh Quân",
-            classes: "D23CQCN06-B",
-            message: "Bài nào thế bro, gửi xem nào",
-            timestamp: "12:30 04-04-2026",
-        },
-        {
-            id: "3",
-            avatar: "https://i.pravatar.cc/150?u=13",
-            name: "Phạm Thu Hà",
-            classes: "D23CQCN01-A",
-            message: "T đang làm dở phần login bằng JWT nè",
-            timestamp: "12:30 04-04-2026",
-        },
-        {
-            id: "4",
-            avatar: "https://i.pravatar.cc/150?u=14",
-            name: "Lê Đức Anh",
-            classes: "D23CQCN05-C",
-            message: "JWT khó vãi, t debug mãi không ra 😩",
-            timestamp: "12:30 04-04-2026",
-        },
-        {
-            id: "5",
-            avatar: "https://i.pravatar.cc/150?u=15",
-            name: "Hoàng Hải Nam",
-            classes: "D23CQCN02-B",
-            message: "Ai cần code mẫu không, t share cho",
-            timestamp: "12:30 04-04-2026",
-        },
-        {
-            id: "6",
-            avatar: "https://i.pravatar.cc/150?u=16",
-            name: "Đỗ Thị Mai",
-            classes: "D23CQAT01-B",
-            message: "Cho mình xin với ạ 🙏",
-            timestamp: "12:30 04-04-2026",
-        },
-        {
-            id: "7",
-            avatar: "https://i.pravatar.cc/150?u=17",
-            name: "Vũ Thành Đạt",
-            classes: "D23CQVT03-A",
-            message: "Mai kiểm tra rồi mà chưa học gì luôn 💀",
-            timestamp: "12:30 04-04-2026",
-        },
-        {
-            id: "8",
-            avatar: "https://i.pravatar.cc/150?u=18",
-            name: "Bùi Quang Huy",
-            classes: "D23CQCN07-D",
-            message: "Đi ngủ đi mai tính tiếp 😂",
-            timestamp: "12:30 04-04-2026",
-        },
-        {
-            id: "9",
-            avatar: "https://i.pravatar.cc/150?u=19",
-            name: "Nguyễn Thị Lan",
-            classes: "D23CQCN04-B",
-            message: "Ai học frontend không, React khó quá",
-            timestamp: "12:30 04-04-2026",
-        },
-        {
-            id: "10",
-            avatar: "https://i.pravatar.cc/150?u=20",
-            name: "Phan Tuấn Kiệt",
-            classes: "D23CQCN06-B",
-            message: "React cứ luyện hooks là quen thôi 👍",
-            timestamp: "12:30 04-04-2026",
-        },
-    ];
-
     return (
         <div className="community-container">
             <div className="main-message-position">
@@ -231,6 +140,7 @@ function Community() {
                                 name={item.fullName}
                                 message={item.content}
                                 timestamp={item.timestamp}
+                                check={item.userId == localStorage.getItem("userId")}
                             />
                         })}
                         <div ref={messageEndRef} />

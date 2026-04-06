@@ -31,6 +31,8 @@ function LoginPage(){
                 const jwt=jwtDecode(response.data.message);
                 localStorage.setItem("token", response.data.message); 
                 localStorage.setItem("role",jwt.roles[0]);
+                localStorage.setItem("userId",jwt.userId);
+                console.log(localStorage.getItem("userId"));
                 navigate("/");
             }
         } catch(error){
