@@ -26,4 +26,6 @@ public interface PostService {
     List<PostVO> getReportPosts();
 
     List<PostVO> getSavePosts();
+
+    List<PostVO> getAllPosts();
 }
