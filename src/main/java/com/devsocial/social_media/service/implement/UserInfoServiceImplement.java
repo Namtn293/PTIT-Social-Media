@@ -1,5 +1,7 @@
 package com.devsocial.social_media.service.implement;
 
+import com.devsocial.social_media.core.auth.entity.User;
+import com.devsocial.social_media.core.auth.repository.UserRepository;
 import com.devsocial.social_media.core.util.BusinessException;
 import com.devsocial.social_media.entity.Classes;
 import com.devsocial.social_media.entity.Major;
@@ -8,6 +10,7 @@ import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.enumration.StatusEnum;
 import com.devsocial.social_media.model.dto.UserInfoDTO;
 import com.devsocial.social_media.model.vo.UserInfoAdminVO;
+import com.devsocial.social_media.model.vo.UserInfoManagementVO;
 import com.devsocial.social_media.model.vo.UserInfoVO;
 import com.devsocial.social_media.repository.ClassesRepository;
 import com.devsocial.social_media.repository.MajorRepository;
@@ -27,19 +30,30 @@ public class UserInfoServiceImplement implements UserInfoService {
     private final ImagesServiceImplement imageImplement;
     private final MajorRepository majorRepository;
     private final ClassesRepository classesRepository;
-
-    public UserInfoServiceImplement(ClassesRepository classesRepository,MajorRepository majorRepository,UserInfoRepository userInfoRepository, CloudinaryServiceImplement cloudinaryServiceImplement, ImagesServiceImplement imageImplement) {
+    private final UserRepository userRepository;
+    public UserInfoServiceImplement(UserRepository userRepository,ClassesRepository classesRepository,MajorRepository majorRepository,UserInfoRepository userInfoRepository, CloudinaryServiceImplement cloudinaryServiceImplement, ImagesServiceImplement imageImplement) {
         this.userInfoRepository = userInfoRepository;
         this.cloudinaryServiceImplement = cloudinaryServiceImplement;
         this.imageImplement = imageImplement;
         this.classesRepository = classesRepository;
         this.majorRepository = majorRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
-    public List<UserInfoAdminVO> getAllUserInfo() {
-        List<UserInfoAdminVO> uiaVOS = new ArrayList<>();
-        userInfoRepository.findAll().forEach((ui)->uiaVOS.add(convertToUserInfoAdminVO(ui)));
+    public List<UserInfoManagementVO> getAllUserInfo() {
+        List<UserInfoManagementVO> uiaVOS = new ArrayList<>();
+        List<UserInfo> list=userInfoRepository.findAll();
+        list.forEach(c->{
+            UserInfoManagementVO vo=UserInfoManagementVO.builder()
+                    .role(userRepository.findRoleEnumByUserName(c.getUserName()))
+                    .status(c.getStatus())
+                    .userName(c.getUserName())
+                    .userId(c.getId())
+                    .email(c.getEmail())
+                    .build();
+            uiaVOS.add(vo);
+        });
         return uiaVOS;
     }
 
@@ -102,6 +116,14 @@ public class UserInfoServiceImplement implements UserInfoService {
                 .status(userInfo.getStatus())
                 .major(major.getMajorName())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void delete(Long id) {
+        UserInfo userInfo=userInfoRepository.findById(id).orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST));
+        userRepository.deleteUserByUserName(userInfo.getUserName());
+        userInfoRepository.deleteById(id);
     }
 
 }

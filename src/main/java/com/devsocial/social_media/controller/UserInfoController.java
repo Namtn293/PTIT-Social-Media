@@ -2,9 +2,9 @@ package com.devsocial.social_media.controller;
 
 import com.devsocial.social_media.core.util.ResponseUtil;
 import com.devsocial.social_media.core.util.SuccessResponse;
-import com.devsocial.social_media.entity.UserInfo;
 import com.devsocial.social_media.model.dto.UserInfoDTO;
 import com.devsocial.social_media.model.vo.UserInfoAdminVO;
+import com.devsocial.social_media.model.vo.UserInfoManagementVO;
 import com.devsocial.social_media.model.vo.UserInfoVO;
 import com.devsocial.social_media.service.UserInfoService;
 import org.springframework.http.MediaType;
@@ -26,7 +26,7 @@ public class UserInfoController {
     }
 
     @GetMapping("get/all")
-    public SuccessResponse<List<UserInfoAdminVO>> getAllUserInfo(){
+    public SuccessResponse<List<UserInfoManagementVO>> getAllUserInfo(){
         return ResponseUtil.ok(
                 "Get All UserInfo Success",
                 userInfoService.getAllUserInfo()
@@ -68,5 +68,10 @@ public class UserInfoController {
     public SuccessResponse<String> activeUser(@PathVariable String userName) {
         userInfoService.activeUser(userName);
         return ResponseUtil.ok("Account Active");
+    }
+    @PostMapping("delete/{id}")
+    public SuccessResponse<String> deleteUser(@PathVariable Long id) {
+        userInfoService.delete(id);
+        return ResponseUtil.ok("Delete account");
     }
 }
