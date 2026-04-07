@@ -2,7 +2,6 @@ import { useState } from "react";
 import { Popover, Spin, Button } from "antd";
 import {
     UserOutlined, MailOutlined, IdcardOutlined, ReadOutlined,
-    MessageOutlined, ProfileOutlined
 } from "@ant-design/icons";
 import useInfoApi from "../../api/UserInfoApi";
 
@@ -66,7 +65,6 @@ const MessageContent = ({check, avatar, name, timestamp, message, userName}) => 
     return (
         <>
             {!check ? (
-                // Tin nhắn của người khác (bên trái)
                 <div style={{marginBottom:"20px",marginLeft:"20px",display:"flex",flexDirection:"row",marginTop:"10px",alignItems:"center"}}>
                     
                     {/* Wrap Avatar vào Popover, mở sang bên Phải */}
@@ -82,7 +80,7 @@ const MessageContent = ({check, avatar, name, timestamp, message, userName}) => 
                 </div>
             ) : (
                 <div style={{marginBottom:"20px",marginRight:"20px",display:"flex",flexDirection:"row",marginTop:"10px",alignItems:"center",justifyContent:"end"}}>
-                    <div style={{backgroundColor:"white",marginRight:"15px",display:"flex",flexDirection:"column",paddingLeft:"10px",paddingRight:"10px",borderRadius:"7px",paddingTop:"5px",paddingBottom:"5px",maxWidth:"500px"}}>
+                    <div style={{backgroundColor:"rgb(225, 230, 255)",marginRight:"15px",display:"flex",flexDirection:"column",paddingLeft:"10px",paddingRight:"10px",borderRadius:"7px",paddingTop:"5px",paddingBottom:"5px",maxWidth:"500px"}}>
                         <div style={{fontSize:"12px",color:"rgb(110, 110, 110)"}}>{name}</div>
                         <div style={{fontSize:"15px",color:"rgb(0, 0, 0)"}}>{message}</div>
                         <div style={{marginTop:"4px",fontSize:"10px",color:"rgb(110, 110, 110)"}}>{timestamp}</div>
