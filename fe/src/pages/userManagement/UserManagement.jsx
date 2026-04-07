@@ -7,7 +7,7 @@ import userInfoApi from "../../api/UserInfoApi"
 function UserManagement() {
 
   const [data,setData]=useState([]);  
-  
+  const [searchText,setSearchText]=useState("");
   const onLock=async(record)=>{
     try{
     const newStatus=record.status==="ACTIVE"?"BANDED":"ACTIVE";
@@ -103,10 +103,17 @@ function UserManagement() {
     fetchData();
   },[])
 
+  const filterData=data.filter((item)=>{
+    return(
+        item.userName.toLowerCase().includes(searchText.toLowerCase()) ||
+        item.email.toLowerCase().includes(searchText.toLowerCase())
+    )
+  })
+
   return (
     <div className="user-management-container">
         <div style={{marginLeft:0,marginBottom:20}}>
-            <Input size="large" style={{ width: "500px",borderRadius:"5px",fontSize:16,height:35}} placeholder="Tìm kiếm người dùng" />
+            <Input onChange={(e)=>setSearchText(e.target.value)} size="large" style={{ width: "500px",borderRadius:"5px",fontSize:16,height:35}} placeholder="Tìm kiếm người dùng" />
                     
             <Button icon={<SearchOutlined/>} size="large" type="primary" style={{height:35,borderRadius:"5px", marginLeft:10 }}>
                 Tìm kiếm
@@ -114,7 +121,7 @@ function UserManagement() {
 
             <Button type="primary" icon={<PlusOutlined/>} size="large" style={{marginLeft:"450px",width:"120px",borderRadius:"5px"}}>Tạo mới</Button>
         </div>
-        <Table columns={columns} dataSource={data} scroll={{x:1000}} pagination={{pageSize:5,position:["bottomCenter"]}}/>
+        <Table columns={columns} dataSource={filterData} scroll={{x:1000}} pagination={{pageSize:5,position:["bottomCenter"]}}/>
     </div>
   );
 }
