@@ -6,9 +6,9 @@ import com.devsocial.social_media.core.auth.entity.User;
 import com.devsocial.social_media.core.auth.repository.UserRepository;
 import com.devsocial.social_media.core.configuration.ThreadContext;
 import com.devsocial.social_media.core.util.BusinessException;
-import com.devsocial.social_media.entity.Documents;
+import com.devsocial.social_media.entity.Document;
 import com.devsocial.social_media.entity.Files;
-import com.devsocial.social_media.entity.Images;
+import com.devsocial.social_media.entity.Image;
 import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.enumration.RoleEnum;
 import com.devsocial.social_media.model.dto.DocumentDTO;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,14 +81,14 @@ public class DocumentsServiceImplement implements DocumentsService {
                     background.getBytes(),
                     ObjectUtils.emptyMap()
             );
-            Images image = Images.builder()
+            Image image = Image.builder()
                     .url(imageUploadResult.get("url").toString())
                     .publicId(imageUploadResult.get("public_id").toString())
                     .build();
             imageRepository.save(image);
             backgroundId = image.getId();
         }
-        Documents document = Documents.builder()
+        Document document = Document.builder()
                 .title(documentDTO.getTitle())
                 .subjectId(documentDTO.getSubjectId())
                 .createBy(ThreadContext.getUserDetail().getUsername())
@@ -102,7 +101,7 @@ public class DocumentsServiceImplement implements DocumentsService {
     @Transactional
     @Override
     public void deleteDocument(Long documentId) {
-        Documents document = documentsRepository.findById(documentId)
+        Document document = documentsRepository.findById(documentId)
                 .orElseThrow(()->new BusinessException(ErrorCode.DOCUMENT_NOT_FOUND));
         User user = userRepository.findByUserName(ThreadContext.getUserDetail().getUsername())
                 .orElseThrow(()->new BusinessException(ErrorCode.FORBIDDEN));
@@ -124,7 +123,7 @@ public class DocumentsServiceImplement implements DocumentsService {
             }
 
             try {
-                Images image = imageRepository.findById(document.getImageId()).
+                Image image = imageRepository.findById(document.getImageId()).
                         orElseThrow(()->new BusinessException(ErrorCode.IMAGE_NOT_EXIST));
                 cloudinary.uploader().destroy(image.getPublicId(), ObjectUtils.emptyMap());
                 imageRepository.delete(image);
@@ -138,7 +137,7 @@ public class DocumentsServiceImplement implements DocumentsService {
 
     @Override
     public List<DocumentVO> getAllDocument() {
-        List<Documents> documents = documentsRepository.findAll();
+        List<Document> documents = documentsRepository.findAll();
         List<DocumentVO> documentVOS = new ArrayList<>();
         documents.forEach((d)->{
           documentVOS.add(convertToDocumentVO(d));
@@ -147,7 +146,7 @@ public class DocumentsServiceImplement implements DocumentsService {
     }
 
     @Override
-    public DocumentVO convertToDocumentVO(Documents document) {
+    public DocumentVO convertToDocumentVO(Document document) {
         DocumentVO documentVO = new DocumentVO();
         documentVO.setFileURL(documentsRepository.getFileURL(document.getFileId()).get(0));
         documentVO.setImageURL(documentsRepository.getImageURL(document.getImageId()).get(0));

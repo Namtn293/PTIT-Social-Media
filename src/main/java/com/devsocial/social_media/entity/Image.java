@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Images extends EntityBase {
+public class Image extends EntityBase {
     @Column(name = "URL")
     private String url;
 

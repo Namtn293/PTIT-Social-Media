@@ -1,6 +1,6 @@
 package com.devsocial.social_media.repository;
 
-import com.devsocial.social_media.entity.Documents;
+import com.devsocial.social_media.entity.Document;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface DocumentsRepository extends JpaRepository<Documents,Long> {
-    Optional<Documents> findById(Long id);
+public interface DocumentsRepository extends JpaRepository<Document,Long> {
+    Optional<Document> findById(Long id);
 
     @Query(value = "SELECT DISTINCT f.url"
             + " FROM main_documents d"

@@ -1,25 +1,24 @@
 package com.devsocial.social_media.service;
 
-import com.devsocial.social_media.entity.Posts;
 import com.devsocial.social_media.model.dto.PostDTO;
 import com.devsocial.social_media.model.dto.PostUpdateDTO;
+import com.devsocial.social_media.model.vo.PostAdminVO;
 import com.devsocial.social_media.model.vo.PostVO;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 
 public interface PostService {
     void createPost(PostDTO dto);
 
-    void deletePost(Long postId) throws RuntimeException;
+    void deletePost(Long postId) ;
 
-    List<PostVO> getAll(int number)throws RuntimeException;
+    List<PostVO> getAllPost();
 
     List<PostVO> getMyPosts();
 
-    List<PostVO> convertToVo(List<Posts> posts) throws RuntimeException;
+    List<PostVO> convertToVo(List<Long> postsId);
 
-    void updatePost(PostUpdateDTO dto) throws RuntimeException;
+    void updatePost(PostUpdateDTO dto);
 
     List<PostVO> getLikePosts();
 
@@ -27,5 +26,5 @@ public interface PostService {
 
     List<PostVO> getSavePosts();
 
-    List<PostVO> getAllPosts();
+    List<PostAdminVO> getAllAdminPosts();
 }

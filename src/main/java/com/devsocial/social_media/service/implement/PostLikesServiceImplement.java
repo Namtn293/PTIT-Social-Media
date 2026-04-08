@@ -1,7 +1,7 @@
 package com.devsocial.social_media.service.implement;
 
 import com.devsocial.social_media.core.configuration.ThreadContext;
-import com.devsocial.social_media.entity.PostLikes;
+import com.devsocial.social_media.entity.PostLike;
 import com.devsocial.social_media.repository.PostLikesRepository;
 import com.devsocial.social_media.repository.UserInfoRepository;
 import com.devsocial.social_media.service.PostLikesService;
@@ -22,15 +22,15 @@ public class PostLikesServiceImplement implements PostLikesService {
     @Override
     public String interactPost(Long postId) throws RuntimeException {
         Long userId=userInfoRepository.findIdByUserName(ThreadContext.getUserDetail().getUsername()).orElse(null);
-        PostLikes postLikes=postLikesRepository.findByPostIdAndUserId(postId,userId).orElse(null);
-        if (postLikes==null){
-            PostLikes postLikes1=new PostLikes();
-            postLikes1.setPostId(postId);
-            postLikes1.setUserId(userId);
-            postLikesRepository.save(postLikes1);
+        PostLike postLike =postLikesRepository.findByPostIdAndUserId(postId,userId).orElse(null);
+        if (postLike ==null){
+            PostLike postLike1 =new PostLike();
+            postLike1.setPostId(postId);
+            postLike1.setUserId(userId);
+            postLikesRepository.save(postLike1);
             return "Like Success";
         }else{
-            postLikesRepository.delete(postLikes);
+            postLikesRepository.delete(postLike);
             return "Dislike Success";
         }
     }

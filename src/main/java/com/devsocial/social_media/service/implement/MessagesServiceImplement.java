@@ -3,7 +3,7 @@ package com.devsocial.social_media.service.implement;
 import com.devsocial.social_media.core.auth.entity.User;
 import com.devsocial.social_media.core.auth.repository.UserRepository;
 import com.devsocial.social_media.core.util.BusinessException;
-import com.devsocial.social_media.entity.Messages;
+import com.devsocial.social_media.entity.Message;
 import com.devsocial.social_media.entity.UserInfo;
 import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.model.dto.MessageDTO;
@@ -34,11 +34,11 @@ public class MessagesServiceImplement implements MessagesService {
 
     @Override
     public MessageVO saveMessage(MessageDTO messageDTO) {
-        Messages messages = Messages.builder()
+        Message message = Message.builder()
                 .userId(messageDTO.getUserId())
                 .content(messageDTO.getContent())
                 .build();
-        messageRepository.save(messages);
+        messageRepository.save(message);
 
         String fullName = "Cộng đồng";
         String avatar = null;
@@ -55,7 +55,7 @@ public class MessagesServiceImplement implements MessagesService {
         return MessageVO.builder()
                 .userId(messageDTO.getUserId() == null ? 0L : messageDTO.getUserId())
                 .content(messageDTO.getContent())
-                .timestamp(messages.getCreatedAt())
+                .timestamp(message.getCreatedAt())
                 .fullName(fullName)
                 .avatar(avatar)
                 .build();
@@ -63,7 +63,7 @@ public class MessagesServiceImplement implements MessagesService {
 
     @Override
     public List<MessageVO> getAllMessages() {
-        List<Messages> list = messageRepository.findAllByOrderByCreatedAtAsc();
+        List<Message> list = messageRepository.findAllByOrderByCreatedAtAsc();
         List<MessageVO> messageVOS = new ArrayList<>();
         list.forEach(c -> {
             String fullName = "Cộng đồng";

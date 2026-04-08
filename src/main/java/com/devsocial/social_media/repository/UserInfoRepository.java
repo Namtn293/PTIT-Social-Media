@@ -1,6 +1,5 @@
 package com.devsocial.social_media.repository;
 
-import com.devsocial.social_media.entity.Posts;
 import com.devsocial.social_media.entity.UserInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

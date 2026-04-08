@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Data
 @Table(name = "MAIN_DOCUMENTS")
-public class Documents extends EntityBase {
+public class Document extends EntityBase {
     @Column(name = "TITLE")
     private String title;
 

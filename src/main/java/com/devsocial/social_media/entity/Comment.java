@@ -5,22 +5,27 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "MAIN_POST_SAVES")
-@Data
-public class PostSaves extends EntityBase {
-    @Column(name = "POST_ID")
-    private Long postId;
+@Getter
+@Setter
+@Table(name = "MAIN_COMMENTS")
+public class Comment extends EntityBase {
+    @Column(name = "CONTENT")
+    private String content;
+
+    @Column(name = "CREATED_AT")
+    private LocalDateTime createdAt;
 
     @Column(name = "USER_ID")
     private Long userId;
 
-    @Column(name = "CREATED_AT")
-    private LocalDateTime createdAt;
+    @Column(name = "POST_ID")
+    private Long postId;
 
     @PrePersist
     public void prePersist(){

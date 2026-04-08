@@ -1,8 +1,8 @@
 package com.devsocial.social_media.service.implement;
 
 import com.devsocial.social_media.core.util.BusinessException;
-import com.devsocial.social_media.entity.Comments;
-import com.devsocial.social_media.entity.Posts;
+import com.devsocial.social_media.entity.Comment;
+import com.devsocial.social_media.entity.Post;
 import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.model.dto.CommentDTO;
 import com.devsocial.social_media.model.dto.CommentUpdateDTO;
@@ -25,46 +25,46 @@ public class CommentsServiceImplement implements CommentsService {
     }
 
     @Override
-    public Comments createComment(CommentDTO commentDTO) {
-        Posts posts = postsRepository.findById(commentDTO.getPostId())
+    public Comment createComment(CommentDTO commentDTO) {
+        Post post = postsRepository.findById(commentDTO.getPostId())
                 .orElseThrow(()->new BusinessException(ErrorCode.POST_NOT_EXIST));
-        Comments comments = new Comments();
-        comments.setPostId(commentDTO.getPostId());
-        comments.setUserId(commentDTO.getUserId());
-        comments.setContent(commentDTO.getContent());
-        comments.prePersist();
-        commentsRepository.save(comments);
-        return comments;
+        Comment comment = new Comment();
+        comment.setPostId(commentDTO.getPostId());
+        comment.setUserId(commentDTO.getUserId());
+        comment.setContent(commentDTO.getContent());
+        comment.prePersist();
+        commentsRepository.save(comment);
+        return comment;
     }
 
     @Override
-    public List<Comments> getAllByPostId(Long postId) throws BusinessException {
-        Posts posts = postsRepository.findById(postId)
+    public List<Comment> getAllByPostId(Long postId) throws BusinessException {
+        Post post = postsRepository.findById(postId)
                 .orElseThrow(()->new BusinessException(ErrorCode.POST_NOT_EXIST));
-        List<Comments> comments = commentsRepository.findAllByPostId(postId);
-        comments.sort(Comparator.comparing(Comments::getCreatedAt));
+        List<Comment> comments = commentsRepository.findAllByPostId(postId);
+        comments.sort(Comparator.comparing(Comment::getCreatedAt));
         return comments;
     }
 
     @Override
     public void deleteById(Long id, Long userId) {
-        Comments comments = commentsRepository.findById(id)
+        Comment comment = commentsRepository.findById(id)
                 .orElseThrow(()->new BusinessException(ErrorCode.COMMENT_NOT_EXIST));
-        if(!comments.getUserId().equals(userId)){
+        if(!comment.getUserId().equals(userId)){
             throw new BusinessException(ErrorCode.FORBIDDEN);
         }
-        commentsRepository.delete(comments);
+        commentsRepository.delete(comment);
     };
 
     @Override
-    public Comments updateComment(Long id, CommentUpdateDTO commentUpdateDTO) {
-        Comments comments = commentsRepository.findById(id)
+    public Comment updateComment(Long id, CommentUpdateDTO commentUpdateDTO) {
+        Comment comment = commentsRepository.findById(id)
                 .orElseThrow(()->new BusinessException(ErrorCode.COMMENT_NOT_EXIST));
-        if(!comments.getUserId().equals(commentUpdateDTO.getUserId())){
+        if(!comment.getUserId().equals(commentUpdateDTO.getUserId())){
             throw new BusinessException(ErrorCode.FORBIDDEN);
         }
-        comments.setContent(commentUpdateDTO.getContent());
-        commentsRepository.save(comments);
-        return comments;
+        comment.setContent(commentUpdateDTO.getContent());
+        commentsRepository.save(comment);
+        return comment;
     }
 }
