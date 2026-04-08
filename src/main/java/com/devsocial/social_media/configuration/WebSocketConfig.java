@@ -9,6 +9,8 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.MessageHeaderAccessor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
@@ -56,10 +58,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                             String token = bearerToken.substring(7);
                             try {
                                 String username = jwtService.getUserName(token);
-                                org.springframework.security.core.userdetails.UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
                                 if (!jwtService.isExpired(token) && username.equals(userDetails.getUsername())) {
-                                    org.springframework.security.authentication.UsernamePasswordAuthenticationToken authentication = 
-                                        new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                                    UsernamePasswordAuthenticationToken authentication =
+                                        new UsernamePasswordAuthenticationToken(
                                         userDetails, null, userDetails.getAuthorities());
                                     accessor.setUser(authentication);
                                 }
