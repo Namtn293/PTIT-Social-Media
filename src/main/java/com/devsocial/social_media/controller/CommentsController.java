@@ -3,7 +3,7 @@ package com.devsocial.social_media.controller;
 import com.devsocial.social_media.core.util.BusinessException;
 import com.devsocial.social_media.core.util.ResponseUtil;
 import com.devsocial.social_media.core.util.SuccessResponse;
-import com.devsocial.social_media.entity.Comments;
+import com.devsocial.social_media.entity.Comment;
 import com.devsocial.social_media.model.dto.CommentDTO;
 import com.devsocial.social_media.model.dto.CommentUpdateDTO;
 import com.devsocial.social_media.service.CommentsService;
@@ -21,7 +21,7 @@ public class CommentsController {
     }
 
     @PostMapping("/create")
-    SuccessResponse<Comments> createComment(@RequestBody CommentDTO commentDTO){
+    SuccessResponse<Comment> createComment(@RequestBody CommentDTO commentDTO){
         return ResponseUtil.ok(
                 "create comment success",
                 commentsService.createComment(commentDTO)
@@ -29,7 +29,7 @@ public class CommentsController {
     }
 
     @PostMapping("/update/{id}")
-    SuccessResponse<Comments> updateComment(@PathVariable Long id, @RequestBody CommentUpdateDTO commentUpdateDTO){
+    SuccessResponse<Comment> updateComment(@PathVariable Long id, @RequestBody CommentUpdateDTO commentUpdateDTO){
         return ResponseUtil.ok(
                 "update comment success",
                 commentsService.updateComment(id, commentUpdateDTO)
@@ -46,7 +46,7 @@ public class CommentsController {
     }
 
     @PostMapping("/get/{postId}")
-    SuccessResponse<List<Comments>> getAllByPostId(@PathVariable Long postId) throws BusinessException {
+    SuccessResponse<List<Comment>> getAllByPostId(@PathVariable Long postId) throws BusinessException {
         return ResponseUtil.ok(
                 "get all comment success",
                 commentsService.getAllByPostId(postId)

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from "react";
 import { Button, Input, Table, Popconfirm } from "antd";
-import postApi from "../../api/PostAPI";
+import postApi from "../../api/PostApi";
 
 function PostManagement(){
     const [searchText, setSearchText] = useState("");
@@ -21,11 +21,6 @@ function PostManagement(){
             title: "Nội dung",
             dataIndex: "content",
             key: "content"
-        },
-        {
-            title: "Chủ đề",
-            dataIndex: "subject",
-            key: "subject"
         },
         {
             title: "Tác giả",
@@ -80,7 +75,7 @@ function PostManagement(){
 
     const fetchPosts = async ()=>{
         try{
-            const response = await postApi.getAll();
+            const response = await postApi.getAllAdminPost();
 
             const postsWithIndex = response.data.data.map((post,index)=>({
                 ...post,
@@ -111,7 +106,6 @@ function PostManagement(){
     const searchableColumns = [
     "title",
     "content",
-    "subject",
     "author"
     ];
 
@@ -119,7 +113,7 @@ function PostManagement(){
         const keyword = removeVietnameseTones(searchText);
 
         return searchableColumns.some((column) =>
-            removeVietnameseTones(post[column]).includes(keyword)
+            removeVietnameseTones(post[column] || "").includes(keyword)
         );
     });
 

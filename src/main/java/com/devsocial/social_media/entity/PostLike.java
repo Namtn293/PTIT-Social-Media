@@ -5,33 +5,26 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 @Entity
+@Table(name = "MAIN_POST_LIKES")
 @Data
-@Builder
-@AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "MAIN_MESSAGES")
-public class Messages extends EntityBase {
+public class PostLike extends EntityBase {
+    @Column(name = "POST_ID")
+    private Long postId;
+
     @Column(name = "USER_ID")
     private Long userId;
 
-    @Column(name = "CONTENT")
-    private String content;
-
     @Column(name = "CREATED_AT")
-    private String createdAt;
+    private LocalDateTime createdAt;
 
     @PrePersist
     public void prePersist(){
-        DateTimeFormatter dateTimeFormatter=DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy");
-        this.createdAt= LocalDateTime.now().format(dateTimeFormatter);
+        this.createdAt=LocalDateTime.now();
     }
 }

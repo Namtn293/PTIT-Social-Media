@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "MAIN_NOTIFICATIONS")
-public class Notifications extends EntityBase {
+public class Notification extends EntityBase {
     @Column(name = "USER_ID")
     private String userId;
 
