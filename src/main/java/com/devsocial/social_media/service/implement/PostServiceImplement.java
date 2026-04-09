@@ -11,6 +11,7 @@ import com.devsocial.social_media.model.vo.PostAdminVO;
 import com.devsocial.social_media.model.vo.PostVO;
 import com.devsocial.social_media.repository.*;
 import com.devsocial.social_media.service.PostService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,18 +28,14 @@ import java.util.List;
 @Service
 public class PostServiceImplement implements PostService {
     private final PostsRepository postsRepository;
-    private final ModelMapper modelMapper;
-    private final SubjectRepository subjectRepository;
     private final UserInfoRepository userInfoRepository;
     private final PostLikesRepository postLikesRepository;
     private final PostReportRepository postReportRepository;
     private final PostSavesRepository postSavesRepository;
 
     @Autowired
-    public PostServiceImplement(PostSavesRepository postSavesRepository, PostReportRepository postReportRepository, PostLikesRepository postLikesRepository, PostsRepository postsRepository, ModelMapper modelMapper, SubjectRepository subjectRepository, UserInfoRepository userInfoRepository) {
+    public PostServiceImplement(PostSavesRepository postSavesRepository, PostReportRepository postReportRepository, PostLikesRepository postLikesRepository, PostsRepository postsRepository, UserInfoRepository userInfoRepository) {
         this.postsRepository = postsRepository;
-        this.modelMapper = modelMapper;
-        this.subjectRepository = subjectRepository;
         this.userInfoRepository = userInfoRepository;
         this.postLikesRepository = postLikesRepository;
         this.postReportRepository = postReportRepository;
@@ -45,7 +43,7 @@ public class PostServiceImplement implements PostService {
     }
 
     @Override
-    public void createPost(PostDTO dto) {
+    public void createPost(@Valid PostDTO dto) {
         Long userInfoId= userInfoRepository.findIdByUserName(ThreadContext.getUserDetail().getUsername()).orElseThrow(
                 ()-> new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST)
         );
@@ -57,24 +55,27 @@ public class PostServiceImplement implements PostService {
     }
 
     @Override
+    @Transactional
     public void deletePost(Long postId) throws RuntimeException {
-        Post post = postsRepository.findById(postId).orElseThrow(() -> new RuntimeException("Post not already exist"));
-        postsRepository.delete(post);
+        Post post = postsRepository.findById(postId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_EXIST));
 
         List<PostLike> postLikes = postLikesRepository.findByPostId(postId);
-        postLikes.forEach(c -> {
-            postLikesRepository.delete(c);
-        });
+        if (!postLikes.isEmpty()) {
+            postLikesRepository.deleteAllInBatch(postLikes);
+        }
 
         List<PostReport> postReports = postReportRepository.findByPostId(postId);
-        postReports.forEach(c -> {
-            postReportRepository.delete(c);
-        });
+        if (!postReports.isEmpty()) {
+            postReportRepository.deleteAllInBatch(postReports);
+        }
 
         List<PostSave> postSaves = postSavesRepository.findByPostId(postId);
-        postSaves.forEach(c -> {
-            postSavesRepository.delete(c);
-        });
+        if (!postSaves.isEmpty()) {
+            postSavesRepository.deleteAllInBatch(postSaves);
+        }
+
+        postsRepository.delete(post);
     }
 
     @Override
