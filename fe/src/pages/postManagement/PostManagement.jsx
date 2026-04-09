@@ -31,8 +31,8 @@ function PostManagement(){
         },
         {
             title: "Ngày tạo",
-            dataIndex: "createAt",
-            key: "createAt",
+            dataIndex: "createdAt",
+            key: "createdAt",
             render: (date)=>{
                 return new Date(date).toLocaleString("vi-VN",{
                     hour: "2-digit",
@@ -83,6 +83,8 @@ function PostManagement(){
                 ...post,
                 idx: index + 1
             }))
+
+            console.log(postsWithIndex);
 
             setPosts(postsWithIndex);
         }catch(error){
