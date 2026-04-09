@@ -4,8 +4,10 @@ import com.devsocial.social_media.core.util.ResponseUtil;
 import com.devsocial.social_media.core.util.SuccessResponse;
 import com.devsocial.social_media.model.dto.PostDTO;
 import com.devsocial.social_media.model.dto.PostUpdateDTO;
+import com.devsocial.social_media.model.vo.PostAdminVO;
 import com.devsocial.social_media.model.vo.PostVO;
 import com.devsocial.social_media.service.PostService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,29 +24,29 @@ public class PostsController {
     }
 
     @PostMapping("/create")
-    public SuccessResponse<String> createPost(@RequestBody PostDTO dto){
+    public SuccessResponse<String> createPost(@Valid @RequestBody PostDTO dto){
         postService.createPost(dto);
         return ResponseUtil.ok("Create Post Success");
     }
 
-    @PostMapping("/delete/{postId}")
+    @DeleteMapping("/delete/{postId}")
     public SuccessResponse<String> deletePost(@PathVariable Long postId){
         postService.deletePost(postId);
         return ResponseUtil.ok("Delete Post Success");
     }
 
-    @PostMapping("/get/page/{number}")
-    public SuccessResponse<List<PostVO>> getPosts(@PathVariable int number) throws RuntimeException{
-        return ResponseUtil.ok("Get success",postService.getAll(number));
+    @GetMapping("/get/all")
+    public SuccessResponse<List<PostVO>> getPosts(){
+        return ResponseUtil.ok("Get success",postService.getAllPost());
     }
 
     @GetMapping("/get-my-posts")
-    public SuccessResponse<List<PostVO>> getMyPosts() throws RuntimeException{
+    public SuccessResponse<List<PostVO>> getMyPosts(){
         return ResponseUtil.ok("Get success",postService.getMyPosts());
     }
 
     @PostMapping("/update")
-    public SuccessResponse<String> updatePost(@RequestBody PostUpdateDTO dto) throws RuntimeException{
+    public SuccessResponse<String> updatePost(@RequestBody PostUpdateDTO dto){
         postService.updatePost(dto);
         return ResponseUtil.ok("Update success");
     }
@@ -56,19 +58,19 @@ public class PostsController {
 
     @GetMapping("/get-my-report-posts")
     public SuccessResponse<List<PostVO>> getMyReportPosts(){
-        return ResponseUtil.ok("Get My Like Post Success",postService.getReportPosts());
+        return ResponseUtil.ok("Get My Report Post Success",postService.getReportPosts());
     }
 
     @GetMapping("/get-my-save-posts")
     public SuccessResponse<List<PostVO>> getMySavePosts(){
-        return ResponseUtil.ok("Get My Like Post Success",postService.getSavePosts());
+        return ResponseUtil.ok("Get My Save Post Success",postService.getSavePosts());
     }
 
-    @GetMapping("/all")
-    public SuccessResponse<List<PostVO>> getAllPost(){
+    @GetMapping("/admin/get/all")
+    public SuccessResponse<List<PostAdminVO>> getAllAdminPost(){
         return ResponseUtil.ok(
                 "get all post success",
-                postService.getAllPosts()
+                postService.getAllAdminPosts()
         );
     }
 }

@@ -1,5 +1,7 @@
 package com.devsocial.social_media.model.vo;
 
+import com.devsocial.social_media.enumration.RoleEnum;
+import com.devsocial.social_media.enumration.StatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,11 +11,10 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageVO {
-    private String avatar;
-    private String timestamp;
-    private String fullName;
-    private String content;
+public class UserInfoManagementVO {
     private Long userId;
     private String userName;
+    private String email;
+    private StatusEnum status;
+    private RoleEnum role;
 }

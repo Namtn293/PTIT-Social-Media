@@ -1,19 +1,17 @@
 package com.devsocial.social_media.model.vo;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class MessageVO {
-    private String avatar;
-    private String timestamp;
-    private String fullName;
+public class PostAdminVO {
+    private Long id;
+    private String title;
     private String content;
-    private Long userId;
-    private String userName;
+    private LocalDateTime createdAt;
+    private String author;
 }

@@ -1,16 +1,19 @@
 package com.devsocial.social_media.entity;
 
 import com.devsocial.social_media.core.util.EntityBase;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "MAIN_POST_REPORT")
+@Table(name = "MAIN_POST_REPORT",uniqueConstraints = @UniqueConstraint(columnNames = {"POST_ID","USER_ID"}))
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Data
 public class PostReport extends EntityBase {
     @Column(name = "POST_ID")

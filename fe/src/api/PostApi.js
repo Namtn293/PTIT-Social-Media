@@ -1,7 +1,7 @@
 import axiosClient from "./AxiosClient";
 const postApi={
-    getAll: ()=>{
-        return axiosClient.get("api/posts/all")
+    getAllAdminPost: ()=>{
+        return axiosClient.get("api/posts/admin/get/all")
     }
 }
 

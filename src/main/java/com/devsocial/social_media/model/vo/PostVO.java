@@ -8,30 +8,16 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Getter
 @NoArgsConstructor
+@Builder
 public class PostVO {
-    String title;
-    String content;
-    String subject;
-    LocalDateTime createAt;
-    String author;
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public void setCreateAt(LocalDateTime createAt) {
-        this.createAt = createAt;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
+    private String title;
+    private String content;
+    private LocalDateTime createAt;
+    private String author;
+    private String className;
+    private Long likeTotal;
+    private Long commentTotal;
+    private Long saveTotal;
+    private Long reportTotal;
+    private Long postId;
 }

@@ -1,7 +1,9 @@
 package com.devsocial.social_media.service.implement;
 
+import com.devsocial.social_media.core.auth.entity.User;
+import com.devsocial.social_media.core.auth.repository.UserRepository;
 import com.devsocial.social_media.core.util.BusinessException;
-import com.devsocial.social_media.entity.Messages;
+import com.devsocial.social_media.entity.Message;
 import com.devsocial.social_media.entity.UserInfo;
 import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.model.dto.MessageDTO;
@@ -20,21 +22,23 @@ public class MessagesServiceImplement implements MessagesService {
     private final MessageRepository messageRepository;
     private final UserInfoRepository userInfoRepository;
     private final ImageRepository imageRepository;
+    private final UserRepository userRepository;
 
-    public MessagesServiceImplement(ImageRepository imageRepository, UserInfoRepository userInfoRepository,
+    public MessagesServiceImplement(UserRepository userRepository,ImageRepository imageRepository, UserInfoRepository userInfoRepository,
             MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
         this.userInfoRepository = userInfoRepository;
         this.imageRepository = imageRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
     public MessageVO saveMessage(MessageDTO messageDTO) {
-        Messages messages = Messages.builder()
+        Message message = Message.builder()
                 .userId(messageDTO.getUserId())
                 .content(messageDTO.getContent())
                 .build();
-        messageRepository.save(messages);
+        messageRepository.save(message);
 
         String fullName = "Cộng đồng";
         String avatar = null;
@@ -51,7 +55,7 @@ public class MessagesServiceImplement implements MessagesService {
         return MessageVO.builder()
                 .userId(messageDTO.getUserId() == null ? 0L : messageDTO.getUserId())
                 .content(messageDTO.getContent())
-                .timestamp(messages.getCreatedAt())
+                .timestamp(message.getCreatedAt())
                 .fullName(fullName)
                 .avatar(avatar)
                 .build();
@@ -59,18 +63,20 @@ public class MessagesServiceImplement implements MessagesService {
 
     @Override
     public List<MessageVO> getAllMessages() {
-        List<Messages> list = messageRepository.findAllByOrderByCreatedAtAsc();
+        List<Message> list = messageRepository.findAllByOrderByCreatedAtAsc();
         List<MessageVO> messageVOS = new ArrayList<>();
         list.forEach(c -> {
             String fullName = "Cộng đồng";
-            String avatar = null;
+            String avatar = null,userName="";
             if (c.getUserId() != null) {
-                UserInfo userInfo = userInfoRepository.findById(c.getUserId()).orElse(null);
+                User user=userRepository.findById(c.getUserId()).orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST));
+                UserInfo userInfo = userInfoRepository.findByUserName(user.getUsername()).orElse(null);
                 if (userInfo != null) {
                     if (userInfo.getFullName() != null) fullName = userInfo.getFullName();
                     if (userInfo.getImageId() != null) {
                         avatar = imageRepository.findAvatarById(userInfo.getImageId());
                     }
+                    userName=userInfo.getUserName();
                 }
             }
             
@@ -80,6 +86,7 @@ public class MessagesServiceImplement implements MessagesService {
                     .timestamp(c.getCreatedAt())
                     .fullName(fullName)
                     .avatar(avatar)
+                    .userName(userName)
                     .build();
             messageVOS.add(messageVO);
         });

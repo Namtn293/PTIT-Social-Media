@@ -3,7 +3,7 @@ package com.devsocial.social_media.service.implement;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.devsocial.social_media.core.util.BusinessException;
-import com.devsocial.social_media.entity.Images;
+import com.devsocial.social_media.entity.Image;
 import com.devsocial.social_media.entity.UserInfo;
 import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.repository.ImageRepository;
@@ -29,8 +29,8 @@ public class ImagesServiceImplement implements ImageService {
     }
 
     @Override
-    public Images createImage(String url, String publicId) {
-        Images img = Images.builder()
+    public Image createImage(String url, String publicId) {
+        Image img = Image.builder()
                 .url(url)
                 .publicId(publicId)
                 .build();
@@ -56,9 +56,9 @@ public class ImagesServiceImplement implements ImageService {
     public void updateImage(UserInfo userInfo, MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) return;
 
-        Images oldImg = Optional.ofNullable(userInfo.getImageId())
+        Image oldImg = Optional.ofNullable(userInfo.getImageId())
                 .flatMap(imageRepository::findById)
-                .orElseGet(() -> new Images(null, null));
+                .orElseGet(() -> new Image(null, null));
 
         Map uploadResult = cloudinary.uploader().upload(
                 file.getBytes(),
@@ -67,7 +67,7 @@ public class ImagesServiceImplement implements ImageService {
         String url = uploadResult.get("url").toString();
         String publicId = uploadResult.get("public_id").toString();
 
-        Images newImg = createImage(url,publicId);
+        Image newImg = createImage(url,publicId);
         userInfo.setImageId(newImg.getId());
 
         if(oldImg.getPublicId()!=null) {

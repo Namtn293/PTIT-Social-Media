@@ -1,7 +1,6 @@
 package com.devsocial.social_media.service;
 
-import com.devsocial.social_media.entity.Documents;
-import com.devsocial.social_media.entity.Files;
+import com.devsocial.social_media.entity.Document;
 import com.devsocial.social_media.model.dto.DocumentDTO;
 import com.devsocial.social_media.model.vo.DocumentVO;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,5 +13,5 @@ public interface DocumentsService {
     void deleteDocument(Long documentId);
     List<DocumentVO> getAllDocument();
 
-    DocumentVO convertToDocumentVO(Documents document);
+    DocumentVO convertToDocumentVO(Document document);
 }

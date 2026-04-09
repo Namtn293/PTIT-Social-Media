@@ -7,7 +7,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "MAIN_SUBJECT")
-public class Subjects extends EntityBase {
+public class Subject extends EntityBase {
     @Column(name = "SUBJECT_NAME")
     private String subjectName;
 

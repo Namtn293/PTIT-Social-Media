@@ -1,8 +1,7 @@
 package com.devsocial.social_media.service.implement;
 
 import com.devsocial.social_media.core.configuration.ThreadContext;
-import com.devsocial.social_media.entity.PostReport;
-import com.devsocial.social_media.entity.PostSaves;
+import com.devsocial.social_media.entity.PostSave;
 import com.devsocial.social_media.repository.PostSavesRepository;
 import com.devsocial.social_media.repository.UserInfoRepository;
 import com.devsocial.social_media.service.PostSavesService;
@@ -21,15 +20,15 @@ public class PostSavesServiceImplement implements PostSavesService {
     @Override
     public String interactPost(Long postId) {
         Long userId= userInfoRepository.findIdByUserName(ThreadContext.getUserDetail().getUsername()).orElse(null);
-        PostSaves postSaves=postSavesRepository.findByPostIdAndUserId(postId,userId).orElse(null);
-        if (postSaves==null){
-            PostSaves postSaves1=new PostSaves();
-            postSaves1.setUserId(userId);
-            postSaves1.setPostId(postId);
-            postSavesRepository.save(postSaves1);
+        PostSave postSave =postSavesRepository.findByPostIdAndUserId(postId,userId).orElse(null);
+        if (postSave ==null){
+            PostSave postSave1 =new PostSave();
+            postSave1.setUserId(userId);
+            postSave1.setPostId(postId);
+            postSavesRepository.save(postSave1);
             return "Save Success";
         } else {
-            postSavesRepository.delete(postSaves);
+            postSavesRepository.delete(postSave);
             return "Drop the save Success";
         }
     }
