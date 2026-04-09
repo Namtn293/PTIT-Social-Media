@@ -4,6 +4,7 @@ import com.devsocial.social_media.entity.Post;
 import com.devsocial.social_media.model.vo.PostAdminVO;
 import com.devsocial.social_media.model.vo.PostVO;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -56,5 +57,12 @@ public interface PostsRepository extends JpaRepository<Post,Long> {
             " from Post a " +
             " left join UserInfo b on a.userInfoId=b.id ")
     List<PostAdminVO> getAllAdminPosts();
+
+    @Modifying(clearAutomatically = true)
+    @Query(value = "update Post a " +
+            "set a.likeTotal=a.likeTotal+ :valueCount " +
+            "where a.id=:postId")
+    void updateLikePostTotal(@Param("postId")Long postId, @Param("valueCount") Long valueCount);
+
 
 }

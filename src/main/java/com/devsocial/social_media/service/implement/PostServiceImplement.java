@@ -11,6 +11,7 @@ import com.devsocial.social_media.model.vo.PostAdminVO;
 import com.devsocial.social_media.model.vo.PostVO;
 import com.devsocial.social_media.repository.*;
 import com.devsocial.social_media.service.PostService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +43,7 @@ public class PostServiceImplement implements PostService {
     }
 
     @Override
-    public void createPost(PostDTO dto) {
+    public void createPost(@Valid PostDTO dto) {
         Long userInfoId= userInfoRepository.findIdByUserName(ThreadContext.getUserDetail().getUsername()).orElseThrow(
                 ()-> new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST)
         );
