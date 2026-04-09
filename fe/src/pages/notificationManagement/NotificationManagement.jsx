@@ -1,75 +1,77 @@
 import React, {useState} from "react";
-import { Button, Input, Table, Popconfirm } from "antd";
+import { Button, Input, Table, Popconfirm, Flex } from "antd";
+import { SearchOutlined, PlusOutlined} from "@ant-design/icons"
 import { data } from "react-router-dom";
+import NoticeCreate from "../../components/noticeCreate/noticeCreate";
 
 function NotificationManagement(){
     const [notifications, setNotifications] = useState([
         {
             id: 1,
-            userId: "user01",
+            userName: "user01",
             content: "Bạn đã đăng ký tài khoản thành công.",
             isRead: true,
             createAt: "2026-04-01T08:30:00"
         },
         {
             id: 2,
-            userId: "user02",
+            userName: "user02",
             content: "Bài viết của bạn đã được phê duyệt.",
             isRead: false,
             createAt: "2026-04-01T09:15:00"
         },
         {
             id: 3,
-            userId: "user03",
+            userName: "user03",
             content: "Bạn có bình luận mới trên bài viết.",
             isRead: false,
             createAt: "2026-04-02T10:00:00"
         },
         {
             id: 4,
-            userId: "user01",
+            userName: "user01",
             content: "Mật khẩu của bạn đã được thay đổi.",
             isRead: true,
             createAt: "2026-04-02T11:45:00"
         },
         {
             id: 5,
-            userId: "user04",
+            userName: "user04",
             content: "Bạn đã nhận được một tin nhắn mới.",
             isRead: false,
             createAt: "2026-04-03T08:20:00"
         },
         {
             id: 6,
-            userId: "user05",
+            userName: "user05",
             content: "Tài khoản của bạn đã được cập nhật.",
             isRead: true,
             createAt: "2026-04-03T09:10:00"
         },
         {
             id: 7,
-            userId: "user02",
+            userName: "user02",
             content: "Bạn có thông báo hệ thống mới.",
             isRead: false,
             createAt: "2026-04-03T14:30:00"
         },
         {
             id: 8,
-            userId: "user03",
+            userName: "user03",
             content: "Đơn hàng của bạn đã được xác nhận.",
             isRead: true,
             createAt: "2026-04-04T08:00:00"
         },
         {
             id: 9,
-            userId: "user04",
+            userName: "user04",
             content: "Bạn đã được thêm vào nhóm mới.",
             isRead: false,
             createAt: "2026-04-04T10:40:00"
         },
         {
             id: 10,
-            userId: "user05",
+            userName: "user05",
             content: "Hệ thống sẽ bảo trì vào ngày mai.",
             isRead: false,
             createAt: "2026-04-05T07:50:00"
@@ -77,7 +79,9 @@ function NotificationManagement(){
     ]);
 
     const [searchText, setSearchText] = useState("");
-
+    const [filterKeyWord, setFilterKeyWord] = useState("");
+    const [popup, setPopup] = useState(false);
+    const [data, setData] = useState({});
     const columns = [
         {
             title: "ID",
@@ -100,8 +104,8 @@ function NotificationManagement(){
         },
         {
             title: "Người nhận",
-            dataIndex: "userId",
-            key: "userId"
+            dataIndex: "userName",
+            key: "userName"
         },
         {
             title: "Ngày gửi",
@@ -140,6 +144,12 @@ function NotificationManagement(){
         },
     ];
 
+    const handleSaveData = (notice)=>{
+        console.log(notice)
+
+        setNotifications([...notifications,{...notice,id: notifications.length+1}]);
+    }
+
     const handleDelete = (id)=>{
         const newNotifications = notifications.filter(notice=>notice.id!==id);
         setNotifications(newNotifications);
@@ -157,7 +167,7 @@ function NotificationManagement(){
 
     const searchableColumns = [
     "content",
-    "userId"
+    "userName"
     ];
 
     const filteredNotifications = notifications.filter((notice) => {
@@ -170,35 +180,67 @@ function NotificationManagement(){
 
     return(
         <div className="notice-manager-container" 
-            style={{backgroundColor:"#c7c7c79f",
+            style={{backgroundColor:"#f4f4fc",
                 height:"100vh",
                 display:"flex",
                 justifyContent:"center",
                 alignItems:"center",
                 flexDirection:"column",
-                gap:"10px"
+                gap:"10px",
+                padding:"30px"
             }}>
-            <div className="filter-container" style={{width:"100%"}}>
+            <div className="filter-container" style={{width:"100%",display:"flex"}}>
                 <Input 
                     type="text" 
                     placeholder="Nhập từ khóa"
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
+                    value={filterKeyWord}
+                    onChange={(e)=> setFilterKeyWord(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && setSearchText(filterKeyWord)}
                     style={{
-                        width:"200px",
+                        width:"500px",
                         borderRadius:"5px",
                         outline:"none",
                         padding:"5px 10px",
                         border: "1px solid #ccc",
-                        margin: "10px 0 0 65px"
                     }}
                 />
+                <Button icon={<SearchOutlined/>} 
+                    size="large" 
+                    type="primary" 
+                    onClick={()=>setSearchText(filterKeyWord)}
+                    style={{
+                        height:35,
+                        borderRadius:"5px", 
+                        marginLeft:10,
+                    }}>
+                    Tìm kiếm
+                </Button>
+
+                <Button icon={<PlusOutlined/>}
+                    size="large" 
+                    type="primary" 
+                    onClick={()=>setPopup(true)}
+                    style={{
+                        height:35,
+                        borderRadius:"5px", 
+                        marginLeft:10,
+                        backgroundColor:"#4db8ff",
+                        marginLeft:"auto"
+                    }}>
+                    Thêm thông báo</Button>
+                    {
+                        popup && 
+                        <NoticeCreate 
+                            onClose={()=> setPopup(false)}
+                            onSubmit={handleSaveData}
+                        />
+                    }
             </div>
             
             <div className="list-pages-container"
                 style={{
-                    width: "90%",
-                    height: "90%",
+                    width: "100%",
+                    height: "100%",
                     backgroundColor:"#ffffff",
                     borderRadius:"10px",
                     marginBottom:"10px"
