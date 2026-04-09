@@ -35,7 +35,6 @@ public class PostLikesServiceImplement implements PostLikesService {
         Long userId=userInfoRepository.findIdByUserName(ThreadContext.getUserDetail().getUsername())
                 .orElseThrow(()-> new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST));
         PostLike postLike = postLikesRepository.findByPostIdAndUserId(postId,userId).orElse(null);
-
         if (postLike == null){
             postLikesRepository.save(PostLike.builder()
                             .postId(postId)
