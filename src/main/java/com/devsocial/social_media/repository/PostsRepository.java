@@ -64,5 +64,16 @@ public interface PostsRepository extends JpaRepository<Post,Long> {
             "where a.id=:postId")
     void updateLikePostTotal(@Param("postId")Long postId, @Param("valueCount") Long valueCount);
 
+    @Modifying(clearAutomatically = true)
+    @Query(value = "update Post a " +
+            "set a.reportTotal=a.reportTotal+ :valueCount " +
+            "where a.id=:postId")
+    void updateReportPostTotal(@Param("postId")Long postId, @Param("valueCount") Long valueCount);
+
+    @Modifying(clearAutomatically = true)
+    @Query(value = "update Post a " +
+            "set a.saveTotal=a.saveTotal+ :valueCount " +
+            "where a.id=:postId")
+    void updateSavePostTotal(@Param("postId")Long postId, @Param("valueCount") Long valueCount);
 
 }
