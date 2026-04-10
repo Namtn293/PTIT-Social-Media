@@ -3,6 +3,7 @@ package com.devsocial.social_media.service.implement;
 import com.devsocial.social_media.core.auth.entity.User;
 import com.devsocial.social_media.core.auth.repository.UserRepository;
 import com.devsocial.social_media.core.util.BusinessException;
+import com.devsocial.social_media.entity.Image;
 import com.devsocial.social_media.entity.Message;
 import com.devsocial.social_media.entity.UserInfo;
 import com.devsocial.social_media.enumration.ErrorCode;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MessagesServiceImplement implements MessagesService {
@@ -75,22 +77,22 @@ public class MessagesServiceImplement implements MessagesService {
         java.util.Set<Long> userIds = messages.stream()
                 .map(Message::getUserId)
                 .filter(java.util.Objects::nonNull)
-                .collect(java.util.Collectors.toSet());
+                .collect(Collectors.toSet());
 
         // Batch fetch all UserInfo records
         java.util.Map<Long, UserInfo> userInfoMap = userInfoRepository.findAllById(userIds).stream()
-                .collect(java.util.Collectors.toMap(UserInfo::getId, userInfo -> userInfo));
+                .collect(Collectors.toMap(UserInfo::getId, userInfo -> userInfo));
 
         // Batch fetch all relative Image URLs to eliminate N+1 for avatars
         java.util.Set<Long> imageIds = userInfoMap.values().stream()
                 .map(UserInfo::getImageId)
                 .filter(java.util.Objects::nonNull)
-                .collect(java.util.Collectors.toSet());
+                .collect(Collectors.toSet());
         
         java.util.Map<Long, String> avatarMap = new java.util.HashMap<>();
         if (!imageIds.isEmpty()) {
             avatarMap = imageRepository.findAllById(imageIds).stream()
-                    .collect(java.util.Collectors.toMap(Image::getId, Image::getUrl));
+                    .collect(Collectors.toMap(Image::getId, Image::getUrl));
         }
 
         List<MessageVO> messageVOS = new ArrayList<>();
