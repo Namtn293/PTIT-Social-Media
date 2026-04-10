@@ -15,23 +15,19 @@ import com.devsocial.social_media.repository.UserInfoRepository;
 import com.devsocial.social_media.service.MessagesService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 public class MessagesServiceImplement implements MessagesService {
     private final MessageRepository messageRepository;
     private final UserInfoRepository userInfoRepository;
     private final ImageRepository imageRepository;
-    private final UserRepository userRepository;
 
-    public MessagesServiceImplement(UserRepository userRepository,ImageRepository imageRepository, UserInfoRepository userInfoRepository,
+    public MessagesServiceImplement(ImageRepository imageRepository, UserInfoRepository userInfoRepository,
             MessageRepository messageRepository) {
         this.messageRepository = messageRepository;
         this.userInfoRepository = userInfoRepository;
         this.imageRepository = imageRepository;
-        this.userRepository = userRepository;
     }
 
     @Override
@@ -68,64 +64,6 @@ public class MessagesServiceImplement implements MessagesService {
 
     @Override
     public List<MessageVO> getAllMessages() {
-        List<Message> messages = messageRepository.findAllByOrderByCreatedAtAsc();
-        if (messages.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        // Collect unique userIds
-        java.util.Set<Long> userIds = messages.stream()
-                .map(Message::getUserId)
-                .filter(java.util.Objects::nonNull)
-                .collect(Collectors.toSet());
-
-        // Batch fetch all UserInfo records
-        java.util.Map<Long, UserInfo> userInfoMap = userInfoRepository.findAllById(userIds).stream()
-                .collect(Collectors.toMap(UserInfo::getId, userInfo -> userInfo));
-
-        // Batch fetch all relative Image URLs to eliminate N+1 for avatars
-        java.util.Set<Long> imageIds = userInfoMap.values().stream()
-                .map(UserInfo::getImageId)
-                .filter(java.util.Objects::nonNull)
-                .collect(Collectors.toSet());
-        
-        java.util.Map<Long, String> avatarMap = new java.util.HashMap<>();
-        if (!imageIds.isEmpty()) {
-            avatarMap = imageRepository.findAllById(imageIds).stream()
-                    .collect(Collectors.toMap(Image::getId, Image::getUrl));
-        }
-
-        List<MessageVO> messageVOS = new ArrayList<>();
-        for (Message c : messages) {
-            String fullName = "Thành viên PTIT";
-            String avatar = null;
-            String userName = "";
-            Long userId = c.getUserId();
-
-            if (userId != null) {
-                UserInfo userInfo = userInfoMap.get(userId);
-                if (userInfo != null) {
-                    if (userInfo.getFullName() != null) fullName = userInfo.getFullName();
-                    if (userInfo.getImageId() != null) {
-                        avatar = avatarMap.get(userInfo.getImageId());
-                    }
-                    userName = userInfo.getUserName();
-                } else {
-                    // Falls back to "Thành viên PTIT" if userInfo not found, instead of crashing
-                    fullName = "Cựu thành viên";
-                }
-            }
-            
-            MessageVO messageVO = MessageVO.builder()
-                    .userId(userId == null ? 0L : userId)
-                    .content(c.getContent())
-                    .timestamp(c.getCreatedAt())
-                    .fullName(fullName)
-                    .avatar(avatar)
-                    .userName(userName)
-                    .build();
-            messageVOS.add(messageVO);
-        }
-        return messageVOS;
+        return messageRepository.findAllAsVO();
     }
 }
