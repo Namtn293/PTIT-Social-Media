@@ -21,6 +21,7 @@ function Community() {
             try {
                 const response = await MessageApi.getAll();
                 setMessages(response.data.data);
+                console.log(messages);
             } catch (err) {
                 console.log("Lỗi load tin nhắn " + err);
             } finally {
@@ -43,7 +44,7 @@ function Community() {
                 console.log("Đã kết nối Websocket");
                 client.subscribe("/topic/public", (message) => {
                     const newMessage = JSON.parse(message.body);
-                    setMessages((prev) => [...prev, newMessage]);
+                    setMessages((prev) => [...(prev||[]), newMessage]);
                 });
             },
 
@@ -142,7 +143,7 @@ function Community() {
                             </div>
                         ) : (
                             <>
-                                {messages.map((item, index) => {
+                                {messages?.map((item, index) => {
                                     return <MessageContent
                                         key={index}
                                         avatar={item.avatar || "https://cdn.kona-blue.com/upload/kona-blue_com/post/images/2024/09/18/457/avatar-mac-dinh-12.jpg"}

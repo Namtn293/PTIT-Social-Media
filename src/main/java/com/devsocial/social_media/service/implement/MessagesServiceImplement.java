@@ -42,6 +42,7 @@ public class MessagesServiceImplement implements MessagesService {
 
         String fullName = "Cộng đồng";
         String avatar = null;
+        String userName = "";
         if (messageDTO.getUserId() != null) {
             UserInfo userInfo = userInfoRepository.findById(messageDTO.getUserId()).orElse(null);
             if (userInfo != null) {
@@ -49,6 +50,7 @@ public class MessagesServiceImplement implements MessagesService {
                 if (userInfo.getImageId() != null) {
                     avatar = imageRepository.findAvatarById(userInfo.getImageId());
                 }
+                userName = userInfo.getUserName();
             }
         }
 
@@ -58,30 +60,62 @@ public class MessagesServiceImplement implements MessagesService {
                 .timestamp(message.getCreatedAt())
                 .fullName(fullName)
                 .avatar(avatar)
+                .userName(userName)
                 .build();
     }
 
     @Override
     public List<MessageVO> getAllMessages() {
-        List<Message> list = messageRepository.findAllByOrderByCreatedAtAsc();
+        List<Message> messages = messageRepository.findAllByOrderByCreatedAtAsc();
+        if (messages.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // Collect unique userIds
+        java.util.Set<Long> userIds = messages.stream()
+                .map(Message::getUserId)
+                .filter(java.util.Objects::nonNull)
+                .collect(java.util.Collectors.toSet());
+
+        // Batch fetch all UserInfo records
+        java.util.Map<Long, UserInfo> userInfoMap = userInfoRepository.findAllById(userIds).stream()
+                .collect(java.util.Collectors.toMap(UserInfo::getId, userInfo -> userInfo));
+
+        // Batch fetch all relative Image URLs to eliminate N+1 for avatars
+        java.util.Set<Long> imageIds = userInfoMap.values().stream()
+                .map(UserInfo::getImageId)
+                .filter(java.util.Objects::nonNull)
+                .collect(java.util.Collectors.toSet());
+        
+        java.util.Map<Long, String> avatarMap = new java.util.HashMap<>();
+        if (!imageIds.isEmpty()) {
+            avatarMap = imageRepository.findAllById(imageIds).stream()
+                    .collect(java.util.Collectors.toMap(Image::getId, Image::getUrl));
+        }
+
         List<MessageVO> messageVOS = new ArrayList<>();
-        list.forEach(c -> {
-            String fullName = "Cộng đồng";
-            String avatar = null,userName="";
-            if (c.getUserId() != null) {
-                User user=userRepository.findById(c.getUserId()).orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST));
-                UserInfo userInfo = userInfoRepository.findByUserName(user.getUsername()).orElse(null);
+        for (Message c : messages) {
+            String fullName = "Thành viên PTIT";
+            String avatar = null;
+            String userName = "";
+            Long userId = c.getUserId();
+
+            if (userId != null) {
+                UserInfo userInfo = userInfoMap.get(userId);
                 if (userInfo != null) {
                     if (userInfo.getFullName() != null) fullName = userInfo.getFullName();
                     if (userInfo.getImageId() != null) {
-                        avatar = imageRepository.findAvatarById(userInfo.getImageId());
+                        avatar = avatarMap.get(userInfo.getImageId());
                     }
-                    userName=userInfo.getUserName();
+                    userName = userInfo.getUserName();
+                } else {
+                    // Falls back to "Thành viên PTIT" if userInfo not found, instead of crashing
+                    fullName = "Cựu thành viên";
                 }
             }
             
             MessageVO messageVO = MessageVO.builder()
-                    .userId(c.getUserId() == null ? 0L : c.getUserId())
+                    .userId(userId == null ? 0L : userId)
                     .content(c.getContent())
                     .timestamp(c.getCreatedAt())
                     .fullName(fullName)
@@ -89,7 +123,7 @@ public class MessagesServiceImplement implements MessagesService {
                     .userName(userName)
                     .build();
             messageVOS.add(messageVO);
-        });
+        }
         return messageVOS;
     }
 }
