@@ -3,6 +3,7 @@ package com.devsocial.social_media.service.implement;
 import com.devsocial.social_media.core.auth.entity.User;
 import com.devsocial.social_media.core.auth.repository.UserRepository;
 import com.devsocial.social_media.core.util.BusinessException;
+import com.devsocial.social_media.entity.Image;
 import com.devsocial.social_media.entity.Message;
 import com.devsocial.social_media.entity.UserInfo;
 import com.devsocial.social_media.enumration.ErrorCode;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class MessagesServiceImplement implements MessagesService {
@@ -42,6 +44,7 @@ public class MessagesServiceImplement implements MessagesService {
 
         String fullName = "Cộng đồng";
         String avatar = null;
+        String userName = "";
         if (messageDTO.getUserId() != null) {
             UserInfo userInfo = userInfoRepository.findById(messageDTO.getUserId()).orElse(null);
             if (userInfo != null) {
@@ -49,6 +52,7 @@ public class MessagesServiceImplement implements MessagesService {
                 if (userInfo.getImageId() != null) {
                     avatar = imageRepository.findAvatarById(userInfo.getImageId());
                 }
+                userName = userInfo.getUserName();
             }
         }
 
@@ -58,30 +62,62 @@ public class MessagesServiceImplement implements MessagesService {
                 .timestamp(message.getCreatedAt())
                 .fullName(fullName)
                 .avatar(avatar)
+                .userName(userName)
                 .build();
     }
 
     @Override
     public List<MessageVO> getAllMessages() {
-        List<Message> list = messageRepository.findAllByOrderByCreatedAtAsc();
+        List<Message> messages = messageRepository.findAllByOrderByCreatedAtAsc();
+        if (messages.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        // Collect unique userIds
+        java.util.Set<Long> userIds = messages.stream()
+                .map(Message::getUserId)
+                .filter(java.util.Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // Batch fetch all UserInfo records
+        java.util.Map<Long, UserInfo> userInfoMap = userInfoRepository.findAllById(userIds).stream()
+                .collect(Collectors.toMap(UserInfo::getId, userInfo -> userInfo));
+
+        // Batch fetch all relative Image URLs to eliminate N+1 for avatars
+        java.util.Set<Long> imageIds = userInfoMap.values().stream()
+                .map(UserInfo::getImageId)
+                .filter(java.util.Objects::nonNull)
+                .collect(Collectors.toSet());
+        
+        java.util.Map<Long, String> avatarMap = new java.util.HashMap<>();
+        if (!imageIds.isEmpty()) {
+            avatarMap = imageRepository.findAllById(imageIds).stream()
+                    .collect(Collectors.toMap(Image::getId, Image::getUrl));
+        }
+
         List<MessageVO> messageVOS = new ArrayList<>();
-        list.forEach(c -> {
-            String fullName = "Cộng đồng";
-            String avatar = null,userName="";
-            if (c.getUserId() != null) {
-                User user=userRepository.findById(c.getUserId()).orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST));
-                UserInfo userInfo = userInfoRepository.findByUserName(user.getUsername()).orElse(null);
+        for (Message c : messages) {
+            String fullName = "Thành viên PTIT";
+            String avatar = null;
+            String userName = "";
+            Long userId = c.getUserId();
+
+            if (userId != null) {
+                UserInfo userInfo = userInfoMap.get(userId);
                 if (userInfo != null) {
                     if (userInfo.getFullName() != null) fullName = userInfo.getFullName();
                     if (userInfo.getImageId() != null) {
-                        avatar = imageRepository.findAvatarById(userInfo.getImageId());
+                        avatar = avatarMap.get(userInfo.getImageId());
                     }
-                    userName=userInfo.getUserName();
+                    userName = userInfo.getUserName();
+                } else {
+                    // Falls back to "Thành viên PTIT" if userInfo not found, instead of crashing
+                    fullName = "Cựu thành viên";
                 }
             }
             
             MessageVO messageVO = MessageVO.builder()
-                    .userId(c.getUserId() == null ? 0L : c.getUserId())
+                    .userId(userId == null ? 0L : userId)
                     .content(c.getContent())
                     .timestamp(c.getCreatedAt())
                     .fullName(fullName)
@@ -89,7 +125,7 @@ public class MessagesServiceImplement implements MessagesService {
                     .userName(userName)
                     .build();
             messageVOS.add(messageVO);
-        });
+        }
         return messageVOS;
     }
 }
