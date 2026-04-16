@@ -21,7 +21,6 @@ function Community() {
             try {
                 const response = await MessageApi.getAll();
                 setMessages(response.data.data);
-                console.log(messages);
             } catch (err) {
                 console.log("Lỗi load tin nhắn " + err);
             } finally {
