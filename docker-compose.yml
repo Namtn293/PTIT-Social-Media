@@ -1,0 +1,24 @@
+services:
+  redis_service:
+    image: redis:alpine
+    container_name: redis_service
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: .
+    container_name: spring_backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis_service
+    environment:
+      - SPRING_REDIS_HOST=redis_service
+
+  frontend:
+    build: ./fe
+    container_name: react_frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
