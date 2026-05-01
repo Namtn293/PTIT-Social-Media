@@ -1,9 +1,11 @@
 import React, {useEffect, useState} from "react";
 import { Button, Input, Table, Popconfirm } from "antd";
-import postApi from "../../api/PostApi";
+import { SearchOutlined } from "@ant-design/icons";
+import postApi from "../../api/PostAPI";
 
 function PostManagement(){
     const [searchText, setSearchText] = useState("");
+    const [filterKeyWord, setFilterKeyWord] = useState("");
     const [posts, setPosts] = useState([]);
     const columns = [
         {
@@ -29,8 +31,8 @@ function PostManagement(){
         },
         {
             title: "Ngày tạo",
-            dataIndex: "createAt",
-            key: "createAt",
+            dataIndex: "createdAt",
+            key: "createdAt",
             render: (date)=>{
                 return new Date(date).toLocaleString("vi-VN",{
                     hour: "2-digit",
@@ -68,10 +70,10 @@ function PostManagement(){
         fetchPosts();
     },[]);
 
-    // useEffect(()=>{
-    //     const token = localStorage.getItem("token");
-    //     console.log("Token",token);
-    // })
+    useEffect(()=>{
+        const token = localStorage.getItem("token");
+        console.log("Token",token);
+    })
 
     const fetchPosts = async ()=>{
         try{
@@ -82,6 +84,8 @@ function PostManagement(){
                 idx: index + 1
             }))
 
+            console.log(postsWithIndex);
+
             setPosts(postsWithIndex);
         }catch(error){
             console.error("Lỗi gọi API:", error);
@@ -89,7 +93,7 @@ function PostManagement(){
     }
 
     const handleDelete = (id)=>{
-        const newPosts = posts.filter(posts=>posts.id!==id);
+        const newPosts = posts.filter(post=>post.id!==id);
         setPosts(newPosts);
     }
 
@@ -119,35 +123,47 @@ function PostManagement(){
 
     return(
         <div className="post-manager-container" 
-            style={{backgroundColor:"#c7c7c79f",
+            style={{backgroundColor:"#f4f4fc",
                 height:"100vh",
                 display:"flex",
                 justifyContent:"center",
                 alignItems:"center",
                 flexDirection:"column",
-                gap:"10px"
+                gap:"10px",
+                padding:"30px"
             }}>
-            <div className="filter-container" style={{width:"100%"}}>
+            <div className="filter-container" style={{width:"100%",display:"flex"}}>
                 <Input 
                     type="text" 
                     placeholder="Nhập từ khóa"
-                    value={searchText}
-                    onChange={(e) => setSearchText(e.target.value)}
+                    value={filterKeyWord}
+                    onChange={(e)=> setFilterKeyWord(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && setSearchText(filterKeyWord)}
                     style={{
-                        width:"200px",
+                        width:"500px",
                         borderRadius:"5px",
                         outline:"none",
                         padding:"5px 10px",
                         border: "1px solid #ccc",
-                        margin: "10px 0 0 65px"
                     }}
                 />
+                <Button icon={<SearchOutlined/>} 
+                    size="large" 
+                    type="primary" 
+                    onClick={()=>setSearchText(filterKeyWord)}
+                    style={{
+                        height:35,
+                        borderRadius:"5px", 
+                        marginLeft:10,
+                    }}>
+                    Tìm kiếm
+                </Button>
             </div>
             
             <div className="list-pages-container"
                 style={{
-                    width: "90%",
-                    height: "90%",
+                    width: "100%",
+                    height: "100%",
                     backgroundColor:"#ffffff",
                     borderRadius:"10px",
                     marginBottom:"10px"

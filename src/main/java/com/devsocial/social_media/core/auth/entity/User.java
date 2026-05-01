@@ -15,7 +15,9 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "AUTH_USER")
+@Table(name = "AUTH_USER",indexes = {
+        @Index(name = "user_name_index",columnList = "USERNAME",unique = true)
+})
 @Data
 public class User extends EntityBase implements UserDetails {
     @Column(name = "USERNAME")

@@ -12,12 +12,14 @@ import java.time.LocalDateTime;
 public class PostVO {
     private String title;
     private String content;
-    private LocalDateTime createAt;
-    private String author;
-    private String className;
-    private Long likeTotal;
-    private Long commentTotal;
-    private Long saveTotal;
-    private Long reportTotal;
-    private Long postId;
+    private LocalDateTime time;
+    private String name;
+    private String classes;
+    private Long likes;
+    private Long comments;
+    private Long saves;
+    private Long report;
+    private Long id;
+    private String userName;
+    private String avatar;
 }

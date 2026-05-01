@@ -3,10 +3,13 @@ package com.devsocial.social_media.entity;
 import com.devsocial.social_media.core.util.EntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "MAIN_NOTIFICATIONS")
+@Table(name = "MAIN_NOTIFICATIONS",indexes = {
+        @Index(name = "user_id_index",columnList = "USER_ID")
+})
 public class Notification extends EntityBase {
     @Column(name = "USER_ID")
     private String userId;
