@@ -3,10 +3,13 @@ import { Button, Input, Select } from "antd";
 import {SearchOutlined} from "@ant-design/icons"
 import Title from "antd/es/skeleton/Title";
 const { Option } = Select;
+import PostApi from "../../api/PostApi"
 import PostLayout from "../../components/post/PostLayout"
 import Pagination from "../../components/pagination/Pagination"
-import {useState} from "react"
+import {useState,useEffect} from "react"
 function HomeContent() {
+    const [posts,setPosts]=useState([]);
+
     const subject = [
         "CTDL&GT",
         "Xác suất",
@@ -46,87 +49,19 @@ function HomeContent() {
     },
   ];
 
-    const posts=[
-    {
-        "id": "1",
-        "title": "Góc cứu trợ Giải tích 2",
-        "name": "Nguyễn Văn An",
-        "time": "5 phút trước",
-        "classes": "D23CQCN01-B",
-        "likes": 125,
-        "comments": 48,
-        "saves": 30,
-        "report": 0,
-        "userName":"admin",
-        "content": "Có anh chị khóa trên nào còn bộ tài liệu ôn thi Giải tích 2 của thầy Tùng không ạ? Càng gần thi em càng thấy kiến thức bay màu dần đều, cứu em với! 😭"
-    },
-    {
-        "id": "2",
-        "title": "Review Căng tin A2",
-        "name": "Trần Thị Lan",
-        "time": "45 phút trước",
-        "classes": "D22CQDT05-N",
-        "likes": 89,
-        "comments": 15,
-        "saves": 5,
-        "report": 2,
-        "userName":"admin",
-        "content": "Mọi người ơi, hôm nay căng tin A2 có món sườn xào chua ngọt đỉnh lắm nhé. Mỗi tội phải xếp hàng hơi lâu từ cổng đỏ vào, ai đi ăn thì tranh thủ đi sớm nha."
-    },
-    {
-        "id": "3",
-        "title": "Tìm đồ thất lạc",
-        "name": "Lê Minh Đức",
-        "time": "2 tiếng trước",
-        "classes": "D21CQCN09-B",
-        "likes": 42,
-        "comments": 10,
-        "saves": 2,
-        "report": 0,
-        "userName":"admin",
-        "content": "Mình có đánh rơi một chiếc thẻ sinh viên tên Lê Minh Đức ở khu vực sân bóng lúc 5h chiều nay. Ai nhặt được cho mình xin lại với ạ, mình xin cảm ơn và hậu tạ một chầu trà sữa!"
-    },
-    {
-        "id": "4",
-        "title": "Kinh nghiệm thực tập",
-        "name": "Hoàng Xuân Bách",
-        "time": "5 tiếng trước",
-        "classes": "D20CQVT01-B",
-        "likes": 310,
-        "comments": 85,
-        "saves": 150,
-        "report": 0,
-        "userName":"admin",
-        "content": "Chào các em khóa dưới, mình vừa hoàn thành kỳ thực tập tại Viettel. Có vài tips về việc chuẩn bị CV và ôn tập kiến thức nền tảng (OOP, SQL, Data Structure) muốn chia sẻ cho các bạn D22, D23 đang lo lắng. Ai quan tâm không?"
-    },
-    {
-        "id": "5",
-        "title": "CLB S-Media tuyển thành viên",
-        "name": "S-Media PTIT",
-        "time": "1 ngày trước",
-        "classes": "CLB Truyền Thông",
-        "likes": 520,
-        "comments": 120,
-        "saves": 45,
-        "report": 0,
-        "userName":"admin",
-        "content": "🔥 [RECRUITMENT] Bạn đam mê nhiếp ảnh? Bạn thích viết lách hay edit video? Đừng bỏ lỡ cơ hội trở thành một mẩu của gia đình S-Media trong đợt tuyển thành viên lớn nhất năm nay nhé!"
-    },
-    {
-        "id": "6",
-        "title": "Thắc mắc đăng ký tín chỉ",
-        "name": "Phạm Hải Yến",
-        "time": "2 ngày trước",
-        "classes": "D23CQMR02-B",
-        "likes": 15,
-        "comments": 60,
-        "saves": 3,
-        "report": 5,
-        "userName":"admin",
-        "content": "Web trường mình lại 'nghẻo' rồi hả mọi người? Em canh từ 12h đêm đến giờ vẫn chưa vào được để đăng ký môn học phần. Có ai bị giống em không?"
-    }
-    ];
+    useEffect(()=>{
+        const fetchData=async () =>{
+            try{
+                const response=await PostApi.getAllHomePosts();
+                setPosts(response.data.data);
+            } catch(err){
+                console.log("Lỗi tải dữ liệu "+err);
+            } finally{
 
+            }
+        }
+        fetchData();
+    },[])
 
     
     return (
