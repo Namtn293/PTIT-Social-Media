@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import { Button, Input, Table, Popconfirm } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
-import postApi from "../../api/PostAPI";
+import postApi from "../../api/PostApi";
 
 function PostManagement(){
     const [searchText, setSearchText] = useState("");
@@ -66,15 +66,6 @@ function PostManagement(){
         },
     ];
 
-    useEffect(()=>{
-        fetchPosts();
-    },[]);
-
-    useEffect(()=>{
-        const token = localStorage.getItem("token");
-        console.log("Token",token);
-    })
-
     const fetchPosts = async ()=>{
         try{
             const response = await postApi.getAllAdminPost();
@@ -91,6 +82,16 @@ function PostManagement(){
             console.error("Lỗi gọi API:", error);
         }
     }
+
+    useEffect(()=>{
+        fetchPosts();
+    },[]);
+
+    useEffect(()=>{
+        const token = localStorage.getItem("token");
+        console.log("Token",token);
+    })
+
 
     const handleDelete = (id)=>{
         const newPosts = posts.filter(post=>post.id!==id);

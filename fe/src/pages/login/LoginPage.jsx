@@ -33,7 +33,7 @@ function LoginPage(){
                 localStorage.setItem("role",jwt.roles[0]);
                 localStorage.setItem("userId",jwt.userId);
                 console.log(localStorage.getItem("userId"));
-                navigate("/");
+                window.location.href = "/";
             }
         } catch(error){
             message.error("Đăng nhập thất bại, vui lòng thử lại")

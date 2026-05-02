@@ -2,6 +2,7 @@ package com.devsocial.social_media.service.implement;
 
 import com.devsocial.social_media.core.auth.entity.User;
 import com.devsocial.social_media.core.auth.repository.UserRepository;
+import com.devsocial.social_media.core.configuration.ThreadContext;
 import com.devsocial.social_media.core.util.BusinessException;
 import com.devsocial.social_media.entity.Classes;
 import com.devsocial.social_media.entity.Major;
@@ -31,13 +32,15 @@ public class UserInfoServiceImplement implements UserInfoService {
     private final MajorRepository majorRepository;
     private final ClassesRepository classesRepository;
     private final UserRepository userRepository;
-    public UserInfoServiceImplement(UserRepository userRepository,ClassesRepository classesRepository,MajorRepository majorRepository,UserInfoRepository userInfoRepository, CloudinaryServiceImplement cloudinaryServiceImplement, ImagesServiceImplement imageImplement) {
+    private final NotificationPublisher notificationPublisher;
+    public UserInfoServiceImplement(NotificationPublisher notificationPublisher,UserRepository userRepository,ClassesRepository classesRepository,MajorRepository majorRepository,UserInfoRepository userInfoRepository, CloudinaryServiceImplement cloudinaryServiceImplement, ImagesServiceImplement imageImplement) {
         this.userInfoRepository = userInfoRepository;
         this.cloudinaryServiceImplement = cloudinaryServiceImplement;
         this.imageImplement = imageImplement;
         this.classesRepository = classesRepository;
         this.majorRepository = majorRepository;
         this.userRepository = userRepository;
+        this.notificationPublisher = notificationPublisher;
     }
 
     @Override
@@ -81,9 +84,16 @@ public class UserInfoServiceImplement implements UserInfoService {
     @Override
     public void banUser(String userName) {
         UserInfo userInfo = userInfoRepository.findByUserName(userName)
-                .orElseThrow(()->new RuntimeException("user not found"));
+                .orElseThrow(() -> new RuntimeException("user not found"));
         userInfo.setStatus(StatusEnum.BANNED);
         userInfoRepository.save(userInfo);
+
+        // Gửi thông báo real-time tới chính user bị khóa
+        notificationPublisher.publish(
+                userInfo.getUserName(),
+                "Tài khoản của bạn đã bị quản trị viên khóa",
+                "BAN"
+        );
     }
 
     @Override

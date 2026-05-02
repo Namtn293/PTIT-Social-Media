@@ -7,6 +7,7 @@ import Header from './components/header/HeaderUser';
 import SideBar from './components/sidebar/SideBar';
 import PageContent from './components/pagecontent/PageContent';
 import HeaderAdmin from './components/header/HeaderAdmin';
+import { NotificationProvider } from './context/NotificationContext';
 function App() {
 const theme={
     token:{
@@ -17,40 +18,41 @@ const theme={
 
 return (
     <ConfigProvider theme={theme}>
-        <BrowserRouter>
-            <div className='app-container'>
-                <Routes>
-                    <Route path="/*" element={
-                        localStorage.getItem("role")=="ROLE_ADMIN"?(
-                        <div style={{
-                            justifyContent:"center",
-                            display:"flex",
-                            width:"100vw",
-                            height:"100vh"
-                        }}>
-                            <SideBar/>
-                            <div className='in-content'>
-                                <HeaderAdmin/>
-                                <PageContent/>
-                            </div>
-                            
-                        </div>
-                    ):(
-                        <div style={{
-                            justifyContent:"center",
-                            display:"flex"
-                        }}>
-                            <Header/>
-                            <PageContent/>
-                        </div>
-                    )}/>
-                    <Route path='/login' element={<LoginPage/>} />
-                    <Route path='/register' element={<RegisterPage/>} />
-                </Routes>
-            </div>
-        </BrowserRouter>
+        <NotificationProvider> {/* 1. Mở NotificationProvider */}
+            <BrowserRouter>
+                <div className='app-container'>
+                    <Routes>
+                        <Route path="/*" element={
+                            localStorage.getItem("role") == "ROLE_ADMIN" ? (
+                                <div style={{
+                                    justifyContent: "center",
+                                    display: "flex",
+                                    width: "100vw",
+                                    height: "100vh"
+                                }}>
+                                    <SideBar />
+                                    <div className='in-content'>
+                                        <HeaderAdmin />
+                                        <PageContent />
+                                    </div>
+                                </div>
+                            ) : (
+                                <div style={{
+                                    justifyContent: "center",
+                                    display: "flex"
+                                }}>
+                                    <Header />
+                                    <PageContent />
+                                </div>
+                            )
+                        } />
+                        <Route path='/login' element={<LoginPage />} />
+                        <Route path='/register' element={<RegisterPage />} />
+                    </Routes>
+                </div>
+            </BrowserRouter>
+        </NotificationProvider> 
     </ConfigProvider>
 )
 }
-
-export default App
+export default App;

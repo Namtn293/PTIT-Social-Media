@@ -8,7 +8,6 @@ import {
 } from "@ant-design/icons";
 import useInfoApi from "../../api/UserInfoApi";
 
-// Cấu hình Dayjs để hiển thị tiếng Việt và thời gian tương đối
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import "dayjs/locale/vi"; 

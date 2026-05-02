@@ -3,7 +3,7 @@ import { Button, Input, Select } from "antd";
 import {SearchOutlined} from "@ant-design/icons"
 import Title from "antd/es/skeleton/Title";
 const { Option } = Select;
-import PostApi from "../../api/PostApi"
+import PostApi from "../../api/PostApi.js"
 import PostLayout from "../../components/post/PostLayout"
 import Pagination from "../../components/pagination/Pagination"
 import {useState,useEffect} from "react"
