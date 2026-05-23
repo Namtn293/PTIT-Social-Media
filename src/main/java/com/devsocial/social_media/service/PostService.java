@@ -27,4 +27,6 @@ public interface PostService {
     List<PostVO> getSavePosts();
 
     List<PostAdminVO> getAllAdminPosts();
+
+    Long getPostTotal();
 }

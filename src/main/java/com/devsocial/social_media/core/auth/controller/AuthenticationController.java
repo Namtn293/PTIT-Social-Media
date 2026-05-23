@@ -9,10 +9,7 @@ import com.devsocial.social_media.core.util.SuccessResponse;
 import com.devsocial.social_media.enumration.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -45,5 +42,10 @@ public class AuthenticationController {
         authHeader=authHeader.substring(7);
         authenticationService.logout(authHeader);
         return ResponseUtil.ok("Logout success");
+    }
+
+    @GetMapping("/statistic/get-user-total")
+    public SuccessResponse<Long> getUserTotal(){
+        return ResponseUtil.ok("Get user total success", authenticationService.getUserTotal());
     }
 }

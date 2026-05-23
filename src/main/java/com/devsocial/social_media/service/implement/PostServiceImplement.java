@@ -134,4 +134,9 @@ public class PostServiceImplement implements PostService {
     public List<PostAdminVO> getAllAdminPosts() {
         return postsRepository.getAllAdminPosts();
     }
+
+    @Override
+    public Long getPostTotal() {
+        return postsRepository.count();
+    }
 }
