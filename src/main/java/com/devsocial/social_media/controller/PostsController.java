@@ -73,4 +73,9 @@ public class PostsController {
                 postService.getAllAdminPosts()
         );
     }
+
+    @GetMapping("/statistic/get-post-data-chart")
+    public SuccessResponse<Long> getPostDateChart(){
+        return ResponseUtil.ok("Get post total success", postService.getPostTotal());
+    }
 }

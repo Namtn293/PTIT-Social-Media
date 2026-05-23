@@ -96,4 +96,8 @@ public class AuthenticationService {
         jwt.setRevoked(true);
         tokenRepository.save(jwt);
     }
+
+    public Long getUserTotal(){
+        return userRepository.count();
+    }
 }
