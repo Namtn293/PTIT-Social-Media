@@ -1,59 +1,6 @@
 import "./HomeContent.css";
-import { useState } from "react";
-
-// ── Mock data ──────────────────────────────────────────────
-const CHART_DATA = {
-  "7 ngày qua": [
-    { date: "17/05", posts: 45, views: 520 },
-    { date: "18/05", posts: 60, views: 680 },
-    { date: "19/05", posts: 38, views: 410 },
-    { date: "20/05", posts: 75, views: 820 },
-    { date: "21/05", posts: 55, views: 610 },
-    { date: "22/05", posts: 48, views: 540 },
-    { date: "23/05", posts: 52, views: 590 },
-  ],
-  "30 ngày qua": [
-    { date: "01/05", posts: 35, views: 420 },
-    { date: "02/05", posts: 42, views: 480 },
-    { date: "03/05", posts: 50, views: 560 },
-    { date: "04/05", posts: 45, views: 510 },
-    { date: "05/05", posts: 38, views: 440 },
-    { date: "06/05", posts: 55, views: 620 },
-    { date: "07/05", posts: 48, views: 540 },
-    { date: "08/05", posts: 62, views: 700 },
-    { date: "09/05", posts: 40, views: 460 },
-    { date: "10/05", posts: 35, views: 400 },
-    { date: "11/05", posts: 58, views: 650 },
-    { date: "12/05", posts: 45, views: 510 },
-    { date: "13/05", posts: 52, views: 590 },
-    { date: "14/05", posts: 48, views: 540 },
-    { date: "15/05", posts: 65, views: 740 },
-    { date: "16/05", posts: 72, views: 820 },
-    { date: "17/05", posts: 58, views: 660 },
-    { date: "18/05", posts: 45, views: 510 },
-    { date: "19/05", posts: 38, views: 430 },
-    { date: "20/05", posts: 55, views: 620 },
-    { date: "21/05", posts: 60, views: 680 },
-    { date: "22/05", posts: 42, views: 480 },
-    { date: "23/05", posts: 50, views: 560 },
-    { date: "24/05", posts: 45, views: 510 },
-    { date: "25/05", posts: 38, views: 430 },
-    { date: "26/05", posts: 52, views: 590 },
-    { date: "27/05", posts: 48, views: 540 },
-    { date: "28/05", posts: 55, views: 620 },
-    { date: "29/05", posts: 50, views: 570 },
-    { date: "30/05", posts: 45, views: 510 },
-  ],
-  "90 ngày qua": [
-    { date: "01/03", posts: 28, views: 320 },
-    { date: "15/03", posts: 35, views: 400 },
-    { date: "01/04", posts: 42, views: 480 },
-    { date: "15/04", posts: 55, views: 620 },
-    { date: "01/05", posts: 48, views: 540 },
-    { date: "15/05", posts: 65, views: 740 },
-    { date: "30/05", posts: 50, views: 570 },
-  ],
-};
+import { useState, useEffect } from "react";
+import statisticAdminApi from "../../api/StatisticAdminApi.js";
 
 const RECENT_POSTS = [
   {
@@ -96,21 +43,24 @@ function LineChart({ data }) {
   const innerH = H - PAD.top - PAD.bottom;
 
   const maxPosts = Math.max(...data.map((d) => d.posts));
-  const maxViews = Math.max(...data.map((d) => d.views));
 
   const xStep = innerW / (data.length - 1);
   const scaleY = (val, max) => innerH - (val / (max * 1.15)) * innerH;
 
-  const polyPoints = (key, max) =>
-    data
-      .map((d, i) => `${PAD.left + i * xStep},${PAD.top + scaleY(d[key], max)}`)
-      .join(" ");
+  // Y-axis ticks - tính toán động dựa trên maxPosts
+  const maxYValue = maxPosts + 1;
+  const yTicksCount = Math.min(5, maxYValue);
+  const tickStep = Math.ceil(maxYValue / yTicksCount);
+  const yTicks = Array.from({ length: yTicksCount + 1 }, (_, i) => {
+    const val = i * tickStep;
+    return val <= maxYValue ? val : maxYValue;
+  }).filter((v, i, arr) => i === 0 || v !== arr[i - 1]);
 
   const pathD = (key, max) => {
     return data
       .map((d, i) => {
         const x = PAD.left + i * xStep;
-        const y = PAD.top + scaleY(d[key], max);
+        const y = PAD.top + scaleY(d[key], maxYValue);
         return i === 0 ? `M ${x} ${y}` : `L ${x} ${y}`;
       })
       .join(" ");
@@ -119,7 +69,7 @@ function LineChart({ data }) {
   const areaD = (key, max) => {
     const pts = data.map((d, i) => ({
       x: PAD.left + i * xStep,
-      y: PAD.top + scaleY(d[key], max),
+      y: PAD.top + scaleY(d[key], maxYValue),
     }));
     const firstX = pts[0].x;
     const lastX = pts[pts.length - 1].x;
@@ -130,9 +80,6 @@ function LineChart({ data }) {
       ` L ${lastX} ${bottom} Z`
     );
   };
-
-  // Y-axis ticks
-  const yTicks = [0, 20, 40, 60, 80, 100];
 
   // Show only some x-axis labels to avoid clutter
   const showXLabel = (i) => {
@@ -160,7 +107,7 @@ function LineChart({ data }) {
 
       {/* Grid lines */}
       {yTicks.map((tick) => {
-        const y = PAD.top + scaleY(tick, 100);
+        const y = PAD.top + scaleY(tick, maxYValue);
         return (
           <g key={tick}>
             <line
@@ -201,33 +148,22 @@ function LineChart({ data }) {
       )}
 
       {/* Area fills */}
-      <path d={areaD("posts", maxPosts)} fill="url(#gradPosts)" />
-      <path d={areaD("views", maxViews)} fill="url(#gradViews)" />
+      <path d={areaD("posts", maxYValue)} fill="url(#gradPosts)" />
 
       {/* Lines */}
       <path
-        d={pathD("posts", maxPosts)}
+        d={pathD("posts", maxYValue)}
         fill="none"
         stroke="#6366f1"
         strokeWidth="2.5"
         strokeLinejoin="round"
         strokeLinecap="round"
       />
-      <path
-        d={pathD("views", maxViews)}
-        fill="none"
-        stroke="#a78bfa"
-        strokeWidth="2"
-        strokeLinejoin="round"
-        strokeLinecap="round"
-        strokeDasharray="5,3"
-      />
 
       {/* Dots + hover */}
       {data.map((d, i) => {
         const cx = PAD.left + i * xStep;
-        const cyPosts = PAD.top + scaleY(d.posts, maxPosts);
-        const cyViews = PAD.top + scaleY(d.views, maxViews);
+        const cyPosts = PAD.top + scaleY(d.posts, maxYValue);
         return (
           <g key={i}>
             <circle
@@ -235,14 +171,6 @@ function LineChart({ data }) {
               cy={cyPosts}
               r="4"
               fill="#6366f1"
-              stroke="white"
-              strokeWidth="2"
-            />
-            <circle
-              cx={cx}
-              cy={cyViews}
-              r="3.5"
-              fill="#a78bfa"
               stroke="white"
               strokeWidth="2"
             />
@@ -271,7 +199,7 @@ function LineChart({ data }) {
               x={tx}
               y={PAD.top}
               width="100"
-              height="52"
+              height="36"
               rx="6"
               fill="white"
               stroke="#e0e0e0"
@@ -284,7 +212,6 @@ function LineChart({ data }) {
             <text x={tx + 8} y={PAD.top + 30} fontSize="10" fill="#6366f1">
               ● Bài viết: {d.posts}
             </text>
-            
           </g>
         );
       })()}
@@ -312,11 +239,37 @@ function StatCard({ icon, label, value, growth, color }) {
 
 // ── Main Component ─────────────────────────────────────────
 function HomeContent() {
-  const [period, setPeriod] = useState("30 ngày qua");
-  const data = CHART_DATA[period];
+  const [chartData, setChartData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const totalPosts = data.reduce((s, d) => s + d.posts, 0);
-  const totalViews = data.reduce((s, d) => s + d.views, 0).toLocaleString("vi-VN");
+  // Fetch chart data from API
+  useEffect(() => {
+    const fetchChartData = async () => {
+      try {
+        setLoading(true);
+        const response = await statisticAdminApi.getAllAdminPost();
+        console.log("API Response:", response.data); // Debug log
+        // API trả về {data: [...], message: ..., status: ...}
+        setChartData(response.data.data);
+        setError(null);
+      } catch (err) {
+        console.error("Error fetching chart data:", err);
+        setError(err.message);
+        setChartData(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchChartData();
+  }, []);
+
+  // Use fetched data - remove fallback to avoid confusion
+  const data = chartData && Array.isArray(chartData) ? chartData : [];
+
+  const totalPosts = data?.reduce((s, d) => s + d.posts, 0) || 0;
+  const totalViews = data?.reduce((s, d) => s + d.views, 0).toLocaleString("vi-VN") || 0;
 
   return (
     <div className="hc-root">
@@ -414,7 +367,21 @@ function HomeContent() {
             <h2 className="hc-chart-title">Thống kê bài viết</h2>
           </div>
           <div className="hc-chart-wrap">
-            <LineChart data={data} />
+            {loading ? (
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
+                <p>Đang tải dữ liệu...</p>
+              </div>
+            ) : error ? (
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
+                <p style={{ color: "#ef4444" }}>Lỗi tải dữ liệu: {error}</p>
+              </div>
+            ) : data && data.length > 0 ? (
+              <LineChart data={data} />
+            ) : (
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
+                <p>Không có dữ liệu</p>
+              </div>
+            )}
           </div>
         </div>
 

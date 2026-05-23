@@ -8,10 +8,12 @@ import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.model.dto.PostDTO;
 import com.devsocial.social_media.model.dto.PostUpdateDTO;
 import com.devsocial.social_media.model.vo.PostAdminVO;
+import com.devsocial.social_media.model.vo.PostDataChart;
 import com.devsocial.social_media.model.vo.PostVO;
 import com.devsocial.social_media.repository.*;
 import com.devsocial.social_media.service.PostService;
 import jakarta.validation.Valid;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +23,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -136,7 +140,30 @@ public class PostServiceImplement implements PostService {
     }
 
     @Override
-    public Long getPostTotal() {
-        return postsRepository.count();
+    public List<PostDataChart> getPostDataChart() {
+        Map<LocalDate,Long> map=new TreeMap<>();
+        for (LocalDate localDate = LocalDate.now().minusDays(14);!localDate.isAfter(LocalDate.now());localDate = localDate.plusDays(1)) {
+            map.put(localDate, 0L);
+        }
+
+        List<Object[]> results=postsRepository.getPostsDataChart();
+        for (Object[] o:results){
+            LocalDate date=((LocalDate) o[0]);
+            Long posts=((Number) o[1]).longValue();
+            if (map.containsKey(date)){
+                map.put(date,posts);
+            }
+            System.out.println(date+" "+posts);
+        }
+        List<PostDataChart> postDataChartList=new ArrayList<>();
+        map.forEach((key,value)->{
+            String date=key.format(DateTimeFormatter.ofPattern("dd/MM"));
+            postDataChartList.add(PostDataChart.builder()
+                            .date(date)
+                            .posts(value)
+                    .build());
+        });
+        return postDataChartList;
     }
+
 }

@@ -80,4 +80,13 @@ public interface PostsRepository extends JpaRepository<Post,Long> {
             "where a.id=:postId")
     void updateSavePostTotal(@Param("postId")Long postId, @Param("valueCount") Long valueCount);
 
+    @Query(value = """
+        select DATE(p.created_at) as created_date,
+               count(*) as total
+        from main_posts p
+        where p.created_at >= now() - interval '15 days'
+        group by DATE(p.created_at)
+        order by DATE(p.created_at)
+        """, nativeQuery = true)
+    List<Object[]> getPostsDataChart();
 }
