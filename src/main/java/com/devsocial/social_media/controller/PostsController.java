@@ -2,9 +2,11 @@ package com.devsocial.social_media.controller;
 
 import com.devsocial.social_media.core.util.ResponseUtil;
 import com.devsocial.social_media.core.util.SuccessResponse;
+import com.devsocial.social_media.entity.Post;
 import com.devsocial.social_media.model.dto.PostDTO;
 import com.devsocial.social_media.model.dto.PostUpdateDTO;
 import com.devsocial.social_media.model.vo.PostAdminVO;
+import com.devsocial.social_media.model.vo.PostDataChart;
 import com.devsocial.social_media.model.vo.PostVO;
 import com.devsocial.social_media.service.PostService;
 import jakarta.validation.Valid;
@@ -75,7 +77,7 @@ public class PostsController {
     }
 
     @GetMapping("/statistic/get-post-data-chart")
-    public SuccessResponse<Long> getPostDateChart(){
-        return ResponseUtil.ok("Get post total success", postService.getPostTotal());
+    public SuccessResponse<List<PostDataChart>> getPostDateChart(){
+        return ResponseUtil.ok("Get post total success", postService.getPostDataChart());
     }
 }
