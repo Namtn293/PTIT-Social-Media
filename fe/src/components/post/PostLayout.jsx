@@ -32,6 +32,29 @@ const PostLayout = ({report,content,avatar,title,name,time,userName,classes,like
         }
     },[userName]);
 
+    const formatTimeAgo = (time) => {
+    const now = new Date();
+    const diffMs = now - new Date(time);
+
+    const minutes = Math.floor(diffMs / (1000 * 60));
+    const hours = Math.floor(diffMs / (1000 * 60 * 60));
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (minutes < 1) {
+        return "Vừa xong";
+    }
+
+    if (minutes < 60) {
+        return `${minutes} phút trước`;
+    }
+
+    if (hours < 24) {
+        return `${hours} giờ trước`;
+    }
+
+    return `${days} ngày trước`;
+    };
+
     const detailProfile=(
         <div style={{ width: "280px", padding: "8px" }}>
             <div style={{ borderBottom: "1px solid #f0f0f0", paddingBottom: "10px", marginBottom: "15px" }}>
@@ -91,7 +114,7 @@ const PostLayout = ({report,content,avatar,title,name,time,userName,classes,like
                     <div className="name-time">
                         <span className="name-post">{name}</span>
                         <span className="classes-post">• {classes}</span>
-                        <span className="time-post">• {time}</span>
+                        <span className="time-post">• {formatTimeAgo(time)}</span>
                     </div>
 
                     <span className="post-title">{title}</span>

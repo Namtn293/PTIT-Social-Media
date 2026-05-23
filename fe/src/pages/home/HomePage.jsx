@@ -1,7 +1,7 @@
 import Header from "../../components/header/HeaderUser";
 import PageContent from "../../components/pagecontent/PageContent";
 import SideBar from "../../components/sidebar/SideBar";
-
+import PageContentUser from "../../components/pagecontent/PageContentUser";
 function homePage(){
 return  (<BrowserRouter>
             <Routes>
@@ -16,7 +16,7 @@ return  (<BrowserRouter>
                         <div>
                             <Header/>
                             
-                            <PageContent/>
+                            <PageContentUser/>
                         </div>
                     )
                 } />

@@ -3,10 +3,11 @@ import './App.css'
 import LoginPage from "./pages/login/LoginPage"
 import { BrowserRouter, Route, Routes,Navigate } from 'react-router-dom';
 import RegisterPage from './pages/register/RegisterPage';
-import Header from './components/header/HeaderUser';
+import HeaderUser from './components/header/HeaderUser';
 import SideBar from './components/sidebar/SideBar';
 import PageContent from './components/pagecontent/PageContent';
 import HeaderAdmin from './components/header/HeaderAdmin';
+import PageContentUser from './components/pagecontent/PageContentUser';
 function App() {
 const theme={
     token:{
@@ -33,15 +34,11 @@ return (
                                 <HeaderAdmin/>
                                 <PageContent/>
                             </div>
-                            
                         </div>
                     ):(
-                        <div style={{
-                            justifyContent:"center",
-                            display:"flex"
-                        }}>
-                            <Header/>
-                            <PageContent/>
+                        <div>
+                            <HeaderUser/>
+                            <PageContentUser/>
                         </div>
                     )}/>
                     <Route path='/login' element={<LoginPage/>} />

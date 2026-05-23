@@ -1,0 +1,40 @@
+#root{
+    width:100%;
+    min-height:100vh;
+}
+
+.app-container{
+    width:100%;
+    min-height:100vh;
+}
+
+.home, .post, .community, .document {
+    border-radius: 10px;
+    padding: 10px;
+    background-color: white;
+}
+
+.home:hover, 
+.post:hover, 
+.community:hover,
+.document:hover {
+    cursor: pointer;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: rgba(238, 203, 182, 0.26);
+    color:rgb(236, 63, 11)
+}
+
+.bell{
+    background: none;
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bell:hover{
+    background-color: #eecbb642;
+}
