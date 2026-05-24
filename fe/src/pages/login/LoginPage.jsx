@@ -28,11 +28,14 @@ function LoginPage(){
                 message.error("Tên đăng nhập không đúng, vui lòng thử lại!");
             } else{
                 message.success("Đăng nhập thành công!");
-                const jwt=jwtDecode(response.data.message);
-                localStorage.setItem("token", response.data.message); 
+                const jwt=jwtDecode(response.data.data.token);
+                localStorage.setItem("token", response.data.data.token); 
                 localStorage.setItem("role",jwt.roles[0]);
                 localStorage.setItem("userId",jwt.userId);
-                console.log(localStorage.getItem("userId"));
+                localStorage.setItem("userInfoId",response.data.data.userInfoId);
+                localStorage.setItem("fullName",response.data.data.fullName);
+                localStorage.setItem("avatar",response.data.data.avatar || "https://ss-images.saostar.vn/wp700/pc/1613810558698/Facebook-Avatar_3.png");
+                console.log(localStorage.getItem("fullName"));
                 navigate("/");
             }
         } catch(error){

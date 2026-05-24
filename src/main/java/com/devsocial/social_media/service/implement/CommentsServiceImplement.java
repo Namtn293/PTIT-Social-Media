@@ -6,6 +6,7 @@ import com.devsocial.social_media.entity.Post;
 import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.model.dto.CommentDTO;
 import com.devsocial.social_media.model.dto.CommentUpdateDTO;
+import com.devsocial.social_media.model.vo.CommentVO;
 import com.devsocial.social_media.repository.CommentsRepository;
 import com.devsocial.social_media.repository.PostsRepository;
 import com.devsocial.social_media.service.CommentsService;
@@ -32,18 +33,14 @@ public class CommentsServiceImplement implements CommentsService {
         comment.setPostId(commentDTO.getPostId());
         comment.setUserId(commentDTO.getUserId());
         comment.setContent(commentDTO.getContent());
-        comment.prePersist();
+        postsRepository.updateCommentTotal(commentDTO.getPostId());
         commentsRepository.save(comment);
         return comment;
     }
 
     @Override
-    public List<Comment> getAllByPostId(Long postId) throws BusinessException {
-        Post post = postsRepository.findById(postId)
-                .orElseThrow(()->new BusinessException(ErrorCode.POST_NOT_EXIST));
-        List<Comment> comments = commentsRepository.findAllByPostId(postId);
-        comments.sort(Comparator.comparing(Comment::getCreatedAt));
-        return comments;
+    public List<CommentVO> getAllByPostId(Long postId) throws BusinessException {
+        return commentsRepository.getAllCommentByPostId(postId);
     }
 
     @Override

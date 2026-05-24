@@ -4,6 +4,7 @@ import com.devsocial.social_media.core.util.ResponseUtil;
 import com.devsocial.social_media.core.util.SuccessResponse;
 import com.devsocial.social_media.model.dto.DocumentDTO;
 import com.devsocial.social_media.model.vo.DocumentVO;
+import com.devsocial.social_media.model.vo.GeneralCountHomeVO;
 import com.devsocial.social_media.service.DocumentsService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -46,5 +47,10 @@ public class DocumentsController {
                 "Get all document success",
                 documentsService.getAllDocument()
         );
+    }
+
+    @GetMapping("/statistic/get-document-total")
+    public SuccessResponse<GeneralCountHomeVO> getDocumentTotal(){
+        return ResponseUtil.ok("Get post total success", documentsService.getDocumentTotal());
     }
 }

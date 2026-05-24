@@ -13,6 +13,7 @@ import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.enumration.RoleEnum;
 import com.devsocial.social_media.model.dto.DocumentDTO;
 import com.devsocial.social_media.model.vo.DocumentVO;
+import com.devsocial.social_media.model.vo.GeneralCountHomeVO;
 import com.devsocial.social_media.repository.DocumentsRepository;
 import com.devsocial.social_media.repository.FilesRepository;
 import com.devsocial.social_media.repository.ImageRepository;
@@ -156,5 +157,18 @@ public class DocumentsServiceImplement implements DocumentsService {
         for (String i : documentsRepository.getImageURL(document.getImageId())) System.out.println(i);
         return documentVO;
 
+    }
+
+    @Override
+    public GeneralCountHomeVO getDocumentTotal() {
+        Long documentTotalInThisMonth=documentsRepository.getDocumentTotalInThisMonth();
+        Long documentTotalInLastMonth=documentsRepository.getDocumentTotalInLastMonth();
+        String status=documentTotalInLastMonth>documentTotalInThisMonth ? "Decrease" : "Increase";
+        double percentage=documentTotalInLastMonth!=0  ? Math.abs((double) (documentTotalInThisMonth-documentTotalInLastMonth)/documentTotalInLastMonth)*100.0 :0.0;
+        return GeneralCountHomeVO.builder()
+                .count(documentTotalInThisMonth)
+                .percentage(Math.round(percentage*10.0)/10.0)
+                .status(status)
+                .build();
     }
 }

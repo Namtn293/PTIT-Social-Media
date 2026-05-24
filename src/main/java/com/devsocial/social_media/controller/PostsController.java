@@ -5,9 +5,7 @@ import com.devsocial.social_media.core.util.SuccessResponse;
 import com.devsocial.social_media.entity.Post;
 import com.devsocial.social_media.model.dto.PostDTO;
 import com.devsocial.social_media.model.dto.PostUpdateDTO;
-import com.devsocial.social_media.model.vo.PostAdminVO;
-import com.devsocial.social_media.model.vo.PostDataChart;
-import com.devsocial.social_media.model.vo.PostVO;
+import com.devsocial.social_media.model.vo.*;
 import com.devsocial.social_media.service.PostService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +76,16 @@ public class PostsController {
 
     @GetMapping("/statistic/get-post-data-chart")
     public SuccessResponse<List<PostDataChart>> getPostDateChart(){
-        return ResponseUtil.ok("Get post total success", postService.getPostDataChart());
+        return ResponseUtil.ok("Get chart post total success", postService.getPostDataChart());
+    }
+
+    @GetMapping("/statistic/get-post-total")
+    public SuccessResponse<GeneralCountHomeVO> getPostTotal(){
+        return ResponseUtil.ok("Get post total success", postService.getPostTotalStatistic());
+    }
+
+    @GetMapping("/statistic/get-top-4-post-statistic")
+    public SuccessResponse<List<PostStatisticVO>> getPostTop4Early(){
+        return ResponseUtil.ok("Get post total success", postService.getTop4EarlyPost());
     }
 }

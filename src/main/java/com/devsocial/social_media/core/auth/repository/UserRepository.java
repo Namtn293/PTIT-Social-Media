@@ -20,4 +20,20 @@ public interface UserRepository extends JpaRepository<User,Long> {
     RoleEnum findRoleEnumByUserName(@Param(value = "userInfoName") String userName);
 
     void deleteUserByUserName(String userName);
+
+    @Query(value = """
+            select count(u)
+            from auth_user u
+            where extract(month from u.created_at)=extract(month from now())
+            and extract(year from u.created_at)=extract(year from now())
+            """,nativeQuery = true)
+    Long getUserTotalInThisMonth();
+
+    @Query(value = """
+            select count(u)
+            from auth_user u
+            where u.created_at>=date_trunc('month',current_date- interval'1 month')
+            and u.created_at<date_trunc('month',current_date)
+            """,nativeQuery = true)
+    Long getUserTotalInLastMonth();
 }

@@ -3,9 +3,7 @@ package com.devsocial.social_media.service;
 import com.devsocial.social_media.entity.Post;
 import com.devsocial.social_media.model.dto.PostDTO;
 import com.devsocial.social_media.model.dto.PostUpdateDTO;
-import com.devsocial.social_media.model.vo.PostAdminVO;
-import com.devsocial.social_media.model.vo.PostDataChart;
-import com.devsocial.social_media.model.vo.PostVO;
+import com.devsocial.social_media.model.vo.*;
 
 import java.util.List;
 
@@ -31,4 +29,8 @@ public interface PostService {
     List<PostAdminVO> getAllAdminPosts();
 
     List<PostDataChart> getPostDataChart();
+
+    GeneralCountHomeVO getPostTotalStatistic();
+
+    List<PostStatisticVO> getTop4EarlyPost();
 }

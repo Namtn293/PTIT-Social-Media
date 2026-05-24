@@ -2,38 +2,41 @@ import "./HomeContent.css";
 import { useState, useEffect } from "react";
 import statisticAdminApi from "../../api/StatisticAdminApi.js";
 
-const RECENT_POSTS = [
-  {
-    id: 1,
-    title: "Kinh nghiệm ôn thi giữa kỳ hiệu quả",
-    author: "Nguyễn Văn A",
-    time: "2 giờ trước",
-    img: "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=80&h=56&fit=crop",
-  },
-  {
-    id: 2,
-    title: "Tài liệu học tập môn Cấu trúc dữ liệu",
-    author: "Trần Thị B",
-    time: "5 giờ trước",
-    img: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?w=80&h=56&fit=crop",
-  },
-  {
-    id: 3,
-    title: "Hướng dẫn tạo CV xin việc chuyên nghiệp",
-    author: "Lê Văn C",
-    time: "1 ngày trước",
-    img: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=80&h=56&fit=crop",
-  },
-  {
-    id: 4,
-    title: "Thảo luận: Nên học thêm ngôn ngữ nào?",
-    author: "Phạm Thị D",
-    time: "2 ngày trước",
-    img: "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=80&h=56&fit=crop",
-  },
-];
+function SkeletonStatCard() {
+  return (
+    <div className="hc-stat-card" style={{ opacity: 0.6 }}>
+      <div className="hc-stat-icon skeleton-shimmer" style={{ width: 56, height: 56, borderRadius: 12 }} />
+      <div className="hc-stat-info" style={{ flex: 1 }}>
+        <div className="skeleton-shimmer" style={{ width: "60%", height: 14, marginBottom: 8, borderRadius: 4 }} />
+        <div className="skeleton-shimmer" style={{ width: "80%", height: 20, marginBottom: 8, borderRadius: 4 }} />
+        <div className="skeleton-shimmer" style={{ width: "70%", height: 12, borderRadius: 4 }} />
+      </div>
+    </div>
+  );
+}
 
-// ── SVG Line Chart ─────────────────────────────────────────
+function SkeletonChart() {
+  return (
+    <div style={{ padding: "20px" }}>
+      <div className="skeleton-shimmer" style={{ width: "30%", height: 20, marginBottom: 20, borderRadius: 4 }} />
+      <svg width="100%" viewBox="0 0 520 200" style={{ opacity: 0.3 }}>
+        <rect x="20" y="20" width="480" height="160" fill="none" stroke="#e8eaf0" strokeWidth="1" />
+      </svg>
+    </div>
+  );
+}
+
+function SkeletonRecentPost() {
+  return (
+    <div className="hc-recent-item" style={{ opacity: 0.6 }}>
+      <div className="hc-recent-info">
+        <div className="skeleton-shimmer" style={{ width: "85%", height: 16, marginBottom: 10, borderRadius: 4 }} />
+        <div className="skeleton-shimmer" style={{ width: "60%", height: 12, borderRadius: 4 }} />
+      </div>
+    </div>
+  );
+}
+
 function LineChart({ data }) {
   const [tooltip, setTooltip] = useState(null);
   const W = 520;
@@ -47,7 +50,6 @@ function LineChart({ data }) {
   const xStep = innerW / (data.length - 1);
   const scaleY = (val, max) => innerH - (val / (max * 1.15)) * innerH;
 
-  // Y-axis ticks - tính toán động dựa trên maxPosts
   const maxYValue = maxPosts + 1;
   const yTicksCount = Math.min(5, maxYValue);
   const tickStep = Math.ceil(maxYValue / yTicksCount);
@@ -81,7 +83,6 @@ function LineChart({ data }) {
     );
   };
 
-  // Show only some x-axis labels to avoid clutter
   const showXLabel = (i) => {
     if (data.length <= 8) return true;
     return i % Math.ceil(data.length / 6) === 0 || i === data.length - 1;
@@ -220,7 +221,8 @@ function LineChart({ data }) {
 }
 
 // ── Stat Card ──────────────────────────────────────────────
-function StatCard({ icon, label, value, growth, color }) {
+function StatCard({ icon, label, value, percentage, status, color }) {
+  const isIncrease = status === "Increase";
   return (
     <div className="hc-stat-card">
       <div className="hc-stat-icon" style={{ background: color + "18" }}>
@@ -230,7 +232,13 @@ function StatCard({ icon, label, value, growth, color }) {
         <p className="hc-stat-label">{label}</p>
         <p className="hc-stat-value">{value}</p>
         <p className="hc-stat-growth">
-          <span className="hc-arrow">↑</span> {growth} so với tháng trước
+          <span className="hc-arrow" style={{ color: isIncrease ? "#10b981" : "#ef4444" }}>
+            {isIncrease ? "↑" : "↓"}
+          </span>{" "}
+          <span style={{ color: isIncrease ? "#10b981" : "#ef4444" }}>
+            {percentage?.toFixed(2)}% {isIncrease ? "tăng" : "giảm"}
+          </span>{" "}
+          so với tháng trước
         </p>
       </div>
     </div>
@@ -242,6 +250,17 @@ function HomeContent() {
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Statistics state
+  const [userStats, setUserStats] = useState(null);
+  const [postStats, setPostStats] = useState(null);
+  const [documentStats, setDocumentStats] = useState(null);
+  const [notificationStats, setNotificationStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+  
+  // Recent Posts state
+  const [recentPosts, setRecentPosts] = useState([]);
+  const [recentPostsLoading, setRecentPostsLoading] = useState(true);
 
   // Fetch chart data from API
   useEffect(() => {
@@ -263,6 +282,51 @@ function HomeContent() {
     };
 
     fetchChartData();
+  }, []);
+
+  // Fetch statistics data from APIs
+  useEffect(() => {
+    const fetchStatistics = async () => {
+      try {
+        setStatsLoading(true);
+        const [userRes, postRes, docRes, notifRes] = await Promise.all([
+          statisticAdminApi.getUserStatistic(),
+          statisticAdminApi.getPostStatistic(),
+          statisticAdminApi.getDocumentStatistic(),
+          statisticAdminApi.getNotificationStatistic(),
+        ]);
+        
+        setUserStats(userRes.data.data);
+        setPostStats(postRes.data.data);
+        setDocumentStats(docRes.data.data);
+        setNotificationStats(notifRes.data.data);
+      } catch (err) {
+        console.error("Error fetching statistics:", err);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    fetchStatistics();
+  }, []);
+
+  // Fetch recent posts from API
+  useEffect(() => {
+    const fetchRecentPosts = async () => {
+      try {
+        setRecentPostsLoading(true);
+        const response = await statisticAdminApi.getTop4EarlyPost();
+        console.log("Recent Posts API Response:", response.data);
+        setRecentPosts(response.data.data || []);
+      } catch (err) {
+        console.error("Error fetching recent posts:", err);
+        setRecentPosts([]);
+      } finally {
+        setRecentPostsLoading(false);
+      }
+    };
+
+    fetchRecentPosts();
   }, []);
 
   // Use fetched data - remove fallback to avoid confusion
@@ -305,58 +369,73 @@ function HomeContent() {
 
       {/* ── Stat Cards ── */}
       <div className="hc-stats-grid">
-        <StatCard
-          icon={
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
-              <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          }
-          label="Người dùng mới trong tháng"
-          value="1.248"
-          growth="12.5%"
-          color="#6366f1"
-        />
-        <StatCard
-          icon={
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          }
-          label="Bài viết mới trong tháng"
-          value="342"
-          growth="8.3%"
-          color="#10b981"
-        />
-        <StatCard
-          icon={
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          }
-          label="Tài liệu mới trong tháng"
-          value="28"
-          growth="7.7%"
-          color="#8b5cf6"
-        />
-        <StatCard
-          icon={
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          }
-          label="Thông báo đã gửi trong tháng"
-          value="156"
-          growth="15.2%"
-          color="#f59e0b"
-          width="400px"
-        />
+        {statsLoading ? (
+          <>
+            <SkeletonStatCard />
+            <SkeletonStatCard />
+            <SkeletonStatCard />
+            <SkeletonStatCard />
+          </>
+        ) : (
+          <>
+            <StatCard
+              icon={
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <circle cx="9" cy="7" r="4" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              }
+              label="Người dùng mới trong tháng"
+              value={userStats?.count || "0"}
+              percentage={userStats?.percentage || 0}
+              status={userStats?.status || "Increase"}
+              color="#6366f1"
+            />
+            <StatCard
+              icon={
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              }
+              label="Bài viết mới trong tháng"
+              value={postStats?.count || "0"}
+              percentage={postStats?.percentage || 0}
+              status={postStats?.status || "Increase"}
+              color="#10b981"
+            />
+            <StatCard
+              icon={
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              }
+              label="Tài liệu mới trong tháng"
+              value={documentStats?.count || "0"}
+              percentage={documentStats?.percentage || 0}
+              status={documentStats?.status || "Increase"}
+              color="#8b5cf6"
+            />
+            <StatCard
+              icon={
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              }
+              label="Thông báo đã gửi trong tháng"
+              value={notificationStats?.count || "0"}
+              percentage={notificationStats?.percentage || 0}
+              status={notificationStats?.status || "Increase"}
+              color="#f59e0b"
+              width="400px"
+            />
+          </>
+        )}
       </div>
 
       {/* ── Bottom Row ── */}
@@ -368,9 +447,7 @@ function HomeContent() {
           </div>
           <div className="hc-chart-wrap">
             {loading ? (
-              <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
-                <p>Đang tải dữ liệu...</p>
-              </div>
+              <SkeletonChart />
             ) : error ? (
               <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "200px" }}>
                 <p style={{ color: "#ef4444" }}>Lỗi tải dữ liệu: {error}</p>
@@ -392,16 +469,27 @@ function HomeContent() {
             <a href="/bai-viet" className="hc-see-all">Xem tất cả</a>
           </div>
           <div className="hc-recent-list">
-            {RECENT_POSTS.map((post) => (
-              <div className="hc-recent-item" key={post.id}>
-                <div className="hc-recent-info">
-                  <p className="hc-recent-post-title">{post.title}</p>
-                  <p className="hc-recent-meta">
-                    {post.author} <span className="hc-dot">•</span> {post.time}
-                  </p>
+            {recentPostsLoading ? (
+              <>
+                <SkeletonRecentPost />
+                <SkeletonRecentPost />
+                <SkeletonRecentPost />
+                <SkeletonRecentPost />
+              </>
+            ) : recentPosts && recentPosts.length > 0 ? (
+              recentPosts.map((post, index) => (
+                <div className="hc-recent-item" key={index}>
+                  <div className="hc-recent-info">
+                    <p className="hc-recent-post-title">{post.content}</p>
+                    <p className="hc-recent-meta">
+                      {post.fullName} <span className="hc-dot">•</span> {post.time} {post.timeUnit}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p style={{ textAlign: "center", color: "#9ca3af", padding: "20px" }}>Không có bài viết nào</p>
+            )}
           </div>
         </div>
       </div>

@@ -34,6 +34,12 @@
 .name-post {
     font-weight: bold;
     font-size: 18px;
+    color: #000;
+}
+
+.classes-post {
+    color: #666;
+    font-size: 14px;
 }
 
 

@@ -1,28 +1,21 @@
 package com.devsocial.social_media.service.implement;
 
-import com.devsocial.social_media.core.auth.repository.UserRepository;
 import com.devsocial.social_media.core.configuration.ThreadContext;
 import com.devsocial.social_media.core.util.BusinessException;
 import com.devsocial.social_media.entity.*;
 import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.model.dto.PostDTO;
 import com.devsocial.social_media.model.dto.PostUpdateDTO;
-import com.devsocial.social_media.model.vo.PostAdminVO;
-import com.devsocial.social_media.model.vo.PostDataChart;
-import com.devsocial.social_media.model.vo.PostVO;
+import com.devsocial.social_media.model.vo.*;
 import com.devsocial.social_media.repository.*;
 import com.devsocial.social_media.service.PostService;
 import jakarta.validation.Valid;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -153,7 +146,6 @@ public class PostServiceImplement implements PostService {
             if (map.containsKey(date)){
                 map.put(date,posts);
             }
-            System.out.println(date+" "+posts);
         }
         List<PostDataChart> postDataChartList=new ArrayList<>();
         map.forEach((key,value)->{
@@ -166,4 +158,58 @@ public class PostServiceImplement implements PostService {
         return postDataChartList;
     }
 
+    @Override
+    public GeneralCountHomeVO getPostTotalStatistic() {
+        Long postTotalInThisMonth=postsRepository.getPostTotalInThisMonth();
+        Long postTotalInLastMonth=postsRepository.getPostTotalInLastMonth();
+        String status=postTotalInLastMonth>postTotalInThisMonth ? "Decrease" : "Increase";
+        double percentage=postTotalInLastMonth!=0 ? Math.abs((double) (postTotalInThisMonth-postTotalInLastMonth)/postTotalInLastMonth)*100.0 :0.0;
+        return GeneralCountHomeVO.builder()
+                .count(postTotalInThisMonth)
+                .percentage(Math.round(percentage*10.0)/10.0)
+                .status(status)
+                .build();
+    }
+
+    @Override
+    public List<PostStatisticVO> getTop4EarlyPost() {
+        List<PostAdminVO> postAdminVOS=postsRepository.getTop4EarlyPost();
+        List<PostStatisticVO> list=new ArrayList<>();
+        postAdminVOS.forEach(c->{
+            String timeUnit="giây";
+            Long time=0L;
+            long seconds= Duration.between(c.getCreatedAt(), LocalDateTime.now()).getSeconds();
+            if (seconds < 60) {
+                time = seconds;
+                timeUnit = "giây";
+
+            } else if ((seconds /= 60) < 60) {
+                time = seconds;
+                timeUnit = "phút";
+
+            } else if ((seconds /= 60) < 24) {
+                time = seconds;
+                timeUnit = "giờ";
+
+            } else if ((seconds /= 24) < 30) {
+                time = seconds;
+                timeUnit = "ngày";
+
+            } else if ((seconds /= 30) < 12) {
+                time = seconds;
+                timeUnit = "tháng";
+
+            } else {
+                time = seconds / 12;
+                timeUnit = "năm";
+            }
+            list.add(PostStatisticVO.builder()
+                            .timeUnit(timeUnit)
+                            .time(time)
+                            .fullName(c.getAuthor())
+                            .content(c.getContent())
+                    .build());
+        });
+        return list;
+    }
 }

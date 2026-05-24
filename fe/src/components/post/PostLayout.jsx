@@ -6,7 +6,8 @@ import {
     FlagOutlined, UserOutlined, MailOutlined, 
     IdcardOutlined, ReadOutlined 
 } from "@ant-design/icons";
-import useInfoApi from "../../api/UserInfoApi";
+import userInfoApi from "../../api/UserInfoApi";
+import CommentDialog from "./CommentDialog";
 
 // Cấu hình Dayjs để hiển thị tiếng Việt và thời gian tương đối
 import dayjs from "dayjs";
@@ -19,6 +20,7 @@ const PostLayout = ({ report, content, avatar, title, name, time, userName, clas
     const [likeCount, setLikeCount] = useState(likes);
     const [liked, setLiked] = useState(false);
     const [userData, setUserData] = useState(null);
+    const [commentDialogVisible, setCommentDialogVisible] = useState(false);
 
     const handleLike = () => {
         setLiked(!liked);
@@ -28,7 +30,7 @@ const PostLayout = ({ report, content, avatar, title, name, time, userName, clas
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
-                const response = await useInfoApi.getUserInfo(userName);
+                const response = await userInfoApi.getUserInfo(userName);
                 setUserData(response.data.data);
             } catch (err) {
                 console.log("Lỗi lấy dữ liệu " + err);
@@ -55,24 +57,24 @@ const PostLayout = ({ report, content, avatar, title, name, time, userName, clas
             {userData ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                     <div style={{ display: "flex", alignItems: "center" }}>
-                        <UserOutlined style={{ color: "#595959", fontSize: "16px", width: "25px" }} />
-                        <span style={{ color: "#8c8c8c", width: "80px" }}>Họ và tên:</span>
-                        <span style={{ fontWeight: 600, color: "#262626" }}>{name}</span>
+                        <UserOutlined style={{ color: "#666", fontSize: "16px", width: "25px" }} />
+                        <span style={{ color: "#555", width: "80px", fontWeight: 500 }}>Họ và tên:</span>
+                        <span style={{ fontWeight: 600, color: "#000" }}>{name}</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center" }}>
-                        <MailOutlined style={{ color: "#595959", fontSize: "16px", width: "25px" }} />
-                        <span style={{ color: "#8c8c8c", width: "80px" }}>Email:</span>
-                        <span style={{ fontWeight: 600, color: "#262626" }}>{userData?.email || "Chưa cập nhật"}</span>
+                        <MailOutlined style={{ color: "#666", fontSize: "16px", width: "25px" }} />
+                        <span style={{ color: "#555", width: "80px", fontWeight: 500 }}>Email:</span>
+                        <span style={{ fontWeight: 600, color: "#000" }}>{userData?.email || "Chưa cập nhật"}</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center" }}>
-                        <IdcardOutlined style={{ color: "#595959", fontSize: "16px", width: "25px" }} />
-                        <span style={{ color: "#8c8c8c", width: "80px" }}>Lớp:</span>
-                        <span style={{ fontWeight: 600, color: "#262626" }}>{classes || "N/A"}</span>
+                        <IdcardOutlined style={{ color: "#666", fontSize: "16px", width: "25px" }} />
+                        <span style={{ color: "#555", width: "80px", fontWeight: 500 }}>Lớp:</span>
+                        <span style={{ fontWeight: 600, color: "#000" }}>{classes || "N/A"}</span>
                     </div>
                     <div style={{ display: "flex", alignItems: "center" }}>
-                        <ReadOutlined style={{ color: "#595959", fontSize: "16px", width: "25px" }} />
-                        <span style={{ color: "#8c8c8c", width: "80px" }}>Ngành:</span>
-                        <span style={{ fontWeight: 600, color: "#262626" }}>{userData?.major || "Chưa cập nhật"}</span>
+                        <ReadOutlined style={{ color: "#666", fontSize: "16px", width: "25px" }} />
+                        <span style={{ color: "#555", width: "80px", fontWeight: 500 }}>Ngành:</span>
+                        <span style={{ fontWeight: 600, color: "#000" }}>{userData?.major || "Chưa cập nhật"}</span>
                     </div>
                 </div>
             ) : (
@@ -128,7 +130,7 @@ const PostLayout = ({ report, content, avatar, title, name, time, userName, clas
                 </div>
                 
                 {/* Đã bỏ Popover dư thừa xung quanh Comment */}
-                <div className="action post-comment" style={{ marginLeft: "20px", cursor: "pointer" }}>
+                <div className="action post-comment" style={{ marginLeft: "20px", cursor: "pointer" }} onClick={() => setCommentDialogVisible(true)}>
                     <CommentOutlined />
                     <span> {comments}</span>
                 </div>
@@ -142,6 +144,13 @@ const PostLayout = ({ report, content, avatar, title, name, time, userName, clas
                     <span> {report}</span>
                 </div>
             </div>
+
+            <CommentDialog 
+                visible={commentDialogVisible}
+                onClose={() => setCommentDialogVisible(false)}
+                postId={1}
+                postTitle={title}
+            />
         </div>
     );
 };

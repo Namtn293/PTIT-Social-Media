@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -89,4 +90,33 @@ public interface PostsRepository extends JpaRepository<Post,Long> {
         order by DATE(p.created_at)
         """, nativeQuery = true)
     List<Object[]> getPostsDataChart();
+
+    @Query(value = """
+            select count(u)
+            from main_posts u
+            where extract(month from u.created_at)=extract(month from now())
+            and extract(year from u.created_at)=extract(year from now())
+            """,nativeQuery = true)
+    Long getPostTotalInThisMonth();
+
+    @Query(value = """
+            select count(u)
+            from main_posts u
+            where u.created_at>=date_trunc('month',current_date- interval'1 month')
+            and u.created_at<date_trunc('month',current_date)
+            """,nativeQuery = true)
+    Long getPostTotalInLastMonth();
+
+    @Query(value = "select new com.devsocial.social_media.model.vo.PostAdminVO(p.id,p.title,p.content,p.createdAt,u.fullName) " +
+            "from Post p " +
+            "join UserInfo u on u.id=p.userInfoId " +
+            "order by p.createdAt desc " +
+            "limit 4 ")
+    List<PostAdminVO> getTop4EarlyPost();
+
+    @Transactional
+    @Modifying
+    @Query(value = "update Post " +
+            "set commentTotal=commentTotal+1 where id=:postId")
+    void updateCommentTotal(@Param("postId")Long postId);
 }

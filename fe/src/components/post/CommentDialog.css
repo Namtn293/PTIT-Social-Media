@@ -1,0 +1,137 @@
+/* CommentDialog Modal */
+.comment-modal {
+  border-radius: 12px;
+}
+
+.comment-modal .ant-modal-content {
+  border-radius: 12px;
+}
+
+/* Scrollbar styling */
+.ant-modal-body {
+  scrollbar-width: thin;
+  scrollbar-color: #c8b8e8 #f5f5f5;
+}
+
+.ant-modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ant-modal-body::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+.ant-modal-body::-webkit-scrollbar-thumb {
+  background: #c8b8e8;
+  border-radius: 4px;
+}
+
+.ant-modal-body::-webkit-scrollbar-thumb:hover {
+  background: #a89bd3;
+}
+
+/* Comments List */
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.comment-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.comment-item:hover {
+  background: #f8f4ff;
+}
+
+.comment-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.comment-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.comment-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.comment-author {
+  font-weight: 600;
+  color: #000;
+  font-size: 14px;
+}
+
+.comment-time {
+  color: #999;
+  font-size: 12px;
+}
+
+.comment-text {
+  color: #333;
+  font-size: 14px;
+  margin: 6px 0;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.comment-likes {
+  color: #999;
+  font-size: 12px;
+  margin-top: 8px;
+}
+
+/* Comment Input Section */
+.comment-input-section {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid #e8d5f2;
+  margin: 0 -16px -16px -16px;
+  padding: 12px 16px;
+  background: #f8f4ff;
+}
+
+.comment-input-section .ant-input {
+  border-radius: 20px;
+  padding: 8px 16px;
+  border: 1px solid #d9c6e6 !important;
+  background: white;
+}
+
+.comment-input-section .ant-input:focus {
+  border-color: #a89bd3 !important;
+  box-shadow: 0 0 0 2px rgba(168, 155, 211, 0.1) !important;
+}
+
+.send-button {
+  background: #6366f1 !important;
+  border-color: #6366f1 !important;
+  flex-shrink: 0;
+}
+
+.send-button:hover {
+  background: #4f46e5 !important;
+  border-color: #4f46e5 !important;
+}
+
+.send-button:disabled {
+  background: #ccc !important;
+  border-color: #ccc !important;
+}

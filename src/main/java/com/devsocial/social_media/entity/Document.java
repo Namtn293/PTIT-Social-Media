@@ -3,11 +3,14 @@ package com.devsocial.social_media.entity;
 import com.devsocial.social_media.core.util.EntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Builder
@@ -30,4 +33,12 @@ public class Document extends EntityBase {
 
     @Column(name = "CREATE_BY")
     private String createBy;
+
+    @Column(name = "CREATED_AT")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void prePersist(){
+        this.createdAt=LocalDateTime.now();
+    }
 }

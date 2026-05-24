@@ -3,6 +3,7 @@ package com.devsocial.social_media.service;
 import com.devsocial.social_media.entity.Document;
 import com.devsocial.social_media.model.dto.DocumentDTO;
 import com.devsocial.social_media.model.vo.DocumentVO;
+import com.devsocial.social_media.model.vo.GeneralCountHomeVO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -14,4 +15,6 @@ public interface DocumentsService {
     List<DocumentVO> getAllDocument();
 
     DocumentVO convertToDocumentVO(Document document);
+
+    GeneralCountHomeVO getDocumentTotal();
 }

@@ -33,6 +33,11 @@ function SideBar(){
             icon:<AuditOutlined/>,
             label:"Quản lý thông báo",
         },
+        {
+            key:"/mau",
+            icon:<AuditOutlined/>,
+            label:"Mẫu test",
+        },
 
     ]
     return (

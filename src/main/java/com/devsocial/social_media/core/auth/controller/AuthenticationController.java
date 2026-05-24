@@ -7,6 +7,8 @@ import com.devsocial.social_media.core.util.BusinessException;
 import com.devsocial.social_media.core.util.ResponseUtil;
 import com.devsocial.social_media.core.util.SuccessResponse;
 import com.devsocial.social_media.enumration.ErrorCode;
+import com.devsocial.social_media.model.vo.GeneralCountHomeVO;
+import com.devsocial.social_media.model.vo.LoginVO;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,8 +30,8 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public SuccessResponse<String> login(@RequestBody LoginDTO dto){
-        return ResponseUtil.ok(authenticationService.login(dto));
+    public SuccessResponse<LoginVO> login(@RequestBody LoginDTO dto){
+        return ResponseUtil.ok("Login success",authenticationService.login(dto));
     }
 
 
@@ -45,7 +47,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/statistic/get-user-total")
-    public SuccessResponse<Long> getUserTotal(){
+    public SuccessResponse<GeneralCountHomeVO> getUserTotal(){
         return ResponseUtil.ok("Get user total success", authenticationService.getUserTotal());
     }
 }

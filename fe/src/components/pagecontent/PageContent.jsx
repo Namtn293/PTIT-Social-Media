@@ -4,6 +4,7 @@ import UserManagement from "../../pages/userManagement/UserManagement";
 import Community from "../../pages/community/Community";
 import PostManagement from "../../pages/postManagement/PostManagement"
 import NotificationManagement from "../../pages/notificationManagement/NotificationManagement"
+import Mau from "../../pages/Mau";
 
 function PageContent(){
     return (
@@ -14,6 +15,7 @@ function PageContent(){
             <Route path="/cong-dong" element={<Community/>}/>
             <Route path="/bai-viet" element={<PostManagement/>}/>
             <Route path="/quan-ly-thong-bao" element={<NotificationManagement/>}/>
+            <Route path="/mau" element={<Mau/>}/>
         </Routes>
     )
 }
