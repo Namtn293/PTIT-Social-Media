@@ -32,6 +32,7 @@ function LoginPage(){
                 localStorage.setItem("token", response.data.message); 
                 localStorage.setItem("role",jwt.roles[0]);
                 localStorage.setItem("userId",jwt.userId);
+                localStorage.setItem("userName", jwt.sub);
                 console.log(localStorage.getItem("userId"));
                 navigate("/");
             }

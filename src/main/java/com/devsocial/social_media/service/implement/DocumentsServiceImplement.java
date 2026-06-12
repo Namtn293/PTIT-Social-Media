@@ -17,11 +17,17 @@ import com.devsocial.social_media.repository.DocumentsRepository;
 import com.devsocial.social_media.repository.FilesRepository;
 import com.devsocial.social_media.repository.ImageRepository;
 import com.devsocial.social_media.service.DocumentsService;
+import com.devsocial.social_media.entity.Subject;
+import com.devsocial.social_media.entity.UserInfo;
+import com.devsocial.social_media.repository.SubjectRepository;
+import com.devsocial.social_media.repository.UserInfoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,21 +39,34 @@ public class DocumentsServiceImplement implements DocumentsService {
     private final ImageRepository imageRepository;
     private final FilesRepository filesRepository;
     private final UserRepository userRepository;
+    private final SubjectRepository subjectRepository;
+    private final UserInfoRepository userInfoRepository;
 
-    public DocumentsServiceImplement(Cloudinary cloudinary, DocumentsRepository documentsRepository, ImageRepository imageRepository, FilesRepository filesRepository, UserRepository userRepository) {
+    public DocumentsServiceImplement(Cloudinary cloudinary, DocumentsRepository documentsRepository, ImageRepository imageRepository, FilesRepository filesRepository, UserRepository userRepository, SubjectRepository subjectRepository, UserInfoRepository userInfoRepository) {
         this.cloudinary = cloudinary;
         this.documentsRepository = documentsRepository;
         this.imageRepository = imageRepository;
         this.filesRepository = filesRepository;
         this.userRepository = userRepository;
+        this.subjectRepository = subjectRepository;
+        this.userInfoRepository = userInfoRepository;
+    }
+
+    private String formatFileSize(long bytes) {
+        if (bytes <= 0) return "0 B";
+        final String[] units = new String[] { "B", "KB", "MB", "GB", "TB" };
+        int digitGroups = (int) (Math.log10(bytes)/Math.log10(1024));
+        return new java.text.DecimalFormat("#,##0.#").format(bytes/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
     @Transactional
     @Override
     public void createDocument(DocumentDTO documentDTO, MultipartFile file, MultipartFile background) throws IOException {
         Long fileId = null;
         Long backgroundId = null;
+        String sizeStr = "0 B";
         //upload file
         if(file!=null){
+            sizeStr = formatFileSize(file.getSize());
             String type = file.getContentType();
             System.out.println(file.getContentType()+" "+type.equals("application/pdf"));
 
@@ -94,6 +113,7 @@ public class DocumentsServiceImplement implements DocumentsService {
                 .createBy(ThreadContext.getUserDetail().getUsername())
                 .imageId(backgroundId)
                 .fileId(fileId)
+                .size(sizeStr)
                 .build();
         documentsRepository.save(document);
         System.out.println(fileId+" "+backgroundId);
@@ -148,13 +168,37 @@ public class DocumentsServiceImplement implements DocumentsService {
     @Override
     public DocumentVO convertToDocumentVO(Document document) {
         DocumentVO documentVO = new DocumentVO();
+        documentVO.setId(document.getId());
         documentVO.setFileURL(documentsRepository.getFileURL(document.getFileId()).get(0));
         documentVO.setImageURL(documentsRepository.getImageURL(document.getImageId()).get(0));
         documentVO.setTitle(document.getTitle());
         documentVO.setSubjectId(document.getSubjectId());
+        
+        // Find uploader display name
+        String uploaderName = "Thành viên PTIT";
+        Optional<UserInfo> uploaderInfo = userInfoRepository.findByUserName(document.getCreateBy());
+        if (uploaderInfo.isPresent()) {
+            uploaderName = uploaderInfo.get().getFullName();
+        }
+        documentVO.setUploaderName(uploaderName);
+        documentVO.setSize(document.getSize() != null ? document.getSize() : "N/A");
+        
+        // Format creation date
+        String formattedDate = "";
+        if (document.getCreatedAt() != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mm a");
+            formattedDate = document.getCreatedAt().format(formatter);
+        }
+        documentVO.setCreatedAt(formattedDate);
+        documentVO.setCreateBy(document.getCreateBy());
+
         for (String i : documentsRepository.getFileURL(document.getFileId())) System.out.println(i);
         for (String i : documentsRepository.getImageURL(document.getImageId())) System.out.println(i);
         return documentVO;
+    }
 
+    @Override
+    public List<Subject> getAllSubjects() {
+        return subjectRepository.findAll();
     }
 }

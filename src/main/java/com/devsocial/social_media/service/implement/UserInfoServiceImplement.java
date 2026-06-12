@@ -18,6 +18,7 @@ import com.devsocial.social_media.repository.ImageRepository;
 import com.devsocial.social_media.repository.MajorRepository;
 import com.devsocial.social_media.repository.UserInfoRepository;
 import com.devsocial.social_media.service.UserInfoService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,7 +35,8 @@ public class UserInfoServiceImplement implements UserInfoService {
     private final ClassesRepository classesRepository;
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
-    public UserInfoServiceImplement(UserRepository userRepository,ClassesRepository classesRepository,MajorRepository majorRepository,UserInfoRepository userInfoRepository, CloudinaryServiceImplement cloudinaryServiceImplement, ImagesServiceImplement imageImplement, ImageRepository imageRepository) {
+    private final PasswordEncoder passwordEncoder;
+    public UserInfoServiceImplement(UserRepository userRepository,ClassesRepository classesRepository,MajorRepository majorRepository,UserInfoRepository userInfoRepository, CloudinaryServiceImplement cloudinaryServiceImplement, ImagesServiceImplement imageImplement, ImageRepository imageRepository, PasswordEncoder passwordEncoder) {
         this.userInfoRepository = userInfoRepository;
         this.cloudinaryServiceImplement = cloudinaryServiceImplement;
         this.imageImplement = imageImplement;
@@ -42,6 +44,7 @@ public class UserInfoServiceImplement implements UserInfoService {
         this.majorRepository = majorRepository;
         this.userRepository = userRepository;
         this.imageRepository = imageRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -80,6 +83,12 @@ public class UserInfoServiceImplement implements UserInfoService {
             userInfo.setEmail(userInfoDTO.getEmail());
         if(file!=null && !file.isEmpty()){
             imageImplement.updateImage(userInfo,file);
+        }
+        if(userInfoDTO.getPassword()!=null && !userInfoDTO.getPassword().isEmpty()){
+            User user = userRepository.findByUserName(userName)
+                    .orElseThrow(()->new RuntimeException("user not found"));
+            user.setPassword(passwordEncoder.encode(userInfoDTO.getPassword()));
+            userRepository.save(user);
         }
 
         userInfoRepository.save(userInfo);

@@ -8,10 +8,12 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+import com.devsocial.social_media.entity.Subject;
+
 public interface DocumentsService {
     void createDocument(DocumentDTO documentDTO, MultipartFile file, MultipartFile background) throws IOException;
     void deleteDocument(Long documentId);
     List<DocumentVO> getAllDocument();
-
+    List<Subject> getAllSubjects();
     DocumentVO convertToDocumentVO(Document document);
 }

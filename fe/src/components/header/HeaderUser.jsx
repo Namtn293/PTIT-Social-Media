@@ -1,4 +1,5 @@
-import "./HeaderUser.css"
+import { useState, useEffect, useRef } from "react";
+import "./HeaderUser.css";
 import {
     BellOutlined,
     FormOutlined,
@@ -8,11 +9,25 @@ import {
 } from "@ant-design/icons";
 
 import { useNavigate, useLocation } from "react-router-dom";
-import { Button, Badge, Popover, List, Avatar } from "antd";
+import { Button, Badge, Popover, List, Avatar, Modal, Input, message } from "antd";
+import userInfoApi from "../../api/UserInfoApi";
 
 function HeaderUser() {
     const navigate = useNavigate();
     const location = useLocation();
+
+    const [userInfo, setUserInfo] = useState(null);
+    const [modalOpen, setModalOpen] = useState(false);
+    
+    // Form fields state
+    const [fullName, setFullName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [file, setFile] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState("");
+    
+    const [loading, setLoading] = useState(false);
+    const fileInputRef = useRef(null);
 
     const titleMap = {
         "/": "Trang chủ",
@@ -34,9 +49,91 @@ function HeaderUser() {
         }
     ];
 
+    const fetchUserData = async () => {
+        const userName = localStorage.getItem("userName");
+        if (!userName) return;
+        try {
+            const res = await userInfoApi.getUserInfo(userName);
+            const data = res?.data?.data;
+            if (data) {
+                setUserInfo(data);
+                setFullName(data.fullName || "");
+                setEmail(data.email || "");
+                if (data.avatar) {
+                    localStorage.setItem("userAvatar", data.avatar);
+                }
+            }
+        } catch (err) {
+            console.error("Lỗi tải thông tin cá nhân:", err);
+        }
+    };
+
+    useEffect(() => {
+        fetchUserData();
+    }, []);
+
+    const openModal = () => {
+        if (userInfo) {
+            setFullName(userInfo.fullName || "");
+            setEmail(userInfo.email || "");
+            setPassword("");
+            setFile(null);
+            setPreviewUrl(userInfo.avatar || "");
+        }
+        setModalOpen(true);
+    };
+
+    const handleFileChange = (e) => {
+        const selectedFile = e.target.files[0];
+        if (selectedFile) {
+            setFile(selectedFile);
+            const url = URL.createObjectURL(selectedFile);
+            setPreviewUrl(url);
+        }
+    };
+
+    const handleAvatarClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleUpdate = async () => {
+        const userName = localStorage.getItem("userName");
+        if (!userName) return;
+        if (!fullName.trim()) {
+            message.warning("Vui lòng nhập họ và tên!");
+            return;
+        }
+        if (!email.trim()) {
+            message.warning("Vui lòng nhập email!");
+            return;
+        }
+
+        try {
+            setLoading(true);
+            const payload = {
+                fullName: fullName.trim(),
+                email: email.trim()
+            };
+            if (password) {
+                payload.password = password;
+            }
+            await userInfoApi.updateUserInfo(userName, payload, file);
+            message.success("Cập nhật thông tin thành công!");
+            setModalOpen(false);
+            await fetchUserData();
+        } catch (err) {
+            console.error("Lỗi cập nhật:", err);
+            message.error("Cập nhật thông tin thất bại!");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const onFinish = () => {
         localStorage.removeItem("token");
         localStorage.removeItem("role");
+        localStorage.removeItem("userName");
+        localStorage.removeItem("userAvatar");
         navigate("/login");
     };
 
@@ -189,9 +286,10 @@ function HeaderUser() {
 
                     <img
                         className="avatar"
-                        src={localStorage.getItem("userAvatar") || "https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg"}
+                        src={userInfo?.avatar || "https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg"}
                         alt="avatar"
-                        style={{ height: "50px",borderRadius:"50%" }}
+                        style={{ height: "50px", borderRadius: "50%", cursor: "pointer" }}
+                        onClick={openModal}
                     />
 
                     <Button
@@ -207,6 +305,92 @@ function HeaderUser() {
                     </Button>
                 </div>
             </div>
+
+            {/* Profile Update Modal */}
+            <Modal
+                title={<span style={{ fontWeight: 700, fontSize: "20px", color: "#b71c1c" }}>Cập nhật thông tin cá nhân</span>}
+                open={modalOpen}
+                onCancel={() => !loading && setModalOpen(false)}
+                footer={null}
+                width={450}
+                centered
+            >
+                <div className="profile-modal-body" style={{ display: "flex", flexDirection: "column", gap: "16px", paddingTop: "10px" }}>
+                    
+                    {/* Avatar Upload Container */}
+                    <div style={{ display: "flex", justifyContent: "center", marginBottom: "10px" }}>
+                        <div className="avatar-preview-wrapper" onClick={handleAvatarClick} style={{ position: "relative", cursor: "pointer" }}>
+                            <img
+                                src={previewUrl || "https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg"}
+                                alt="avatar preview"
+                                className="avatar-preview"
+                                style={{ width: "100px", height: "100px", borderRadius: "50%", objectFit: "cover", border: "2px solid #f0f0f0" }}
+                            />
+                            <div className="avatar-overlay">
+                                <span>Thay ảnh</span>
+                            </div>
+                        </div>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            style={{ display: 'none' }}
+                            accept="image/*"
+                            onChange={handleFileChange}
+                            disabled={loading}
+                        />
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <span style={{ fontWeight: 500, color: "#333" }}>Tài khoản</span>
+                        <Input
+                            value={userInfo?.userName || ""}
+                            disabled
+                            style={{ height: "40px", backgroundColor: "#f5f5f5", color: "#8c8c8c", cursor: "not-allowed" }}
+                        />
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <span style={{ fontWeight: 500, color: "#333" }}>Họ và tên</span>
+                        <Input
+                            value={fullName}
+                            onChange={(e) => setFullName(e.target.value)}
+                            disabled={loading}
+                            style={{ height: "40px" }}
+                        />
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <span style={{ fontWeight: 500, color: "#333" }}>Email</span>
+                        <Input
+                            type="email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            disabled={loading}
+                            style={{ height: "40px" }}
+                        />
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+                        <span style={{ fontWeight: 500, color: "#333" }}>Mật khẩu mới</span>
+                        <Input.Password
+                            placeholder="Nhập mật khẩu mới nếu muốn thay đổi"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            disabled={loading}
+                            style={{ height: "40px" }}
+                        />
+                    </div>
+
+                    <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "15px" }}>
+                        <Button onClick={() => setModalOpen(false)} disabled={loading} style={{ height: "40px", borderRadius: "6px" }}>
+                            Hủy
+                        </Button>
+                        <Button type="primary" onClick={handleUpdate} loading={loading} style={{ height: "40px", borderRadius: "6px", backgroundColor: "#b71c1c", borderColor: "#b71c1c" }}>
+                            Cập nhật
+                        </Button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 }

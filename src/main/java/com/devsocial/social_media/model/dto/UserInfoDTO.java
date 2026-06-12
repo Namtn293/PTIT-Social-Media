@@ -13,4 +13,5 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserInfoDTO {
     private String fullName;
     private String email;
+    private String password;
 }

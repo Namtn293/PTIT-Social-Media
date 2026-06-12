@@ -30,4 +30,15 @@ public class Document extends EntityBase {
 
     @Column(name = "CREATE_BY")
     private String createBy;
+
+    @Column(name = "CREATED_AT")
+    private java.time.LocalDateTime createdAt;
+
+    @Column(name = "SIZE")
+    private String size;
+
+    @jakarta.persistence.PrePersist
+    public void prePersist() {
+        this.createdAt = java.time.LocalDateTime.now();
+    }
 }

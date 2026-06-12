@@ -10,8 +10,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DocumentVO {
+    private Long id;
     private String title;
     private String fileURL;
     private String ImageURL;
     private Long subjectId;
+    private String uploaderName;
+    private String size;
+    private String createdAt;
+    private String createBy;
 }
