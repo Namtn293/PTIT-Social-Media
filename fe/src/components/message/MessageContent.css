@@ -1,0 +1,174 @@
+/* Message row spacing */
+.msg-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding: 0 16px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Sent message alignment */
+.msg-sent {
+    justify-content: flex-end;
+}
+
+/* Received message alignment */
+.msg-received {
+    justify-content: flex-start;
+}
+
+/* Avatar styling */
+.msg-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+    object-fit: cover;
+    margin-bottom: 2px;
+}
+
+.msg-avatar:hover {
+    transform: scale(1.08);
+}
+
+/* Bubble container holds sender name & message bubble */
+.msg-bubble-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 65%;
+}
+
+.msg-sent .msg-bubble-container {
+    align-items: flex-end;
+}
+
+.msg-received .msg-bubble-container {
+    align-items: flex-start;
+}
+
+/* Sender Name styling */
+.msg-sender-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 4px;
+    margin-left: 4px;
+}
+
+.msg-sent .msg-sender-name {
+    margin-right: 4px;
+    margin-left: 0;
+}
+
+/* Bubble bubble base styling */
+.msg-bubble {
+    padding: 10px 14px;
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    line-height: 1.45;
+}
+
+/* Sent bubbles: gradient red, white text */
+.msg-sent .msg-bubble {
+    background: linear-gradient(135deg, #ff4d4f 0%, #c02626 100%);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+/* Received bubbles: white background, dark text */
+.msg-received .msg-bubble {
+    background-color: white;
+    color: #1e293b;
+    border-bottom-left-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+/* Message Text */
+.msg-text {
+    font-size: 14px;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+/* Message Timestamp */
+.msg-time {
+    font-size: 9px;
+    align-self: flex-end;
+    opacity: 0.7;
+}
+
+.msg-received .msg-time {
+    color: #94a3b8;
+}
+
+.msg-sent .msg-time {
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* Student info popover styles */
+.msg-profile-popover {
+    width: 280px;
+    padding: 8px;
+    font-family: system-ui, -apple-system, sans-serif;
+}
+
+.popover-header {
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 10px;
+    margin-bottom: 12px;
+}
+
+.popover-title {
+    font-weight: 700;
+    font-size: 16px;
+    color: #c02626;
+}
+
+.popover-loading {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+.popover-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.popover-info-item {
+    display: flex;
+    align-items: center;
+    font-size: 13px;
+}
+
+.info-icon {
+    color: #64748b;
+    font-size: 15px;
+    width: 24px;
+}
+
+.info-label {
+    color: #94a3b8;
+    width: 80px;
+    font-weight: 500;
+}
+
+.info-value {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.popover-error {
+    text-align: center;
+    color: #94a3b8;
+    padding: 10px;
+}

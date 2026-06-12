@@ -15,6 +15,14 @@ const userInfoApi={
     deleteUserInfo:(id)=>{
         return axiosClient.post(`/api/user-info/delete/${id}`);
     },
+    updateUserInfo: (userName, data, file) => {
+        const formData = new FormData();
+        formData.append("data", new Blob([JSON.stringify(data)], { type: "application/json" }));
+        if (file) formData.append("file", file);
+        return axiosClient.post(`/api/user-info/update/${userName}`, formData, {
+            headers: { "Content-Type": "multipart/form-data" },
+        });
+    },
 }
 
 export default userInfoApi;

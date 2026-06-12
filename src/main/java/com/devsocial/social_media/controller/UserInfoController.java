@@ -50,7 +50,9 @@ public class UserInfoController {
             @RequestPart("data") UserInfoDTO userInfoDTO,
             @RequestPart(value = "file",required = false) MultipartFile file
     ) throws IOException {
-        System.out.println(file.getName());
+        if (file != null) {
+            System.out.println("Uploading file: " + file.getOriginalFilename());
+        }
         userInfoService.updateInfo(userName,userInfoDTO,file);
         return ResponseUtil.ok(
                 "Update UserInfo Success",

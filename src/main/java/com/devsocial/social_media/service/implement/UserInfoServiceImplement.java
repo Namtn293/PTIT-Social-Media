@@ -7,12 +7,14 @@ import com.devsocial.social_media.entity.Classes;
 import com.devsocial.social_media.entity.Major;
 import com.devsocial.social_media.entity.UserInfo;
 import com.devsocial.social_media.enumration.ErrorCode;
+import com.devsocial.social_media.enumration.RoleEnum;
 import com.devsocial.social_media.enumration.StatusEnum;
 import com.devsocial.social_media.model.dto.UserInfoDTO;
 import com.devsocial.social_media.model.vo.UserInfoAdminVO;
 import com.devsocial.social_media.model.vo.UserInfoManagementVO;
 import com.devsocial.social_media.model.vo.UserInfoVO;
 import com.devsocial.social_media.repository.ClassesRepository;
+import com.devsocial.social_media.repository.ImageRepository;
 import com.devsocial.social_media.repository.MajorRepository;
 import com.devsocial.social_media.repository.UserInfoRepository;
 import com.devsocial.social_media.service.UserInfoService;
@@ -31,13 +33,15 @@ public class UserInfoServiceImplement implements UserInfoService {
     private final MajorRepository majorRepository;
     private final ClassesRepository classesRepository;
     private final UserRepository userRepository;
-    public UserInfoServiceImplement(UserRepository userRepository,ClassesRepository classesRepository,MajorRepository majorRepository,UserInfoRepository userInfoRepository, CloudinaryServiceImplement cloudinaryServiceImplement, ImagesServiceImplement imageImplement) {
+    private final ImageRepository imageRepository;
+    public UserInfoServiceImplement(UserRepository userRepository,ClassesRepository classesRepository,MajorRepository majorRepository,UserInfoRepository userInfoRepository, CloudinaryServiceImplement cloudinaryServiceImplement, ImagesServiceImplement imageImplement, ImageRepository imageRepository) {
         this.userInfoRepository = userInfoRepository;
         this.cloudinaryServiceImplement = cloudinaryServiceImplement;
         this.imageImplement = imageImplement;
         this.classesRepository = classesRepository;
         this.majorRepository = majorRepository;
         this.userRepository = userRepository;
+        this.imageRepository = imageRepository;
     }
 
     @Override
@@ -45,14 +49,17 @@ public class UserInfoServiceImplement implements UserInfoService {
         List<UserInfoManagementVO> uiaVOS = new ArrayList<>();
         List<UserInfo> list=userInfoRepository.findAll();
         list.forEach(c->{
-            UserInfoManagementVO vo=UserInfoManagementVO.builder()
-                    .role(userRepository.findRoleEnumByUserName(c.getUserName()))
-                    .status(c.getStatus())
-                    .userName(c.getUserName())
-                    .userId(c.getId())
-                    .email(c.getEmail())
-                    .build();
-            uiaVOS.add(vo);
+            if(userRepository.findByUserName(c.getUserName())
+                    .orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_FOUND)).getRole()== RoleEnum.STUDENT){
+                UserInfoManagementVO vo=UserInfoManagementVO.builder()
+                        .role(userRepository.findRoleEnumByUserName(c.getUserName()))
+                        .status(c.getStatus())
+                        .userName(c.getUserName())
+                        .userId(c.getId())
+                        .email(c.getEmail())
+                        .build();
+                uiaVOS.add(vo);
+            }
         });
         return uiaVOS;
     }
@@ -107,11 +114,16 @@ public class UserInfoServiceImplement implements UserInfoService {
     public UserInfoAdminVO convertToUserInfoAdminVO(UserInfo userInfo) {
         Classes classes=classesRepository.findById(userInfo.getClassId()).orElseThrow(()-> new BusinessException(ErrorCode.CLASS_NOT_EXIST));
         Major major=majorRepository.findById(classes.getMajorId()).orElseThrow(()-> new BusinessException(ErrorCode.MAJOR_NOT_EXIST));
+        String avatar = null;
+        if (userInfo.getImageId() != null) {
+            avatar = imageRepository.findAvatarById(userInfo.getImageId());
+        }
         return UserInfoAdminVO.builder()
                 .id(userInfo.getId())
                 .userName(userInfo.getUserName())
                 .fullName(userInfo.getFullName())
                 .imageId(userInfo.getImageId())
+                .avatar(avatar)
                 .email(userInfo.getEmail())
                 .status(userInfo.getStatus())
                 .major(major.getMajorName())

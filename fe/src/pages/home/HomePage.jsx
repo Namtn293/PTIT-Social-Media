@@ -1,27 +1,13 @@
-import Header from "../../components/header/HeaderUser";
-import PageContent from "../../components/pagecontent/PageContent";
-import SideBar from "../../components/sidebar/SideBar";
+import HeaderUser from "../../components/header/HeaderUser";
+import UserHomeContent from "./UserHomeContent";
 
-function homePage(){
-return  (<BrowserRouter>
-            <Routes>
-                <Route path='/*' element={
-                    localStorage.getItem("role")=="ROLE_ADMIN"?(
-                        <div style={{backgroundColor:"white"}}>
-                            <SideBar/>
-                            
-                            <PageContent/>
-                        </div>
-                    ):(
-                        <div>
-                            <Header/>
-                            
-                            <PageContent/>
-                        </div>
-                    )
-                } />
-            </Routes>
-        </BrowserRouter>)
+function HomePage(){
+    return (
+        <div style={{width: "100%"}}>
+            <HeaderUser />
+            <UserHomeContent />
+        </div>
+    );
 }
 
-export default homePage;
+export default HomePage;

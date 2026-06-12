@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { Popover, Spin, Button } from "antd";
+import { Popover, Spin } from "antd";
 import {
     UserOutlined, MailOutlined, IdcardOutlined, ReadOutlined,
 } from "@ant-design/icons";
 import useInfoApi from "../../api/UserInfoApi";
+import "./MessageContent.css";
 
 const MessageContent = ({check, avatar, name, timestamp, message, userName}) => {
     const [userData, setUserData] = useState(null);
@@ -24,40 +25,40 @@ const MessageContent = ({check, avatar, name, timestamp, message, userName}) => 
     };
 
     const detailProfile = (
-        <div style={{ width: "280px", padding: "8px" }}>
-            <div style={{ borderBottom: "1px solid #f0f0f0", paddingBottom: "10px", marginBottom: "15px" }}>
-                <div style={{ fontWeight: 700, fontSize: "18px", color: "#b71c1c" }}>Thông tin sinh viên</div>
+        <div className="msg-profile-popover">
+            <div className="popover-header">
+                <span className="popover-title">Thông tin sinh viên</span>
             </div>
 
             {isLoading ? (
-                <div style={{ display: "flex", justifyContent: "center", padding: "20px 0" }}>
-                    <Spin tip="Đang tải dữ liệu..." />
+                <div className="popover-loading">
+                    <Spin description="Đang tải dữ liệu..." />
                 </div>
             ) : userData ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                        <UserOutlined style={{ color: "#595959", fontSize: "16px", width: "25px" }} />
-                        <span style={{ color: "#8c8c8c", width: "80px" }}>Họ và tên:</span>
-                        <span style={{ fontWeight: 600, color: "#262626" }}>{name}</span>
+                <div className="popover-body">
+                    <div className="popover-info-item">
+                        <UserOutlined className="info-icon" />
+                        <span className="info-label">Họ và tên:</span>
+                        <span className="info-value">{name}</span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                        <MailOutlined style={{ color: "#595959", fontSize: "16px", width: "25px" }} />
-                        <span style={{ color: "#8c8c8c", width: "80px" }}>Email:</span>
-                        <span style={{ fontWeight: 600, color: "#262626" }}>{userData?.email || "Chưa cập nhật"}</span>
+                    <div className="popover-info-item">
+                        <MailOutlined className="info-icon" />
+                        <span className="info-label">Email:</span>
+                        <span className="info-value">{userData?.email || "Chưa cập nhật"}</span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                        <IdcardOutlined style={{ color: "#595959", fontSize: "16px", width: "25px" }} />
-                        <span style={{ color: "#8c8c8c", width: "80px" }}>Lớp:</span>
-                        <span style={{ fontWeight: 600, color: "#262626" }}>Chưa cập nhật</span>
+                    <div className="popover-info-item">
+                        <IdcardOutlined className="info-icon" />
+                        <span className="info-label">Lớp:</span>
+                        <span className="info-value">Chưa cập nhật</span>
                     </div>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                        <ReadOutlined style={{ color: "#595959", fontSize: "16px", width: "25px" }} />
-                        <span style={{ color: "#8c8c8c", width: "80px" }}>Ngành:</span>
-                        <span style={{ fontWeight: 600, color: "#262626" }}>{userData?.major || "Chưa cập nhật"}</span>
+                    <div className="popover-info-item">
+                        <ReadOutlined className="info-icon" />
+                        <span className="info-label">Ngành:</span>
+                        <span className="info-value">{userData?.major || "Chưa cập nhật"}</span>
                     </div>
                 </div>
             ) : (
-                <div style={{ textAlign: "center", color: "gray", padding: "10px" }}>Không thể tải dữ liệu</div>
+                <div className="popover-error">Không thể tải dữ liệu</div>
             )}
         </div>
     );
@@ -65,35 +66,50 @@ const MessageContent = ({check, avatar, name, timestamp, message, userName}) => 
     return (
         <>
             {!check ? (
-                <div style={{marginBottom:"20px",marginLeft:"20px",display:"flex",flexDirection:"row",marginTop:"10px",alignItems:"center"}}>
-                    
-                    {/* Wrap Avatar vào Popover, mở sang bên Phải */}
-                    <Popover overlayInnerStyle={{ borderRadius: '12px', padding: '10px' }} content={detailProfile} trigger="click" placement="rightTop" arrow={true} onOpenChange={handleOpenChange}>
-                        <img src={avatar} alt="avatar" style={{cursor:"pointer",height:"34px",width:"34px",borderRadius:"50%",marginTop:"5px",marginBottom:"auto"}} />
+                <div className="msg-row msg-received">
+                    <Popover 
+                        overlayInnerStyle={{ borderRadius: '12px', padding: '10px' }} 
+                        content={detailProfile} 
+                        trigger="click" 
+                        placement="rightTop" 
+                        arrow={true} 
+                        onOpenChange={handleOpenChange}
+                    >
+                        <img src={avatar || "https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg"} alt="avatar" className="msg-avatar" />
                     </Popover>
                     
-                    <div style={{backgroundColor:"white",marginLeft:"15px",display:"flex",flexDirection:"column",paddingLeft:"10px",paddingRight:"10px",borderRadius:"7px",paddingTop:"5px",paddingBottom:"5px",maxWidth:"500px"}}>
-                        <div style={{fontSize:"12px",color:"rgb(110, 110, 110)"}}>{name}</div>
-                        <div style={{fontSize:"15px",color:"rgb(0, 0, 0)"}}>{message}</div>
-                        <div style={{marginTop:"4px",fontSize:"10px",color:"rgb(110, 110, 110)"}}>{timestamp}</div>
+                    <div className="msg-bubble-container">
+                        <div className="msg-sender-name">{name}</div>
+                        <div className="msg-bubble">
+                            <div className="msg-text">{message}</div>
+                            <div className="msg-time">{timestamp}</div>
+                        </div>
                     </div>
                 </div>
             ) : (
-                <div style={{marginBottom:"20px",marginRight:"20px",display:"flex",flexDirection:"row",marginTop:"10px",alignItems:"center",justifyContent:"end"}}>
-                    <div style={{backgroundColor:"rgb(225, 230, 255)",marginRight:"15px",display:"flex",flexDirection:"column",paddingLeft:"10px",paddingRight:"10px",borderRadius:"7px",paddingTop:"5px",paddingBottom:"5px",maxWidth:"500px"}}>
-                        <div style={{fontSize:"12px",color:"rgb(110, 110, 110)"}}>{name}</div>
-                        <div style={{fontSize:"15px",color:"rgb(0, 0, 0)"}}>{message}</div>
-                        <div style={{marginTop:"4px",fontSize:"10px",color:"rgb(110, 110, 110)"}}>{timestamp}</div>
+                <div className="msg-row msg-sent">
+                    <div className="msg-bubble-container">
+                        <div className="msg-sender-name">{name}</div>
+                        <div className="msg-bubble">
+                            <div className="msg-text">{message}</div>
+                            <div className="msg-time">{timestamp}</div>
+                        </div>
                     </div>
                     
-                    <Popover overlayInnerStyle={{ borderRadius: '12px', padding: '10px' }} content={detailProfile} trigger="click" placement="leftTop" arrow={true} onOpenChange={handleOpenChange}>
-                        <img src={avatar} alt="avatar" style={{cursor:"pointer",height:"34px",width:"34px",borderRadius:"50%",marginTop:"5px",marginBottom:"auto"}} />
+                    <Popover 
+                        overlayInnerStyle={{ borderRadius: '12px', padding: '10px' }} 
+                        content={detailProfile} 
+                        trigger="click" 
+                        placement="leftTop" 
+                        arrow={true} 
+                        onOpenChange={handleOpenChange}
+                    >
+                        <img src={avatar || "https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg"} alt="avatar" className="msg-avatar" />
                     </Popover>
-
                 </div>  
             )}
         </>
-    )
-}
+    );
+};
 
 export default MessageContent;

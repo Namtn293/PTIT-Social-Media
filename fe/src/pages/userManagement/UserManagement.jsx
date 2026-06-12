@@ -43,13 +43,13 @@ function UserManagement() {
       title: "ID",
       dataIndex: "userId",
       key: "userId",
-      width:60,
+      width:"5%",
     },
     {
       title: "Tên đăng nhập",
       dataIndex: "userName",
       key: "userName",
-      width:160,
+      width:"13%",
     },
     {
       title: "Email",
@@ -61,7 +61,7 @@ function UserManagement() {
       title: "Vai trò",
       dataIndex: "role",
       key: "role",
-      width:120,
+      width:"10%",
       render:(role)=>{
         if (role==="STUDENT") return "Sinh viên";
         return "Quản trị viên";
@@ -76,7 +76,7 @@ function UserManagement() {
           {status === "ACTIVE" ? "Hoạt động" : "Bị cấm"}
         </Tag>
       ),
-      width:120,
+      width:"15%",
     },
     {
       title: "Hành động",
@@ -87,7 +87,7 @@ function UserManagement() {
           <Button danger icon={<DeleteOutlined />}  onClick={()=> onDelete(record)}  />
         </Space>
       ),
-      width:160,
+      width:"23%",
     },
   ];
 
@@ -112,7 +112,7 @@ function UserManagement() {
 
   return (
     <div className="user-management-container">
-        <div style={{marginLeft:0,marginBottom:20}}>
+        <div style={{marginLeft:0,marginBottom:20, display:"flex"}}>
             <Input onChange={(e)=>setSearchText(e.target.value)} size="large" style={{ width: "500px",borderRadius:"5px",fontSize:16,height:35}} placeholder="Tìm kiếm người dùng" />
                     
             <Button icon={<SearchOutlined/>} size="large" type="primary" style={{height:35,borderRadius:"5px", marginLeft:10 }}>
