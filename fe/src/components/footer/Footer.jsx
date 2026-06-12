@@ -14,9 +14,9 @@ function Footer() {
                     <p>✉️ info@ptit.edu.vn</p>
                     <p>📞 024-xxxx-xxxx</p>
                 </div>
-                
+
                 <div className="footer-center">
-                    <h4>Bản hệ</h4>
+                    <h4>Bản quyền</h4>
                     <ul>
                         <li><a href="/">Về chúng tôi</a></li>
                         <li><a href="/">Liên hệ</a></li>
