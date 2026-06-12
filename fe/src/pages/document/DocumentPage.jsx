@@ -10,6 +10,7 @@ function DocumentPage() {
     const [documents, setDocuments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchText, setSearchText] = useState("");
+    const [activeTab, setActiveTab] = useState("repo"); // "repo" or "my-docs"
 
     // Modal state
     const [showModal, setShowModal] = useState(false);
@@ -27,12 +28,18 @@ function DocumentPage() {
 
     useEffect(() => {
         fetchInitialData();
-    }, []);
+    }, [activeTab]);
+
+    useEffect(() => {
+        setSearchText("");
+    }, [activeTab]);
 
     const fetchInitialData = async () => {
         try {
             setLoading(true);
-            const docsRes = await documentApi.getAllDocuments();
+            const docsRes = activeTab === 'repo' 
+                ? await documentApi.getAllDocuments() 
+                : await documentApi.getMyDocuments();
             if (docsRes?.data?.data) {
                 setDocuments(docsRes.data.data);
             }
@@ -112,8 +119,7 @@ function DocumentPage() {
         try {
             setIsSubmitting(true);
             const data = {
-                title: docTitle.trim(),
-                subjectId: null
+                title: docTitle.trim()
             };
             await documentApi.createDocument(data, docFile, docImage);
             message.success("Đăng tài liệu thành công!");
@@ -149,8 +155,11 @@ function DocumentPage() {
     };
 
     const filteredDocuments = documents.filter(doc => {
+        if (activeTab === 'my-docs' && doc.createBy !== currentUserName) {
+            return false;
+        }
         return removeVietnameseTones(doc.title).includes(removeVietnameseTones(searchText)) ||
-               removeVietnameseTones(doc.uploaderName).includes(removeVietnameseTones(searchText));
+            removeVietnameseTones(doc.uploaderName || "").includes(removeVietnameseTones(searchText));
     });
 
     return (
@@ -158,16 +167,32 @@ function DocumentPage() {
             <HeaderUser />
 
             <div className="document-page-container">
+                {/* Navigation Tabs */}
+                <div className="doc-nav-tabs">
+                    <Button
+                        className={`btn-nav-tab ${activeTab === 'repo' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('repo')}
+                    >
+                        Kho tài liệu
+                    </Button>
+                    <Button
+                        className={`btn-nav-tab ${activeTab === 'my-docs' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('my-docs')}
+                    >
+                        Tài liệu của tôi
+                    </Button>
+                </div>
+
                 {/* Header Section */}
                 <div className="doc-header-section">
                     <div className="doc-header-left">
-                        <h2>Kho tài liệu học tập</h2>
-                        <p>Tìm kiếm và chia sẻ các tài liệu ôn thi chất lượng của PTIT</p>
+                        <h2>{activeTab === 'repo' ? "Kho tài liệu học tập" : "Tài liệu của tôi"}</h2>
+                        <p>{activeTab === 'repo' ? "Tìm kiếm và chia sẻ các tài liệu ôn thi chất lượng của PTIT" : "Quản lý các tài liệu học tập bạn đã tải lên hệ thống"}</p>
                     </div>
-                    <Button 
-                        type="primary" 
-                        icon={<PlusOutlined />} 
-                        onClick={openUploadModal} 
+                    <Button
+                        type="primary"
+                        icon={<PlusOutlined />}
+                        onClick={openUploadModal}
                         className="btn-upload-doc"
                     >
                         Đăng tài liệu
@@ -175,16 +200,18 @@ function DocumentPage() {
                 </div>
 
                 {/* Filter and Search Bar */}
-                <div className="doc-search-filter-bar">
-                    <Input
-                        placeholder="Tìm kiếm tài liệu theo tiêu đề hoặc người đăng..."
-                        prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
-                        value={searchText}
-                        onChange={handleSearch}
-                        allowClear
-                        className="doc-search-input"
-                    />
-                </div>
+                {activeTab === 'repo' && (
+                    <div className="doc-search-filter-bar">
+                        <Input
+                            placeholder="Tìm kiếm tài liệu theo tiêu đề hoặc người đăng..."
+                            prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
+                            value={searchText}
+                            onChange={handleSearch}
+                            allowClear
+                            className="doc-search-input"
+                        />
+                    </div>
+                )}
 
                 {/* Main Documents Grid */}
                 {loading ? (
@@ -195,42 +222,48 @@ function DocumentPage() {
                 ) : filteredDocuments.length > 0 ? (
                     <div className="doc-grid-layout">
                         {filteredDocuments.map(doc => (
-                            <Card 
+                            <Card
                                 key={doc.id}
                                 className="doc-item-card"
                                 cover={
-                                    <div className="doc-card-banner" style={{ 
-                                        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url(${doc.ImageURL || 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=500&auto=format&fit=crop'})`
+                                    <div className="doc-card-banner" style={{
+                                        backgroundImage: `url(${doc.ImageURL || 'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=500&auto=format&fit=crop'})`
                                     }}>
                                         <div className="doc-banner-icon">
                                             {getFileIcon(doc.fileURL)}
                                         </div>
-                                        {(currentUserRole === "ROLE_ADMIN" || doc.createBy === currentUserName) && (
-                                            <Button 
-                                                type="text" 
-                                                icon={<DeleteOutlined />} 
-                                                className="btn-delete-doc"
-                                                onClick={() => handleDelete(doc.id)}
-                                            />
-                                        )}
                                     </div>
                                 }
                             >
                                 <div className="doc-card-body">
                                     <h3 className="doc-card-title" title={doc.title}>{doc.title}</h3>
                                     <div className="doc-card-info">
-                                        <p><strong>Người gửi:</strong> {doc.uploaderName}</p>
+                                        {activeTab === 'repo' && (
+                                            <p><strong>Người gửi:</strong> {doc.uploaderName}</p>
+                                        )}
                                         <p><strong>Thời gian:</strong> {doc.createdAt || "N/A"}</p>
                                         <p><strong>Dung lượng:</strong> {doc.size || "N/A"}</p>
                                     </div>
-                                    <Button 
-                                        type="primary" 
-                                        icon={<DownloadOutlined />} 
-                                        onClick={() => handleDownload(doc.fileURL)}
-                                        className="btn-download-doc"
-                                    >
-                                        Tải xuống
-                                    </Button>
+                                    {activeTab === 'repo' ? (
+                                        <Button
+                                            type="primary"
+                                            icon={<DownloadOutlined />}
+                                            onClick={() => handleDownload(doc.fileURL)}
+                                            className="btn-download-doc"
+                                        >
+                                            Tải xuống
+                                        </Button>
+                                    ) : (
+                                        <Button
+                                            type="primary"
+                                            danger
+                                            icon={<DeleteOutlined />}
+                                            onClick={() => handleDelete(doc.id)}
+                                            className="btn-delete-doc-bottom"
+                                        >
+                                            Xóa tài liệu
+                                        </Button>
+                                    )}
                                 </div>
                             </Card>
                         ))}
@@ -256,9 +289,9 @@ function DocumentPage() {
                 <div className="upload-modal-body">
                     <div className="upload-field">
                         <label>Tiêu đề tài liệu <span className="req">*</span></label>
-                        <Input 
-                            value={docTitle} 
-                            onChange={(e) => setDocTitle(e.target.value)} 
+                        <Input
+                            value={docTitle}
+                            onChange={(e) => setDocTitle(e.target.value)}
                             placeholder="Ví dụ: Đề cương môn Giải tích 1"
                             maxLength={150}
                             disabled={isSubmitting}
@@ -272,9 +305,9 @@ function DocumentPage() {
                             <InboxOutlined className="upload-box-icon" />
                             <p>{docFile ? docFile.name : "Chọn file tài liệu để tải lên máy chủ"}</p>
                         </div>
-                        <input 
-                            type="file" 
-                            ref={fileInputRef} 
+                        <input
+                            type="file"
+                            ref={fileInputRef}
                             style={{ display: 'none' }}
                             accept=".pdf,.doc,.docx"
                             onChange={handleFileChange}
@@ -294,9 +327,9 @@ function DocumentPage() {
                                 </>
                             )}
                         </div>
-                        <input 
-                            type="file" 
-                            ref={imageInputRef} 
+                        <input
+                            type="file"
+                            ref={imageInputRef}
                             style={{ display: 'none' }}
                             accept="image/*"
                             onChange={handleImageChange}
@@ -307,9 +340,9 @@ function DocumentPage() {
                         <Button onClick={() => setShowModal(false)} disabled={isSubmitting}>
                             Hủy bỏ
                         </Button>
-                        <Button 
-                            type="primary" 
-                            onClick={handleSubmit} 
+                        <Button
+                            type="primary"
+                            onClick={handleSubmit}
                             loading={isSubmitting}
                             disabled={!docTitle.trim() || !docFile}
                             style={{ backgroundColor: '#b71c1c', borderColor: '#b71c1c' }}

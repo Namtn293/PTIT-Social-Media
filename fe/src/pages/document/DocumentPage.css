@@ -65,13 +65,6 @@
     background-color: white;
 }
 
-.doc-subject-select .ant-select-selector {
-    height: 40px !important;
-    border-radius: 6px !important;
-    display: flex;
-    align-items: center;
-}
-
 /* Grid Layout */
 .doc-grid-layout {
     display: grid;
@@ -100,51 +93,25 @@
     height: 180px;
     background-size: cover;
     background-position: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
-.doc-badge-subject {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background-color: rgba(183, 28, 28, 0.9);
-    color: white;
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: 600;
-}
-
-.btn-delete-doc {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    color: rgba(255, 255, 255, 0.8) !important;
-    background-color: rgba(0, 0, 0, 0.35) !important;
-    border-radius: 50% !important;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: none !important;
-}
-
-.btn-delete-doc:hover {
-    color: white !important;
-    background-color: #ff4d4f !important;
-}
 
 .doc-banner-icon {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(255, 255, 255, 0.95);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .doc-icon {
-    font-size: 50px;
+    font-size: 16px;
 }
 
 .doc-icon.pdf {
@@ -295,4 +262,51 @@
 .upload-modal-actions button {
     height: 40px !important;
     border-radius: 6px !important;
+}
+
+/* Navigation Tabs */
+.doc-nav-tabs {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 25px;
+}
+
+.btn-nav-tab {
+    height: 40px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    border-radius: 6px !important;
+    border: 1px solid #d9d9d9 !important;
+    background-color: #ffffff !important;
+    color: #595959 !important;
+    transition: all 0.25s ease !important;
+    padding: 0 20px !important;
+}
+
+.btn-nav-tab:hover {
+    color: #b71c1c !important;
+    border-color: #b71c1c !important;
+}
+
+.btn-nav-tab.active {
+    background-color: #b71c1c !important;
+    border-color: #b71c1c !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px rgba(183, 28, 28, 0.2) !important;
+}
+
+.btn-delete-doc-bottom {
+    background-color: #ff4d4f !important;
+    border-color: #ff4d4f !important;
+    width: 100%;
+    height: 38px !important;
+    font-weight: bold;
+    border-radius: 6px !important;
+    margin-top: auto;
+    color: white !important;
+}
+
+.btn-delete-doc-bottom:hover {
+    background-color: #ff7875 !important;
+    border-color: #ff7875 !important;
 }
