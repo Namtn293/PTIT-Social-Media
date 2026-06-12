@@ -7,6 +7,8 @@ import Header from './components/header/HeaderUser';
 import SideBar from './components/sidebar/SideBar';
 import PageContent from './components/pagecontent/PageContent';
 import HeaderAdmin from './components/header/HeaderAdmin';
+// import UserHomeContent from './pages/home/UserHomeContent';
+import UserPageContent from './components/pagecontent/UserPageContent';
 function App() {
 const theme={
     token:{
@@ -36,12 +38,9 @@ return (
                             
                         </div>
                     ):(
-                        <div style={{
-                            justifyContent:"center",
-                            display:"flex"
-                        }}>
+                        <div >
                             <Header/>
-                            <PageContent/>
+                            <UserPageContent/>  
                         </div>
                     )}/>
                     <Route path='/login' element={<LoginPage/>} />

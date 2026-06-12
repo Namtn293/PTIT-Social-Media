@@ -7,6 +7,7 @@ import com.devsocial.social_media.entity.Classes;
 import com.devsocial.social_media.entity.Major;
 import com.devsocial.social_media.entity.UserInfo;
 import com.devsocial.social_media.enumration.ErrorCode;
+import com.devsocial.social_media.enumration.RoleEnum;
 import com.devsocial.social_media.enumration.StatusEnum;
 import com.devsocial.social_media.model.dto.UserInfoDTO;
 import com.devsocial.social_media.model.vo.UserInfoAdminVO;
@@ -45,14 +46,17 @@ public class UserInfoServiceImplement implements UserInfoService {
         List<UserInfoManagementVO> uiaVOS = new ArrayList<>();
         List<UserInfo> list=userInfoRepository.findAll();
         list.forEach(c->{
-            UserInfoManagementVO vo=UserInfoManagementVO.builder()
-                    .role(userRepository.findRoleEnumByUserName(c.getUserName()))
-                    .status(c.getStatus())
-                    .userName(c.getUserName())
-                    .userId(c.getId())
-                    .email(c.getEmail())
-                    .build();
-            uiaVOS.add(vo);
+            if(userRepository.findByUserName(c.getUserName())
+                    .orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_FOUND)).getRole()== RoleEnum.STUDENT){
+                UserInfoManagementVO vo=UserInfoManagementVO.builder()
+                        .role(userRepository.findRoleEnumByUserName(c.getUserName()))
+                        .status(c.getStatus())
+                        .userName(c.getUserName())
+                        .userId(c.getId())
+                        .email(c.getEmail())
+                        .build();
+                uiaVOS.add(vo);
+            }
         });
         return uiaVOS;
     }
