@@ -6,57 +6,7 @@ import MessageContent from "../../components/message/MessageContent"
 import { Client } from "@stomp/stompjs"
 import SockJS from "sockjs-client"
 import MessageApi from "../../api/MessageApi"
-
-const memberOnline = [
-    {
-        id: "1",
-        avatar: "https://i.pravatar.cc/150?u=1",
-        name: "Trần Nhật Nam",
-        classes: "D23CQCN04-B",
-    },
-    {
-        id: "2",
-        avatar: "https://i.pravatar.cc/150?u=2",
-        name: "Vũ Thế Phong",
-        classes: "D23CQCN06-B",
-    },
-    {
-        id: "3",
-        avatar: "https://i.pravatar.cc/150?u=3",
-        name: "Lê Thị Thu Thảo",
-        classes: "D23CQCN01-A",
-    },
-    {
-        id: "4",
-        avatar: "https://i.pravatar.cc/150?u=4",
-        name: "Nguyễn Minh Đức",
-        classes: "D23CQCN05-C",
-    },
-    {
-        id: "5",
-        avatar: "https://i.pravatar.cc/150?u=5",
-        name: "Phạm Hồng Anh",
-        classes: "D23CQCN02-B",
-    },
-    {
-        id: "6",
-        avatar: "https://i.pravatar.cc/150?u=6",
-        name: "Hoàng Kiều Trang",
-        classes: "D23CQAT01-B",
-    },
-    {
-        id: "7",
-        avatar: "https://i.pravatar.cc/150?u=7",
-        name: "Đỗ Duy Mạnh",
-        classes: "D23CQVT03-A",
-    },
-    {
-        id: "8",
-        avatar: "https://i.pravatar.cc/150?u=8",
-        name: "Bùi Tiến Dũng",
-        classes: "D23CQCN07-D",
-    },
-];
+import userInfoApi from "../../api/UserInfoApi"
 
 const parseTimestamp = (timestampStr) => {
     if (!timestampStr) return new Date(0);
@@ -77,7 +27,8 @@ const parseTimestamp = (timestampStr) => {
 
 function Community() {
     const [messages, setMessages] = useState([])
-    const onlineTotal = memberOnline.length;
+    const [members, setMembers] = useState([])
+    const onlineTotal = members.length;
     const [inputValue, setInputValue] = useState("");
     const [searchMember, setSearchMember] = useState("");
     const stompClientRef = useRef(null);
@@ -101,6 +52,26 @@ function Community() {
             }
         }
         fetchData();
+    }, []);
+
+    useEffect(() => {
+        const fetchMembers = async () => {
+            try {
+                const response = await userInfoApi.getAllUserInfo();
+                if (response?.data?.data) {
+                    const mappedMembers = response.data.data.map(item => ({
+                        id: item.userId,
+                        name: item.fullName || item.userName,
+                        avatar: item.avatar || "https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg",
+                        classes: item.className || "Không có lớp"
+                    }));
+                    setMembers(mappedMembers);
+                }
+            } catch (err) {
+                console.log("Lỗi load danh sách thành viên " + err);
+            }
+        };
+        fetchMembers();
     }, []);
 
     useEffect(() => {
@@ -157,9 +128,9 @@ function Community() {
         if (e.key === "Enter") sendMessage();
     }
 
-    const filteredMembers = memberOnline.filter(member => 
-        member.name.toLowerCase().includes(searchMember.toLowerCase()) || 
-        member.classes.toLowerCase().includes(searchMember.toLowerCase())
+    const filteredMembers = members.filter(member =>
+        (member.name?.toLowerCase() || "").includes(searchMember.toLowerCase()) ||
+        (member.classes?.toLowerCase() || "").includes(searchMember.toLowerCase())
     );
 
     return (
@@ -173,7 +144,7 @@ function Community() {
                             <span className="chat-subtitle-text">Kênh trao đổi học tập và kết nối sinh viên</span>
                         </div>
                     </div>
-                    
+
                     <div className="chat-messages-container">
                         {isLoading ? (
                             <div className="chat-loading-spinner">
@@ -200,14 +171,14 @@ function Community() {
                         <button className="chat-attach-btn" title="Đính kèm tệp">
                             <PaperClipOutlined />
                         </button>
-                        <Input 
-                            onChange={(e) => setInputValue(e.target.value)} 
-                            onKeyDown={handleKeydown} 
-                            value={inputValue} 
-                            placeholder="Nhập tin nhắn gửi tới cộng đồng..." 
+                        <Input
+                            onChange={(e) => setInputValue(e.target.value)}
+                            onKeyDown={handleKeydown}
+                            value={inputValue}
+                            placeholder="Nhập tin nhắn gửi tới cộng đồng..."
                             className="chat-message-input"
                         />
-                        <button 
+                        <button
                             onClick={sendMessage}
                             className="chat-send-btn"
                             title="Gửi tin nhắn"
@@ -221,12 +192,12 @@ function Community() {
                 <div className="members-sidebar">
                     <div className="sidebar-header">
                         <span className="online-badge-dot pulse"></span>
-                        <span className="online-count-text">{onlineTotal} thành viên online</span>
+                        <span className="online-count-text">{onlineTotal} thành viên</span>
                     </div>
-                    
+
                     <div className="search-member-box">
-                        <Input 
-                            placeholder="Tìm kiếm thành viên..." 
+                        <Input
+                            placeholder="Tìm kiếm thành viên..."
                             value={searchMember}
                             onChange={(e) => setSearchMember(e.target.value)}
                             className="search-member-input"
@@ -242,7 +213,6 @@ function Community() {
                                 </div>
                                 <div className="member-details">
                                     <div className="member-name-text">{item.name}</div>
-                                    <div className="member-class-text">{item.classes}</div>
                                 </div>
                             </div>
                         ))}

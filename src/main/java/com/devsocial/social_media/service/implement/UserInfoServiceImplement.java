@@ -3,8 +3,6 @@ package com.devsocial.social_media.service.implement;
 import com.devsocial.social_media.core.auth.entity.User;
 import com.devsocial.social_media.core.auth.repository.UserRepository;
 import com.devsocial.social_media.core.util.BusinessException;
-import com.devsocial.social_media.entity.Classes;
-import com.devsocial.social_media.entity.Major;
 import com.devsocial.social_media.entity.UserInfo;
 import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.enumration.RoleEnum;
@@ -13,9 +11,7 @@ import com.devsocial.social_media.model.dto.UserInfoDTO;
 import com.devsocial.social_media.model.vo.UserInfoAdminVO;
 import com.devsocial.social_media.model.vo.UserInfoManagementVO;
 import com.devsocial.social_media.model.vo.UserInfoVO;
-import com.devsocial.social_media.repository.ClassesRepository;
 import com.devsocial.social_media.repository.ImageRepository;
-import com.devsocial.social_media.repository.MajorRepository;
 import com.devsocial.social_media.repository.UserInfoRepository;
 import com.devsocial.social_media.service.UserInfoService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,17 +27,13 @@ public class UserInfoServiceImplement implements UserInfoService {
     private final UserInfoRepository userInfoRepository;
     private final CloudinaryServiceImplement cloudinaryServiceImplement;
     private final ImagesServiceImplement imageImplement;
-    private final MajorRepository majorRepository;
-    private final ClassesRepository classesRepository;
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
     private final PasswordEncoder passwordEncoder;
-    public UserInfoServiceImplement(UserRepository userRepository,ClassesRepository classesRepository,MajorRepository majorRepository,UserInfoRepository userInfoRepository, CloudinaryServiceImplement cloudinaryServiceImplement, ImagesServiceImplement imageImplement, ImageRepository imageRepository, PasswordEncoder passwordEncoder) {
+    public UserInfoServiceImplement(UserRepository userRepository,UserInfoRepository userInfoRepository, CloudinaryServiceImplement cloudinaryServiceImplement, ImagesServiceImplement imageImplement, ImageRepository imageRepository, PasswordEncoder passwordEncoder) {
         this.userInfoRepository = userInfoRepository;
         this.cloudinaryServiceImplement = cloudinaryServiceImplement;
         this.imageImplement = imageImplement;
-        this.classesRepository = classesRepository;
-        this.majorRepository = majorRepository;
         this.userRepository = userRepository;
         this.imageRepository = imageRepository;
         this.passwordEncoder = passwordEncoder;
@@ -54,12 +46,22 @@ public class UserInfoServiceImplement implements UserInfoService {
         list.forEach(c->{
             if(userRepository.findByUserName(c.getUserName())
                     .orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_FOUND)).getRole()== RoleEnum.STUDENT){
+                String avatar = null;
+                if (c.getImageId() != null) {
+                    avatar = imageRepository.findAvatarById(c.getImageId());
+                }
+                if (avatar == null) {
+                    avatar = "https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg";
+                }
+                String className = null;
                 UserInfoManagementVO vo=UserInfoManagementVO.builder()
                         .role(userRepository.findRoleEnumByUserName(c.getUserName()))
                         .status(c.getStatus())
                         .userName(c.getUserName())
                         .userId(c.getId())
                         .email(c.getEmail())
+                        .fullName(c.getFullName())
+                        .avatar(avatar)
                         .build();
                 uiaVOS.add(vo);
             }
@@ -121,9 +123,7 @@ public class UserInfoServiceImplement implements UserInfoService {
 
     @Override
     public UserInfoAdminVO convertToUserInfoAdminVO(UserInfo userInfo) {
-        Classes classes=classesRepository.findById(userInfo.getClassId()).orElseThrow(()-> new BusinessException(ErrorCode.CLASS_NOT_EXIST));
-        Major major=majorRepository.findById(classes.getMajorId()).orElseThrow(()-> new BusinessException(ErrorCode.MAJOR_NOT_EXIST));
-        String avatar = null;
+       String avatar = null;
         if (userInfo.getImageId() != null) {
             avatar = imageRepository.findAvatarById(userInfo.getImageId());
         }
@@ -135,7 +135,6 @@ public class UserInfoServiceImplement implements UserInfoService {
                 .avatar(avatar)
                 .email(userInfo.getEmail())
                 .status(userInfo.getStatus())
-                .major(major.getMajorName())
                 .build();
     }
 

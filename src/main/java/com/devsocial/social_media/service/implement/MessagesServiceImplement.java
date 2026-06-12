@@ -22,12 +22,14 @@ public class MessagesServiceImplement implements MessagesService {
     private final MessageRepository messageRepository;
     private final UserInfoRepository userInfoRepository;
     private final ImageRepository imageRepository;
+    private final UserRepository userRepository;
 
     public MessagesServiceImplement(ImageRepository imageRepository, UserInfoRepository userInfoRepository,
-            MessageRepository messageRepository) {
+            MessageRepository messageRepository, UserRepository userRepository) {
         this.messageRepository = messageRepository;
         this.userInfoRepository = userInfoRepository;
         this.imageRepository = imageRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -42,13 +44,16 @@ public class MessagesServiceImplement implements MessagesService {
         String avatar = null;
         String userName = "";
         if (messageDTO.getUserId() != null) {
-            UserInfo userInfo = userInfoRepository.findById(messageDTO.getUserId()).orElse(null);
-            if (userInfo != null) {
-                if (userInfo.getFullName() != null) fullName = userInfo.getFullName();
-                if (userInfo.getImageId() != null) {
-                    avatar = imageRepository.findAvatarById(userInfo.getImageId());
+            User user = userRepository.findById(messageDTO.getUserId()).orElse(null);
+            if (user != null) {
+                UserInfo userInfo = userInfoRepository.findByUserName(user.getUsername()).orElse(null);
+                if (userInfo != null) {
+                    if (userInfo.getFullName() != null) fullName = userInfo.getFullName();
+                    if (userInfo.getImageId() != null) {
+                        avatar = imageRepository.findAvatarById(userInfo.getImageId());
+                    }
+                    userName = userInfo.getUserName();
                 }
-                userName = userInfo.getUserName();
             }
         }
 

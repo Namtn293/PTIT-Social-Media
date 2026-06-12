@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import HeaderUser from '../../components/header/HeaderUser';
 import Footer from '../../components/footer/Footer';
 import PostLayout from '../../components/post/PostLayout';
@@ -10,6 +11,9 @@ import './PostPage.css';
 const { TextArea } = Input;
 
 function PostPage() {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const currentTab = searchParams.get('tab') || 'all'; // 'all', 'mine', 'saved'
+
     const [posts, setPosts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [searchText, setSearchText] = useState("");
@@ -20,12 +24,20 @@ function PostPage() {
 
     useEffect(() => {
         fetchPosts();
-    }, []);
+    }, [currentTab]);
 
     const fetchPosts = async () => {
         try {
             setIsLoading(true);
-            const response = await postApi.getAllHomePosts();
+            let response;
+            if (currentTab === 'mine') {
+                response = await postApi.getMyPosts();
+            } else if (currentTab === 'saved') {
+                response = await postApi.getSavePosts();
+            } else {
+                response = await postApi.getAllHomePosts();
+            }
+
             if (response?.data?.data) {
                 const sortedPosts = response.data.data.sort((a, b) => {
                     const dateA = new Date(a.createdAt || a.time || 0);
@@ -33,9 +45,12 @@ function PostPage() {
                     return dateB - dateA;
                 });
                 setPosts(sortedPosts);
+            } else {
+                setPosts([]);
             }
         } catch (err) {
             console.error("Lỗi lấy danh sách bài viết:", err);
+            setPosts([]);
         } finally {
             setIsLoading(false);
         }
@@ -124,20 +139,44 @@ function PostPage() {
                             />
                         </div>
 
-                        {/* Hộp giả lập Tạo bài viết */}
-                        <div className="create-post-card">
-                            <img
-                                className="create-post-avatar"
-                                src={localStorage.getItem("userAvatar") || "https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg"}
-                                alt="avatar"
-                            />
-                            <div className="create-post-input-placeholder" onClick={openModal}>
-                                Bạn đang muốn chia sẻ tài liệu hay thắc mắc gì thế?
-                            </div>
-                            <button className="create-post-btn" onClick={openModal}>
-                                <EditOutlined /> <span>Đăng bài</span>
+                        {/* Tabs chuyển đổi bộ lọc bài viết */}
+                        <div className="post-tabs-container">
+                            <button 
+                                className={`post-tab-btn ${currentTab === 'all' ? 'active' : ''}`}
+                                onClick={() => setSearchParams({ tab: 'all' })}
+                            >
+                                Bài viết chung
+                            </button>
+                            <button 
+                                className={`post-tab-btn ${currentTab === 'mine' ? 'active' : ''}`}
+                                onClick={() => setSearchParams({ tab: 'mine' })}
+                            >
+                                Bài viết của tôi
+                            </button>
+                            <button 
+                                className={`post-tab-btn ${currentTab === 'saved' ? 'active' : ''}`}
+                                onClick={() => setSearchParams({ tab: 'saved' })}
+                            >
+                                Bài viết đã lưu
                             </button>
                         </div>
+
+                        {/* Hộp giả lập Tạo bài viết - Chỉ hiển thị ở Tab Bài viết của tôi */}
+                        {currentTab === 'mine' && (
+                            <div className="create-post-card">
+                                <img
+                                    className="create-post-avatar"
+                                    src={localStorage.getItem("userAvatar") || "https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg"}
+                                    alt="avatar"
+                                />
+                                <div className="create-post-input-placeholder" onClick={openModal}>
+                                    Bạn đang muốn chia sẻ tài liệu hay thắc mắc gì thế?
+                                </div>
+                                <button className="create-post-btn" onClick={openModal}>
+                                    <EditOutlined /> <span>Đăng bài</span>
+                                </button>
+                            </div>
+                        )}
 
                         {/* Danh sách bài viết */}
                         {isLoading ? (
@@ -161,6 +200,9 @@ function PostPage() {
                                         likes={post.likes !== undefined ? post.likes : 0}
                                         comments={post.comments !== undefined ? post.comments : 0}
                                         saves={post.saves !== undefined ? post.saves : 0}
+                                        initialLiked={post.liked}
+                                        initialSaved={post.saved}
+                                        initialReported={post.reported}
                                     />
                                 ))}
                             </div>

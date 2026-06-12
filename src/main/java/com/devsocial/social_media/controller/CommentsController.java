@@ -6,6 +6,7 @@ import com.devsocial.social_media.core.util.SuccessResponse;
 import com.devsocial.social_media.entity.Comment;
 import com.devsocial.social_media.model.dto.CommentDTO;
 import com.devsocial.social_media.model.dto.CommentUpdateDTO;
+import com.devsocial.social_media.model.vo.CommentVO;
 import com.devsocial.social_media.service.CommentsService;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +22,7 @@ public class CommentsController {
     }
 
     @PostMapping("/create")
-    SuccessResponse<Comment> createComment(@RequestBody CommentDTO commentDTO){
+    SuccessResponse<CommentVO> createComment(@RequestBody CommentDTO commentDTO){
         return ResponseUtil.ok(
                 "create comment success",
                 commentsService.createComment(commentDTO)
@@ -46,7 +47,7 @@ public class CommentsController {
     }
 
     @PostMapping("/get/{postId}")
-    SuccessResponse<List<Comment>> getAllByPostId(@PathVariable Long postId) throws BusinessException {
+    SuccessResponse<List<CommentVO>> getAllByPostId(@PathVariable Long postId) throws BusinessException {
         return ResponseUtil.ok(
                 "get all comment success",
                 commentsService.getAllByPostId(postId)

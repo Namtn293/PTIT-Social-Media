@@ -17,9 +17,7 @@ import com.devsocial.social_media.repository.DocumentsRepository;
 import com.devsocial.social_media.repository.FilesRepository;
 import com.devsocial.social_media.repository.ImageRepository;
 import com.devsocial.social_media.service.DocumentsService;
-import com.devsocial.social_media.entity.Subject;
 import com.devsocial.social_media.entity.UserInfo;
-import com.devsocial.social_media.repository.SubjectRepository;
 import com.devsocial.social_media.repository.UserInfoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,16 +37,14 @@ public class DocumentsServiceImplement implements DocumentsService {
     private final ImageRepository imageRepository;
     private final FilesRepository filesRepository;
     private final UserRepository userRepository;
-    private final SubjectRepository subjectRepository;
     private final UserInfoRepository userInfoRepository;
 
-    public DocumentsServiceImplement(Cloudinary cloudinary, DocumentsRepository documentsRepository, ImageRepository imageRepository, FilesRepository filesRepository, UserRepository userRepository, SubjectRepository subjectRepository, UserInfoRepository userInfoRepository) {
+    public DocumentsServiceImplement(Cloudinary cloudinary, DocumentsRepository documentsRepository, ImageRepository imageRepository, FilesRepository filesRepository, UserRepository userRepository, UserInfoRepository userInfoRepository) {
         this.cloudinary = cloudinary;
         this.documentsRepository = documentsRepository;
         this.imageRepository = imageRepository;
         this.filesRepository = filesRepository;
         this.userRepository = userRepository;
-        this.subjectRepository = subjectRepository;
         this.userInfoRepository = userInfoRepository;
     }
 
@@ -197,8 +193,4 @@ public class DocumentsServiceImplement implements DocumentsService {
         return documentVO;
     }
 
-    @Override
-    public List<Subject> getAllSubjects() {
-        return subjectRepository.findAll();
-    }
 }

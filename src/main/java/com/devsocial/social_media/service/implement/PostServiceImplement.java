@@ -36,14 +36,27 @@ public class PostServiceImplement implements PostService {
     private final PostLikesRepository postLikesRepository;
     private final PostReportRepository postReportRepository;
     private final PostSavesRepository postSavesRepository;
+    private final CommentsRepository commentsRepository;
 
     @Autowired
-    public PostServiceImplement(PostSavesRepository postSavesRepository, PostReportRepository postReportRepository, PostLikesRepository postLikesRepository, PostsRepository postsRepository, UserInfoRepository userInfoRepository) {
+    public PostServiceImplement(PostSavesRepository postSavesRepository, PostReportRepository postReportRepository, PostLikesRepository postLikesRepository, PostsRepository postsRepository, UserInfoRepository userInfoRepository, CommentsRepository commentsRepository) {
         this.postsRepository = postsRepository;
         this.userInfoRepository = userInfoRepository;
         this.postLikesRepository = postLikesRepository;
         this.postReportRepository = postReportRepository;
         this.postSavesRepository = postSavesRepository;
+        this.commentsRepository = commentsRepository;
+    }
+
+    @jakarta.annotation.PostConstruct
+    @Transactional
+    public void init() {
+        try {
+            postsRepository.syncAllPostTotals();
+            log.info("Successfully synchronized all post totals with database records.");
+        } catch (Exception e) {
+            log.error("Failed to synchronize post totals: ", e);
+        }
     }
 
     @Override
@@ -64,6 +77,11 @@ public class PostServiceImplement implements PostService {
         Post post = postsRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_EXIST));
 
+        List<Comment> comments = commentsRepository.findAllByPostId(postId);
+        if (!comments.isEmpty()) {
+            commentsRepository.deleteAllInBatch(comments);
+        }
+
         List<PostLike> postLikes = postLikesRepository.findByPostId(postId);
         if (!postLikes.isEmpty()) {
             postLikesRepository.deleteAllInBatch(postLikes);
@@ -82,10 +100,37 @@ public class PostServiceImplement implements PostService {
         postsRepository.delete(post);
     }
 
+    private List<PostVO> decoratePostVOList(List<PostVO> list) {
+        if (list == null || list.isEmpty()) {
+            return list;
+        }
+        Long currentUserId = null;
+        try {
+            String currentUsername = ThreadContext.getUserDetail().getUsername();
+            if (currentUsername != null) {
+                currentUserId = userInfoRepository.findIdByUserName(currentUsername).orElse(null);
+            }
+        } catch (Exception ignored) {}
+
+        if (currentUserId == null) {
+            return list;
+        }
+
+        final Long finalUserId = currentUserId;
+        list.forEach(vo -> {
+            if (vo != null && vo.getId() != null) {
+                vo.setLiked(postLikesRepository.findByPostIdAndUserId(vo.getId(), finalUserId).isPresent());
+                vo.setSaved(postSavesRepository.findByPostIdAndUserId(vo.getId(), finalUserId).isPresent());
+                vo.setReported(postReportRepository.findByPostIdAndUserId(vo.getId(), finalUserId).isPresent());
+            }
+        });
+        return list;
+    }
+
     @Override
     public List<PostVO> getAllPost(){
         List<Long> postList=postsRepository.getAllId();
-        return convertToVo(postList);
+        return decoratePostVOList(convertToVo(postList));
     }
 
     @Override
@@ -96,7 +141,7 @@ public class PostServiceImplement implements PostService {
         );
         List<Long> list=postsRepository.findIdByUserInfoId(userInfoId);
         System.out.println("hello");
-        return convertToVo(list);
+        return decoratePostVOList(convertToVo(list));
     }
 
     @Override
@@ -110,19 +155,19 @@ public class PostServiceImplement implements PostService {
     @Override
     public List<PostVO> getLikePosts() {
         Long userInfoId = userInfoRepository.findIdByUserName(ThreadContext.getUserDetail().getUsername()).orElse(null);
-        return postsRepository.getLikePostVO(userInfoId);
+        return decoratePostVOList(postsRepository.getLikePostVO(userInfoId));
     }
 
     @Override
     public List<PostVO> getReportPosts() {
         Long userInfoId = userInfoRepository.findIdByUserName(ThreadContext.getUserDetail().getUsername()).orElse(null);
-        return postsRepository.getReportPostVO(userInfoId);
+        return decoratePostVOList(postsRepository.getReportPostVO(userInfoId));
     }
 
     @Override
     public List<PostVO> getSavePosts() {
         Long userInfoId = userInfoRepository.findIdByUserName(ThreadContext.getUserDetail().getUsername()).orElse(null);
-        return postsRepository.getSavePostVO(userInfoId);
+        return decoratePostVOList(postsRepository.getSavePostVO(userInfoId));
     }
 
     @Override

@@ -6,6 +6,12 @@ const postApi = {
     getAllHomePosts: () => {
         return axiosClient.get("/api/posts/get/all");
     },
+    getMyPosts: () => {
+        return axiosClient.get("/api/posts/get-my-posts");
+    },
+    getSavePosts: () => {
+        return axiosClient.get("/api/posts/get-my-save-posts");
+    },
     createPost: (data) => {
         return axiosClient.post("/api/posts/create", data);
     },

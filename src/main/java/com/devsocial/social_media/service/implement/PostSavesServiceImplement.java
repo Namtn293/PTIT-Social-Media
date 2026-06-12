@@ -37,10 +37,12 @@ public class PostSavesServiceImplement implements PostSavesService {
                             .userId(userId)
                             .postId(postId)
                     .build());
+            postSavesRepository.flush();
             postsRepository.updateSavePostTotal(postId,1L);
             return "Save Success";
         } else {
             postSavesRepository.delete(postSave);
+            postSavesRepository.flush();
             postsRepository.updateSavePostTotal(postId,-1L);
             return "Drop the save Success";
         }

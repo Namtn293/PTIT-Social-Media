@@ -36,26 +36,27 @@ const MessageContent = ({check, avatar, name, timestamp, message, userName}) => 
                 </div>
             ) : userData ? (
                 <div className="popover-body">
-                    <div className="popover-info-item">
-                        <UserOutlined className="info-icon" />
-                        <span className="info-label">Họ và tên:</span>
-                        <span className="info-value">{name}</span>
-                    </div>
-                    <div className="popover-info-item">
-                        <MailOutlined className="info-icon" />
-                        <span className="info-label">Email:</span>
-                        <span className="info-value">{userData?.email || "Chưa cập nhật"}</span>
-                    </div>
-                    <div className="popover-info-item">
-                        <IdcardOutlined className="info-icon" />
-                        <span className="info-label">Lớp:</span>
-                        <span className="info-value">Chưa cập nhật</span>
-                    </div>
-                    <div className="popover-info-item">
-                        <ReadOutlined className="info-icon" />
-                        <span className="info-label">Ngành:</span>
-                        <span className="info-value">{userData?.major || "Chưa cập nhật"}</span>
-                    </div>
+                    {(userData.fullName || name) && (
+                        <div className="popover-info-item">
+                            <UserOutlined className="info-icon" />
+                            <span className="info-label">Họ và tên:</span>
+                            <span className="info-value">{userData.fullName || name}</span>
+                        </div>
+                    )}
+                    {userData.email && (
+                        <div className="popover-info-item">
+                            <MailOutlined className="info-icon" />
+                            <span className="info-label">Email:</span>
+                            <span className="info-value">{userData.email}</span>
+                        </div>
+                    )}
+                    {userData.major && (
+                        <div className="popover-info-item">
+                            <ReadOutlined className="info-icon" />
+                            <span className="info-label">Ngành:</span>
+                            <span className="info-value">{userData.major}</span>
+                        </div>
+                    )}
                 </div>
             ) : (
                 <div className="popover-error">Không thể tải dữ liệu</div>
@@ -79,7 +80,16 @@ const MessageContent = ({check, avatar, name, timestamp, message, userName}) => 
                     </Popover>
                     
                     <div className="msg-bubble-container">
-                        <div className="msg-sender-name">{name}</div>
+                        <Popover 
+                            overlayInnerStyle={{ borderRadius: '12px', padding: '10px' }} 
+                            content={detailProfile} 
+                            trigger="click" 
+                            placement="top" 
+                            arrow={true} 
+                            onOpenChange={handleOpenChange}
+                        >
+                            <div className="msg-sender-name" style={{ cursor: "pointer" }}>{name}</div>
+                        </Popover>
                         <div className="msg-bubble">
                             <div className="msg-text">{message}</div>
                             <div className="msg-time">{timestamp}</div>
@@ -89,7 +99,16 @@ const MessageContent = ({check, avatar, name, timestamp, message, userName}) => 
             ) : (
                 <div className="msg-row msg-sent">
                     <div className="msg-bubble-container">
-                        <div className="msg-sender-name">{name}</div>
+                        <Popover 
+                            overlayInnerStyle={{ borderRadius: '12px', padding: '10px' }} 
+                            content={detailProfile} 
+                            trigger="click" 
+                            placement="top" 
+                            arrow={true} 
+                            onOpenChange={handleOpenChange}
+                        >
+                            <div className="msg-sender-name" style={{ cursor: "pointer" }}>{name}</div>
+                        </Popover>
                         <div className="msg-bubble">
                             <div className="msg-text">{message}</div>
                             <div className="msg-time">{timestamp}</div>

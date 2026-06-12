@@ -20,14 +20,39 @@ import "dayjs/locale/vi";
 dayjs.extend(relativeTime);
 dayjs.locale("vi");
 
-const PostLayout = ({ id, report, content, avatar, title, name, time, userName, classes, likes, comments, saves }) => {
+const PostLayout = ({ id, report, content, avatar, title, name, time, userName, classes, likes, comments, saves, initialLiked, initialSaved, initialReported }) => {
     const [likeCount, setLikeCount] = useState(likes || 0);
-    const [liked, setLiked] = useState(false);
+    const [liked, setLiked] = useState(initialLiked || false);
     const [saveCount, setSaveCount] = useState(saves || 0);
-    const [saved, setSaved] = useState(false);
+    const [saved, setSaved] = useState(initialSaved || false);
     const [reportCount, setReportCount] = useState(report || 0);
-    const [reported, setReported] = useState(false);
+    const [reported, setReported] = useState(initialReported || false);
     const [userData, setUserData] = useState(null);
+
+    // Sync state when props change (e.g. from refetching)
+    useEffect(() => {
+        setLiked(initialLiked || false);
+    }, [initialLiked]);
+
+    useEffect(() => {
+        setSaved(initialSaved || false);
+    }, [initialSaved]);
+
+    useEffect(() => {
+        setReported(initialReported || false);
+    }, [initialReported]);
+
+    useEffect(() => {
+        setLikeCount(likes || 0);
+    }, [likes]);
+
+    useEffect(() => {
+        setSaveCount(saves || 0);
+    }, [saves]);
+
+    useEffect(() => {
+        setReportCount(report || 0);
+    }, [report]);
 
     // Comment section
     const [showComments, setShowComments] = useState(false);
@@ -38,6 +63,10 @@ const PostLayout = ({ id, report, content, avatar, title, name, time, userName, 
     const [commentsLoading, setCommentsLoading] = useState(false);
     const [submitLoading, setSubmitLoading] = useState(false);
     const commentInputRef = useRef(null);
+
+    useEffect(() => {
+        setCommentCount(comments || 0);
+    }, [comments]);
 
     // Fetch comments khi mở panel
     const fetchComments = async () => {
@@ -306,24 +335,28 @@ const PostLayout = ({ id, report, content, avatar, title, name, time, userName, 
                                     <span>Chưa có bình luận nào. Hãy là người đầu tiên!</span>
                                 </div>
                             ) : (
-                                commentList.map((cmt, idx) => (
-                                    <div key={cmt.id || idx} className="comment-item">
-                                        <img
-                                            src={cmt.avatar || "https://tse3.mm.bing.net/th/id/OIP.aCwqDO1MIaS3qzA7DyFPdAHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3"}
-                                            alt="avatar"
-                                            className="comment-avatar"
-                                        />
-                                        <div className="comment-bubble-wrap">
-                                            <div className="comment-bubble">
-                                                <span className="comment-author">{cmt.fullName || cmt.name || "Thành viên PTIT"}</span>
-                                                <p className="comment-text">{cmt.content}</p>
+                                commentList.map((cmt, idx) => {
+                                    const isMe = String(cmt.userId) === String(localStorage.getItem("userId"));
+                                    const authorName = isMe ? "Bạn" : (cmt.fullName || cmt.name || "Thành viên PTIT");
+                                    return (
+                                        <div key={cmt.id || idx} className="comment-item">
+                                            <img
+                                                src={cmt.avatar || "https://tse3.mm.bing.net/th/id/OIP.aCwqDO1MIaS3qzA7DyFPdAHaHa?r=0&rs=1&pid=ImgDetMain&o=7&rm=3"}
+                                                alt="avatar"
+                                                className="comment-avatar"
+                                            />
+                                            <div className="comment-bubble-wrap">
+                                                <div className="comment-bubble">
+                                                    <span className="comment-author">{authorName}</span>
+                                                    <p className="comment-text">{cmt.content}</p>
+                                                </div>
+                                                {cmt.timestamp && (
+                                                    <span className="comment-time">{getFriendlyTime(cmt.timestamp)}</span>
+                                                )}
                                             </div>
-                                            {cmt.timestamp && (
-                                                <span className="comment-time">{getFriendlyTime(cmt.timestamp)}</span>
-                                            )}
                                         </div>
-                                    </div>
-                                ))
+                                    );
+                                })
                             )}
                         </div>
 

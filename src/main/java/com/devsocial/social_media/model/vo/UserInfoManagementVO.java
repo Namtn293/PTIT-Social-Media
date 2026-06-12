@@ -17,4 +17,7 @@ public class UserInfoManagementVO {
     private String email;
     private StatusEnum status;
     private RoleEnum role;
+    private String fullName;
+    private String avatar;
+    private String className;
 }
