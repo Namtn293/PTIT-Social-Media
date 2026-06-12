@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from 'antd';
+import { BookOutlined, TeamOutlined, BulbOutlined } from '@ant-design/icons';
 import './UserHomeContent.css';
 
 function UserHomeContent() {
@@ -38,6 +39,7 @@ function UserHomeContent() {
                                 <span>Collaboration</span>
                             </div>
                             <div className="feature-item">
+                                <BulbOutlined className="feature-icon" />
                                 <span>Knowledge</span>
                             </div>
                         </div>

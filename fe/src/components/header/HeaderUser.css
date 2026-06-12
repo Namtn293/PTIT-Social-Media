@@ -1,0 +1,62 @@
+#root{
+    width:100%;
+    min-height:100vh;
+}
+
+.app-container{
+    width:100%;
+    min-height:100vh;
+}
+
+.header-wrap {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.logo-title {
+    color: #b71c1c; /* Brand color */
+    font-weight: 700;
+}
+
+.home, .post, .community, .document {
+    border-radius: 10px;
+    padding: 10px;
+    background-color: white;
+    color: #434343; /* Dark gray for visibility on white bg */
+    font-weight: 500;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.home:hover, 
+.post:hover, 
+.community:hover,
+.document:hover,
+.home.active,
+.post.active,
+.community.active,
+.document.active {
+    cursor: pointer;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: rgba(238, 203, 182, 0.26);
+    color: rgb(236, 63, 11);
+}
+
+.bell{
+    background: none;
+    border-radius: 50%;
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #555555; /* Ensure bell icon is dark and visible */
+    font-size: 18px;
+}
+
+.bell:hover{
+    background-color: #eecbb642;
+}
