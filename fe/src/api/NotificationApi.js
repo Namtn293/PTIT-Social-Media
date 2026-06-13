@@ -12,6 +12,9 @@ const notificationApi = {
     },
     deleteNotification: (id) => {
         return axiosClient.post(`/api/notifications/delete/${id}`);
+    },
+    markAsRead: (id) => {
+        return axiosClient.post(`/api/notifications/read/${id}`);
     }
 };
 

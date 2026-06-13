@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -17,5 +19,7 @@ public class NotificationUserVO {
     private String content;
     private LocalDateTime createAt;
     private String createBy; // Name/Display details of creator admin
+
+    @JsonProperty("isRead")
     private Boolean isRead;
 }

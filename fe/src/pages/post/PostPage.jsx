@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import HeaderUser from '../../components/header/HeaderUser';
-import Footer from '../../components/footer/Footer';
 import PostLayout from '../../components/post/PostLayout';
 import postApi from '../../api/PostApi';
 import { Spin, Input, Empty, message } from 'antd';
-import { SearchOutlined, EditOutlined, BookOutlined, FireOutlined, QuestionCircleOutlined, CloseOutlined, SendOutlined } from '@ant-design/icons';
+import { SearchOutlined, EditOutlined, FireOutlined, QuestionCircleOutlined, CloseOutlined, SendOutlined } from '@ant-design/icons';
 import './PostPage.css';
 
 const { TextArea } = Input;
@@ -238,27 +237,9 @@ function PostPage() {
                                 <span className="topic-tag">#An-Toàn-Thông-Tin</span>
                             </div>
                         </div>
-
-                        <div className="sidebar-widget docs-widget">
-                            <h3><BookOutlined className="widget-icon docs" /> Tài liệu được tải nhiều</h3>
-                            <div className="doc-link-item">
-                                <span className="doc-num">1</span>
-                                <span className="doc-name">Đề cương trắc nghiệm Mạng Máy Tính 2026</span>
-                            </div>
-                            <div className="doc-link-item">
-                                <span className="doc-num">2</span>
-                                <span className="doc-name">Slide bài giảng Cấu Trúc Dữ Liệu &amp; Giải Thuật</span>
-                            </div>
-                            <div className="doc-link-item">
-                                <span className="doc-num">3</span>
-                                <span className="doc-name">Đề thi mẫu môn Lập trình hướng đối tượng</span>
-                            </div>
-                        </div>
                     </aside>
                 </div>
             </div>
-
-            <Footer />
 
             {/* ===== MODAL TẠO BÀI VIẾT ===== */}
             {showModal && (

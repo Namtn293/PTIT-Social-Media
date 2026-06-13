@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import HeaderUser from '../../components/header/HeaderUser';
-import Footer from '../../components/footer/Footer';
 import documentApi from '../../api/DocumentApi';
 import { Spin, Input, Button, Modal, Empty, message, Card } from 'antd';
 import { SearchOutlined, DownloadOutlined, PlusOutlined, FilePdfOutlined, FileWordOutlined, FileUnknownOutlined, DeleteOutlined, InboxOutlined } from '@ant-design/icons';
@@ -274,8 +273,6 @@ function DocumentPage() {
                     </div>
                 )}
             </div>
-
-            <Footer />
 
             {/* Upload Document Modal */}
             <Modal

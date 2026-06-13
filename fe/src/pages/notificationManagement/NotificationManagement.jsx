@@ -24,7 +24,6 @@ function NotificationManagement(){
     }, []);
 
     const [searchText, setSearchText] = useState("");
-    const [filterKeyWord, setFilterKeyWord] = useState("");
     const [popup, setPopup] = useState(false);
     const [data, setData] = useState({});
     const [currentPage, setCurrentPage] = useState(1);
@@ -116,27 +115,10 @@ function NotificationManagement(){
         }
     }
 
-    function removeVietnameseTones(str) {
-    return str
-        ?.normalize("NFD")
-        ?.replace(/[\u0300-\u036f]/g, "")
-        ?.replace(/đ/g, "d")
-        ?.replace(/Đ/g, "D")
-        ?.toLowerCase()
-        ?.trim();
-    }
-
-    const searchableColumns = [
-    "title",
-    "content",
-    "userName"
-    ];
-
     const filteredNotifications = notifications.filter((notice) => {
-        const keyword = removeVietnameseTones(searchText);
-
-        return searchableColumns.some((column) =>
-            removeVietnameseTones(notice[column] || "").includes(keyword)
+        return (
+            (notice.title || "").toLowerCase().includes(searchText.toLowerCase()) ||
+            (notice.content || "").toLowerCase().includes(searchText.toLowerCase())
         );
     });
 
@@ -145,19 +127,15 @@ function NotificationManagement(){
             <div className="admin-page-header">
                 <div className="admin-search-wrap">
                     <Input 
-                        type="text" 
-                        placeholder="Tìm kiếm thông báo..."
-                        value={filterKeyWord}
-                        onChange={(e) => setFilterKeyWord(e.target.value)}
-                        onKeyDown={(e) => e.key === "Enter" && setSearchText(filterKeyWord)}
-                        style={{ width: "400px" }}
-                        size="large"
+                        onChange={(e) => setSearchText(e.target.value)} 
+                        size="large" 
+                        style={{ width: "400px" }} 
+                        placeholder="Tìm kiếm thông báo..." 
                     />
                     <Button 
                         icon={<SearchOutlined />} 
                         size="large" 
-                        type="primary" 
-                        onClick={() => setSearchText(filterKeyWord)}
+                        type="primary"
                     >
                         Tìm kiếm
                     </Button>

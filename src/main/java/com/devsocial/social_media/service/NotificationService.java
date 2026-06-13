@@ -11,4 +11,5 @@ public interface NotificationService {
     List<NotificationUserVO> getMyNotifications();
     List<NotificationAdminVO> getAllNotifications();
     void deleteNotification(Long id);
+    void markAsRead(Long id);
 }

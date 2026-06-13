@@ -42,4 +42,10 @@ public class NotificationController {
         notificationService.deleteNotification(id);
         return ResponseUtil.ok("Notification deleted successfully");
     }
+
+    @PostMapping("/read/{id}")
+    public SuccessResponse<String> markAsRead(@PathVariable Long id) {
+        notificationService.markAsRead(id);
+        return ResponseUtil.ok("Notification marked as read successfully");
+    }
 }

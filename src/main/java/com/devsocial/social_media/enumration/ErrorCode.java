@@ -18,6 +18,7 @@ public enum ErrorCode {
     TOKEN_INVAlID("401","Token invalid"),
     CLASS_NOT_EXIST("404","Class not exist"),
     MAJOR_NOT_EXIST("404","Major not exist"),
+    NOTIFICATION_NOT_FOUND("404","Notification not found"),
     ;
 
     private final String code;

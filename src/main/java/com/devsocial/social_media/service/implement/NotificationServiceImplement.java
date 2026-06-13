@@ -191,4 +191,19 @@ public class NotificationServiceImplement implements NotificationService {
         userNotificationRepository.deleteByNotificationId(id);
         notificationRepository.deleteById(id);
     }
+
+    @Override
+    @Transactional
+    public void markAsRead(Long id) {
+        UserNotification userNotification = userNotificationRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.NOTIFICATION_NOT_FOUND));
+
+        String userName = ThreadContext.getUserDetail().getUsername();
+        if (!userNotification.getUser().getUsername().equals(userName)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+
+        userNotification.setIsRead(true);
+        userNotificationRepository.save(userNotification);
+    }
 }

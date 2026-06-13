@@ -31,17 +31,19 @@
 }
 
 /* ── Welcome Banner ─────────────────────────────────────── */
+
+
 .hc-welcome {
   background: white;
   border-radius: 16px;
   padding: 24px 32px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
   border: 1px solid #ede9fe;
   position: relative;
   overflow: hidden;
+  min-height: 120px;
 }
 
 .hc-welcome::before {
@@ -50,6 +52,13 @@
   top: 0; left: 0; right: 0; bottom: 0;
   background: linear-gradient(135deg, #faf5ff 0%, #bfb2ff22 0%, transparent 100%);
   pointer-events: none;
+}
+
+.hc-welcome-text {
+  flex: 1;
+  padding-right: 180px;
+  position: relative;
+  z-index: 1;
 }
 
 .hc-welcome-title {
@@ -67,8 +76,22 @@
 }
 
 .hc-welcome-illustration {
+  position: absolute;
+  right: 32px;
+  top: 50%;
+  transform: translateY(-50%);
   flex-shrink: 0;
   opacity: 0.9;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.hc-welcome-illustration svg {
+  display: block;
+  width: 140px;
+  height: auto;
 }
 
 /* ── Stat Cards ─────────────────────────────────────────── */
@@ -351,5 +374,8 @@
   }
   .hc-welcome-illustration {
     display: none;
+  }
+  .hc-welcome-text {
+    padding-right: 0;
   }
 }

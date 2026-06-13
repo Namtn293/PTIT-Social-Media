@@ -57,6 +57,25 @@ function HeaderUser() {
     const title = titleMap[location.pathname] || "Trang chủ";
 
     const [notifications, setNotifications] = useState([]);
+    const [detailModalOpen, setDetailModalOpen] = useState(false);
+    const [selectedNotification, setSelectedNotification] = useState(null);
+    const [popoverOpen, setPopoverOpen] = useState(false);
+
+    const handleOpenChange = (newOpen) => {
+        if (detailModalOpen) return;
+        setPopoverOpen(newOpen);
+    };
+
+    const sortNotifications = (list) => {
+        return [...list].sort((a, b) => {
+            if (a.isRead !== b.isRead) {
+                return a.isRead ? 1 : -1;
+            }
+            const dateA = new Date(a.createAt || 0);
+            const dateB = new Date(b.createAt || 0);
+            return dateB - dateA;
+        });
+    };
 
     const fetchNotifications = async () => {
         try {
@@ -64,15 +83,38 @@ function HeaderUser() {
             if (res.data && res.data.data) {
                 const formatted = res.data.data.map(item => ({
                     id: item.id,
-                    title: item.createBy 
-                        ? `${item.createBy}: ${item.title ? item.title + " - " : ""}${item.content}`
-                        : (item.content || "Thông báo hệ thống"),
+                    title: item.title || "Thông báo",
+                    content: item.content || "",
+                    createBy: item.createBy || "Hệ thống",
+                    createAt: item.createAt,
+                    isRead: item.isRead !== undefined ? item.isRead : (item.read !== undefined ? item.read : false),
                     description: formatTimeAgo(item.createAt)
                 }));
-                setNotifications(formatted);
+                const sorted = sortNotifications(formatted);
+                setNotifications(sorted);
             }
         } catch (err) {
             console.error("Lỗi lấy thông báo:", err);
+        }
+    };
+
+    const handleNotificationClick = async (item) => {
+        console.log("handleNotificationClick clicked for item:", item);
+        setSelectedNotification(item);
+        setDetailModalOpen(true);
+        if (!item.isRead) {
+            console.log("Marking notification as read in UI for ID:", item.id);
+            setNotifications(prev => {
+                const updated = prev.map(n => n.id === item.id ? { ...n, isRead: true } : n);
+                return sortNotifications(updated);
+            });
+            try {
+                console.log("Calling API markAsRead for ID:", item.id);
+                const res = await notificationApi.markAsRead(item.id);
+                console.log("API response:", res);
+            } catch (err) {
+                console.error("Lỗi cập nhật trạng thái đã đọc:", err);
+            }
         }
     };
 
@@ -178,7 +220,7 @@ function HeaderUser() {
                 style={{
                     maxHeight: "300px",
                     overflowY: "auto",
-                    width: "300px"
+                    width: "340px"
                 }}
                 className="notification-container"
             >
@@ -190,22 +232,44 @@ function HeaderUser() {
                             <List.Item
                                 className="notification-item"
                                 style={{
-                                    cursor: "pointer",
-                                    padding: "10px"
+                                    padding: "0px",
+                                    backgroundColor: item.isRead ? "#ffffff" : "rgba(238, 203, 182, 0.26)",
+                                    transition: "background-color 0.3s ease",
+                                    borderRadius: "4px",
+                                    marginBottom: "4px"
                                 }}
                             >
-                                <List.Item.Meta
-                                    avatar={
-                                        <Avatar
-                                            icon={<BellOutlined />}
-                                            style={{
-                                                backgroundColor: "#fd4e57"
-                                            }}
-                                        />
-                                    }
-                                    title={item.title}
-                                    description={item.description}
-                                />
+                                <div
+                                    onClick={() => handleNotificationClick(item)}
+                                    style={{
+                                        cursor: "pointer",
+                                        padding: "10px",
+                                        width: "100%",
+                                        height: "100%"
+                                    }}
+                                >
+                                    <List.Item.Meta
+                                        avatar={
+                                            <Avatar
+                                                icon={<BellOutlined />}
+                                                style={{
+                                                    backgroundColor: item.isRead ? "#d9d9d9" : "#fd4e57"
+                                                }}
+                                            />
+                                        }
+                                        title={
+                                            <span style={{ fontWeight: item.isRead ? "normal" : "bold" }}>
+                                                {item.title}
+                                            </span>
+                                        }
+                                        description={
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', marginTop: '4px' }}>
+                                                <span style={{ fontSize: '12px', color: '#8c8c8c' }}>{item.description}</span>
+                                                <span style={{ fontSize: '12px', color: '#1890ff', fontWeight: 500 }}>{item.createBy}</span>
+                                            </div>
+                                        }
+                                    />
+                                </div>
                             </List.Item>
                         )}
                     />
@@ -247,6 +311,8 @@ function HeaderUser() {
             </button>
         </div>
     );
+
+    const unreadCount = notifications.filter(n => !n.isRead).length;
 
     return (
         <div>
@@ -342,10 +408,12 @@ function HeaderUser() {
                     <Popover
                         content={notificationContent}
                         trigger="click"
+                        open={popoverOpen}
+                        onOpenChange={handleOpenChange}
                         placement="bottom"
                         arrow={true}
                     >
-                        <Badge count={notifications.length}>
+                        <Badge count={unreadCount}>
                             <div className="bell">
                                 <BellOutlined />
                             </div>
@@ -458,6 +526,39 @@ function HeaderUser() {
                         </Button>
                     </div>
                 </div>
+            </Modal>
+
+            {/* Modal Chi tiết thông báo */}
+            <Modal
+                title={<span style={{ fontWeight: 700, fontSize: "20px", color: "#b71c1c" }}>Chi tiết thông báo</span>}
+                open={detailModalOpen}
+                onCancel={() => setDetailModalOpen(false)}
+                footer={[
+                    <Button 
+                        key="close" 
+                        type="primary" 
+                        onClick={() => setDetailModalOpen(false)}
+                        style={{ backgroundColor: "#b71c1c", borderColor: "#b71c1c" }}
+                    >
+                        Đóng
+                    </Button>
+                ]}
+                centered
+            >
+                {selectedNotification && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: "12px", paddingTop: "10px" }}>
+                        <div>
+                            <h3 style={{ margin: 0, fontSize: "18px", color: "#333" }}>{selectedNotification.title}</h3>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "space-between", fontSize: "13px", color: "#8c8c8c", borderBottom: "1px solid #f0f0f0", paddingBottom: "8px" }}>
+                            <span><strong>Người gửi:</strong> {selectedNotification.createBy}</span>
+                            <span>{selectedNotification.description}</span>
+                        </div>
+                        <div style={{ paddingTop: "8px", fontSize: "15px", lineHeight: "1.6", color: "#4d4d4d", whiteSpace: "pre-wrap" }}>
+                            {selectedNotification.content}
+                        </div>
+                    </div>
+                )}
             </Modal>
         </div>
     );
