@@ -12,6 +12,7 @@ import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.enumration.RoleEnum;
 import com.devsocial.social_media.enumration.StatusEnum;
 import com.devsocial.social_media.repository.UserInfoRepository;
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +35,37 @@ public class AuthenticationService {
         this.userInfoRepository = userInfoRepository;
         this.jwtService = jwtService;
         this.tokenRepository = tokenRepository;
+    }
+
+    @PostConstruct
+    @Transactional
+    public void initAdminAccount() {
+        // Auto-create admin1 account with ADMIN role if not already exists
+        if (!userRepository.existsByUserName("admin1")) {
+            User adminUser = new User();
+            adminUser.setUserName("admin1");
+            adminUser.setRoleEnum(RoleEnum.ADMIN);
+            adminUser.setPassword(passwordEncoder.encode("123456"));
+            userRepository.save(adminUser);
+
+            UserInfo adminInfo = new UserInfo();
+            adminInfo.setUserName("admin1");
+            adminInfo.setEmail("admin1@ptit.edu.vn");
+            adminInfo.setFullName("Quản trị viên");
+            adminInfo.setStatus(StatusEnum.ACTIVE);
+            userInfoRepository.save(adminInfo);
+
+            System.out.println("[INIT] Admin account 'admin1' created successfully.");
+        } else {
+            // If admin1 exists but is STUDENT, promote to ADMIN
+            userRepository.findByUserName("admin1").ifPresent(user -> {
+                if (user.getRoleEnum() != RoleEnum.ADMIN) {
+                    user.setRoleEnum(RoleEnum.ADMIN);
+                    userRepository.save(user);
+                    System.out.println("[INIT] Admin account 'admin1' promoted to ADMIN role.");
+                }
+            });
+        }
     }
 
     @Transactional
@@ -99,5 +131,13 @@ public class AuthenticationService {
 
     public Long getUserTotal(){
         return userRepository.count();
+    }
+
+    @Transactional
+    public void setAdminRole(String userName) {
+        User user = userRepository.findByUserName(userName)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST));
+        user.setRoleEnum(RoleEnum.ADMIN);
+        userRepository.save(user);
     }
 }

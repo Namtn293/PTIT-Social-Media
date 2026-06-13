@@ -40,10 +40,12 @@ public class PostLikesServiceImplement implements PostLikesService {
                             .postId(postId)
                             .userId(userId)
                     .build());
+            postLikesRepository.flush();
             postsRepository.updateLikePostTotal(postId,1L);
             return "Like Success";
         } else {
             postLikesRepository.delete(postLike);
+            postLikesRepository.flush();
             postsRepository.updateLikePostTotal(postId,-1L);
             return "Dislike Success";
         }

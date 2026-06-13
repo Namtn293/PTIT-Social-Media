@@ -5,7 +5,9 @@ import {
     FormOutlined,
     HomeOutlined,
     WechatWorkOutlined,
-    BookOutlined
+    BookOutlined,
+    CompassOutlined,
+    FileTextOutlined
 } from "@ant-design/icons";
 
 import { useNavigate, useLocation } from "react-router-dom";
@@ -187,6 +189,36 @@ function HeaderUser() {
         </div>
     );
 
+    const searchParams = new URLSearchParams(location.search);
+    const activeTab = searchParams.get("tab") || "all";
+    const isPostPage = location.pathname.startsWith("/bai-viet");
+
+    const postMenuContent = (
+        <div className="post-dropdown-menu">
+            <button 
+                className={`post-dropdown-item ${isPostPage && activeTab === "all" ? "active" : ""}`}
+                onClick={() => navigate("/bai-viet?tab=all")}
+            >
+                <CompassOutlined className="post-dropdown-icon" />
+                <span>Bài viết chung</span>
+            </button>
+            <button 
+                className={`post-dropdown-item ${isPostPage && activeTab === "mine" ? "active" : ""}`}
+                onClick={() => navigate("/bai-viet?tab=mine")}
+            >
+                <FileTextOutlined className="post-dropdown-icon" />
+                <span>Bài viết của tôi</span>
+            </button>
+            <button 
+                className={`post-dropdown-item ${isPostPage && activeTab === "saved" ? "active" : ""}`}
+                onClick={() => navigate("/bai-viet?tab=saved")}
+            >
+                <BookOutlined className="post-dropdown-icon" />
+                <span>Bài viết đã lưu</span>
+            </button>
+        </div>
+    );
+
     return (
         <div>
             <div
@@ -235,13 +267,20 @@ function HeaderUser() {
                         <HomeOutlined /> Trang chủ
                         </div>
 
-                        <div
-                            className={`post ${location.pathname === "/bai-viet" ? "active" : ""}`}
-                            onClick={() => navigate("/bai-viet")}
-                            style={{ cursor: "pointer" }}
+                        <Popover
+                            content={postMenuContent}
+                            trigger="click"
+                            placement="bottom"
+                            arrow={false}
+                            styles={{ body: { padding: '4px', borderRadius: '8px' } }}
                         >
-                            <FormOutlined /> Bài viết
-                        </div>
+                            <div
+                                className={`post ${location.pathname.startsWith("/bai-viet") ? "active" : ""}`}
+                                style={{ cursor: "pointer" }}
+                            >
+                                <FormOutlined /> Bài viết
+                            </div>
+                        </Popover>
 
                         <div
                             className={`community ${location.pathname === "/cong-dong" ? "active" : ""}`}

@@ -48,4 +48,10 @@ public class AuthenticationController {
     public SuccessResponse<Long> getUserTotal(){
         return ResponseUtil.ok("Get user total success", authenticationService.getUserTotal());
     }
+
+    @PostMapping("/set-admin/{userName}")
+    public SuccessResponse<String> setAdminRole(@PathVariable String userName){
+        authenticationService.setAdminRole(userName);
+        return ResponseUtil.ok("User " + userName + " is now ADMIN");
+    }
 }

@@ -41,10 +41,12 @@ public class PostReportServiceImplement implements PostReportService {
                             .userId(userId)
                             .postId(postId)
                     .build());
+            postReportRepository.flush();
             postsRepository.updateReportPostTotal(postId,1L);
             return "Report Success";
         } else {
             postReportRepository.delete(postReport);
+            postReportRepository.flush();
             postsRepository.updateReportPostTotal(postId,-1L);
             return "Drop the report Success";
         }

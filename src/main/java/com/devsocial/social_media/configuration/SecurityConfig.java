@@ -40,6 +40,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/like/**").hasAnyRole("STUDENT","ADMIN")
                                 .requestMatchers("/api/report/**").hasAnyRole("STUDENT","ADMIN")
                                 .requestMatchers("/api/save/**").hasAnyRole("STUDENT","ADMIN")
+                                .requestMatchers("/api/posts/debug-db").permitAll()
                                 .requestMatchers("/api/posts/**").hasAnyRole("STUDENT","ADMIN")
                                 .requestMatchers("/api/document/**").hasAnyRole("STUDENT","ADMIN")
                                 .requestMatchers("/ws/**").permitAll()

@@ -19,10 +19,38 @@ import java.util.List;
 @RequestMapping("/api/posts")
 public class PostsController {
     private final PostService postService;
+    private final com.devsocial.social_media.repository.PostsRepository postsRepository;
+    private final com.devsocial.social_media.repository.PostLikesRepository postLikesRepository;
+    private final com.devsocial.social_media.repository.PostSavesRepository postSavesRepository;
+    private final com.devsocial.social_media.repository.PostReportRepository postReportRepository;
+    private final com.devsocial.social_media.repository.UserInfoRepository userInfoRepository;
 
     @Autowired
-    public PostsController(PostService postService) {
+    public PostsController(PostService postService,
+                           com.devsocial.social_media.repository.PostsRepository postsRepository,
+                           com.devsocial.social_media.repository.PostLikesRepository postLikesRepository,
+                           com.devsocial.social_media.repository.PostSavesRepository postSavesRepository,
+                           com.devsocial.social_media.repository.PostReportRepository postReportRepository,
+                           com.devsocial.social_media.repository.UserInfoRepository userInfoRepository) {
         this.postService = postService;
+        this.postsRepository = postsRepository;
+        this.postLikesRepository = postLikesRepository;
+        this.postSavesRepository = postSavesRepository;
+        this.postReportRepository = postReportRepository;
+        this.userInfoRepository = userInfoRepository;
+    }
+
+    @GetMapping("/debug-db")
+    public Object debugDb() {
+        return java.util.Map.of(
+            "rawPosts", postsRepository.findAll(),
+            "decoratedPosts", postService.getAllPost(),
+            "likes", postLikesRepository.findAll(),
+            "saves", postSavesRepository.findAll(),
+            "reports", postReportRepository.findAll(),
+            "users", userInfoRepository.findAll(),
+            "likesCountFor25", postLikesRepository.findByPostId(25L).size()
+        );
     }
 
     @PostMapping("/create")
