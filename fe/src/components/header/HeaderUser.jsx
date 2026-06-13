@@ -13,6 +13,22 @@ import {
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button, Badge, Popover, List, Avatar, Modal, Input, message } from "antd";
 import userInfoApi from "../../api/UserInfoApi";
+import notificationApi from "../../api/NotificationApi";
+
+const formatTimeAgo = (dateStr) => {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    if (isNaN(date)) return dateStr;
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return "Vừa xong";
+    if (diffMins < 60) return `${diffMins} phút trước`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours} giờ trước`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays} ngày trước`;
+};
 
 function HeaderUser() {
     const navigate = useNavigate();
@@ -40,16 +56,25 @@ function HeaderUser() {
 
     const title = titleMap[location.pathname] || "Trang chủ";
 
-    const data = [
-        {
-            title: "Thông báo mới",
-            description: "Bạn có bài viết mới cần xem"
-        },
-        {
-            title: "Cộng đồng",
-            description: "Có người vừa bình luận bài viết của bạn"
+    const [notifications, setNotifications] = useState([]);
+
+    const fetchNotifications = async () => {
+        try {
+            const res = await notificationApi.getMyNotifications();
+            if (res.data && res.data.data) {
+                const formatted = res.data.data.map(item => ({
+                    id: item.id,
+                    title: item.createBy 
+                        ? `${item.createBy}: ${item.title ? item.title + " - " : ""}${item.content}`
+                        : (item.content || "Thông báo hệ thống"),
+                    description: formatTimeAgo(item.createAt)
+                }));
+                setNotifications(formatted);
+            }
+        } catch (err) {
+            console.error("Lỗi lấy thông báo:", err);
         }
-    ];
+    };
 
     const fetchUserData = async () => {
         const userName = localStorage.getItem("userName");
@@ -72,6 +97,9 @@ function HeaderUser() {
 
     useEffect(() => {
         fetchUserData();
+        fetchNotifications();
+        const interval = setInterval(fetchNotifications, 15000);
+        return () => clearInterval(interval);
     }, []);
 
     const openModal = () => {
@@ -136,6 +164,7 @@ function HeaderUser() {
         localStorage.removeItem("role");
         localStorage.removeItem("userName");
         localStorage.removeItem("userAvatar");
+        window.dispatchEvent(new Event("authChange"));
         navigate("/login");
     };
 
@@ -153,10 +182,10 @@ function HeaderUser() {
                 }}
                 className="notification-container"
             >
-                {data.length > 0 ? (
+                {notifications.length > 0 ? (
                     <List
                         itemLayout="horizontal"
-                        dataSource={data}
+                        dataSource={notifications}
                         renderItem={(item) => (
                             <List.Item
                                 className="notification-item"
@@ -316,7 +345,7 @@ function HeaderUser() {
                         placement="bottom"
                         arrow={true}
                     >
-                        <Badge count={data.length}>
+                        <Badge count={notifications.length}>
                             <div className="bell">
                                 <BellOutlined />
                             </div>

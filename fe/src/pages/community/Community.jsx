@@ -3,10 +3,9 @@ import { Input, Spin } from "antd"
 import { useState, useEffect, useRef } from "react"
 import { PaperClipOutlined, SendOutlined } from "@ant-design/icons"
 import MessageContent from "../../components/message/MessageContent"
-import { Client } from "@stomp/stompjs"
-import SockJS from "sockjs-client"
 import MessageApi from "../../api/MessageApi"
 import userInfoApi from "../../api/UserInfoApi"
+import { useWebSocket } from "../../context/WebSocketContext"
 
 const parseTimestamp = (timestampStr) => {
     if (!timestampStr) return new Date(0);
@@ -28,10 +27,10 @@ const parseTimestamp = (timestampStr) => {
 function Community() {
     const [messages, setMessages] = useState([])
     const [members, setMembers] = useState([])
-    const onlineTotal = members.length;
+    const { stompClient, connected, onlineUsernames } = useWebSocket();
+    const onlineTotal = members.filter(m => onlineUsernames.includes(m.userName)).length;
     const [inputValue, setInputValue] = useState("");
     const [searchMember, setSearchMember] = useState("");
-    const stompClientRef = useRef(null);
     const chatScrollAreaRef = useRef(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -61,6 +60,7 @@ function Community() {
                 if (response?.data?.data) {
                     const mappedMembers = response.data.data.map(item => ({
                         id: item.userId,
+                        userName: item.userName,
                         name: item.fullName || item.userName,
                         avatar: item.avatar || "https://cellphones.com.vn/sforum/wp-content/uploads/2023/10/avatar-trang-4.jpg",
                         classes: item.className || "Không có lớp"
@@ -75,34 +75,17 @@ function Community() {
     }, []);
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
+        if (!stompClient || !connected) return;
 
-        const client = new Client({
-            webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
-            connectHeaders: {
-                Authorization: `Bearer ${token}`,
-            },
-
-            onConnect: () => {
-                console.log("Đã kết nối Websocket");
-                client.subscribe("/topic/public", (message) => {
-                    const newMessage = JSON.parse(message.body);
-                    setMessages((prev) => [...(prev || []), newMessage]);
-                });
-            },
-
-            onDisconnect: () => {
-                console.log("Không kết nối được Websocket");
-            },
+        const subscription = stompClient.subscribe("/topic/public", (message) => {
+            const newMessage = JSON.parse(message.body);
+            setMessages((prev) => [...(prev || []), newMessage]);
         });
-        client.activate();
-
-        stompClientRef.current = client;
 
         return () => {
-            client.deactivate();
+            subscription.unsubscribe();
         };
-    }, []);
+    }, [stompClient, connected]);
 
     useEffect(() => {
         if (chatScrollAreaRef.current) {
@@ -115,9 +98,9 @@ function Community() {
 
     const sendMessage = () => {
         if (!inputValue.trim()) return;
-        if (!stompClientRef.current?.connected) return;
+        if (!stompClient || !connected) return;
         const messageDTO = { userId: localStorage.getItem("userId"), content: inputValue };
-        stompClientRef.current.publish({
+        stompClient.publish({
             destination: "/app/chat-community",
             body: JSON.stringify(messageDTO),
         });
@@ -132,6 +115,14 @@ function Community() {
         (member.name?.toLowerCase() || "").includes(searchMember.toLowerCase()) ||
         (member.classes?.toLowerCase() || "").includes(searchMember.toLowerCase())
     );
+
+    const sortedFilteredMembers = [...filteredMembers].sort((a, b) => {
+        const aOnline = onlineUsernames.includes(a.userName);
+        const bOnline = onlineUsernames.includes(b.userName);
+        if (aOnline && !bOnline) return -1;
+        if (!aOnline && bOnline) return 1;
+        return 0;
+    });
 
     return (
         <div className="community-chat-wrapper">
@@ -192,7 +183,7 @@ function Community() {
                 <div className="members-sidebar">
                     <div className="sidebar-header">
                         <span className="online-badge-dot pulse"></span>
-                        <span className="online-count-text">{onlineTotal} thành viên</span>
+                        <span className="online-count-text">{onlineTotal} đang hoạt động</span>
                     </div>
 
                     <div className="search-member-box">
@@ -205,11 +196,13 @@ function Community() {
                     </div>
 
                     <div className="members-list-scroll">
-                        {filteredMembers.map((item) => (
+                        {sortedFilteredMembers.map((item) => (
                             <div key={item.id} className="member-item-row">
                                 <div className="member-avatar-wrapper">
                                     <img src={item.avatar} alt={item.name} className="member-avatar-img" />
-                                    <span className="member-online-status pulse"></span>
+                                    {onlineUsernames.includes(item.userName) && (
+                                        <span className="member-online-status pulse"></span>
+                                    )}
                                 </div>
                                 <div className="member-details">
                                     <div className="member-name-text">{item.name}</div>

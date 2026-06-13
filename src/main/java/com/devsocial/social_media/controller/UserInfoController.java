@@ -1,5 +1,6 @@
 package com.devsocial.social_media.controller;
 
+import com.devsocial.social_media.configuration.WebSocketEventListener;
 import com.devsocial.social_media.core.util.ResponseUtil;
 import com.devsocial.social_media.core.util.SuccessResponse;
 import com.devsocial.social_media.model.dto.UserInfoDTO;
@@ -14,15 +15,26 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/api/user-info")
 @CrossOrigin(origins = "http://localhost:5173")
 public class UserInfoController {
     private final UserInfoService userInfoService;
+    private final WebSocketEventListener webSocketEventListener;
 
-    public UserInfoController(UserInfoService userInfoService) {
+    public UserInfoController(UserInfoService userInfoService, WebSocketEventListener webSocketEventListener) {
         this.userInfoService = userInfoService;
+        this.webSocketEventListener = webSocketEventListener;
+    }
+
+    @GetMapping("online")
+    public SuccessResponse<Set<String>> getOnlineUsers() {
+        return ResponseUtil.ok(
+                "Get Online Users Success",
+                webSocketEventListener.getActiveUsernames()
+        );
     }
 
     @GetMapping("get/all")

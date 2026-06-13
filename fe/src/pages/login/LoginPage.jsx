@@ -34,6 +34,7 @@ function LoginPage(){
                 localStorage.setItem("userId",jwt.userId);
                 localStorage.setItem("userName", jwt.sub);
                 console.log(localStorage.getItem("userId"));
+                window.dispatchEvent(new Event("authChange"));
                 navigate("/");
             }
         } catch(error){

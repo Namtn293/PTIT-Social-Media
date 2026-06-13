@@ -5,6 +5,7 @@ import com.devsocial.social_media.core.util.SuccessResponse;
 import com.devsocial.social_media.entity.Post;
 import com.devsocial.social_media.model.dto.PostDTO;
 import com.devsocial.social_media.model.dto.PostUpdateDTO;
+import com.devsocial.social_media.model.vo.AdminDashboardStatsVO;
 import com.devsocial.social_media.model.vo.PostAdminVO;
 import com.devsocial.social_media.model.vo.PostDataChart;
 import com.devsocial.social_media.model.vo.PostVO;
@@ -107,5 +108,15 @@ public class PostsController {
     @GetMapping("/statistic/get-post-data-chart")
     public SuccessResponse<List<PostDataChart>> getPostDateChart(){
         return ResponseUtil.ok("Get post total success", postService.getPostDataChart());
+    }
+
+    @GetMapping("/statistic/dashboard-stats")
+    public SuccessResponse<AdminDashboardStatsVO> getAdminDashboardStats() {
+        return ResponseUtil.ok("Get admin dashboard stats success", postService.getAdminDashboardStats());
+    }
+
+    @GetMapping("/admin/recent")
+    public SuccessResponse<List<PostAdminVO>> getRecentPosts() {
+        return ResponseUtil.ok("Get recent posts success", postService.getRecentPosts());
     }
 }

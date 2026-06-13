@@ -6,6 +6,9 @@ const userInfoApi={
     getAllUserInfo:()=>{
         return axiosClient.get("/api/user-info/get/all");
     },
+    getOnlineUsers:()=>{
+        return axiosClient.get("/api/user-info/online");
+    },
     lockUserInfo:(userName)=>{
         return axiosClient.post(`/api/user-info/ban/${userName}`);
     },

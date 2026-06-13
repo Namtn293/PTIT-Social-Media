@@ -1,5 +1,6 @@
 import "./HomeContent.css";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import statisticAdminApi from "../../api/StatisticAdminApi.js";
 
 const RECENT_POSTS = [
@@ -237,11 +238,38 @@ function StatCard({ icon, label, value, growth, color }) {
   );
 }
 
+const formatTimeAgo = (dateStr) => {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  if (isNaN(date)) return dateStr;
+  const now = new Date();
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return "Vừa xong";
+  if (diffMins < 60) return `${diffMins} phút trước`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours} giờ trước`;
+  const diffDays = Math.floor(diffHours / 24);
+  return `${diffDays} ngày trước`;
+};
+
 // ── Main Component ─────────────────────────────────────────
 function HomeContent() {
+  const navigate = useNavigate();
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [stats, setStats] = useState({
+    newUsersCount: 0,
+    newUsersGrowth: "0%",
+    newPostsCount: 0,
+    newPostsGrowth: "0%",
+    newDocumentsCount: 0,
+    newDocumentsGrowth: "0%",
+    newNotificationsCount: 0,
+    newNotificationsGrowth: "0%",
+  });
+  const [recentPosts, setRecentPosts] = useState([]);
 
   // Fetch chart data from API
   useEffect(() => {
@@ -262,7 +290,28 @@ function HomeContent() {
       }
     };
 
+    const fetchStatsAndRecent = async () => {
+      try {
+        const statsRes = await statisticAdminApi.getAdminDashboardStats();
+        if (statsRes.data && statsRes.data.data) {
+          setStats(statsRes.data.data);
+        }
+      } catch (err) {
+        console.error("Error fetching stats:", err);
+      }
+
+      try {
+        const recentRes = await statisticAdminApi.getRecentPosts();
+        if (recentRes.data && recentRes.data.data) {
+          setRecentPosts(recentRes.data.data);
+        }
+      } catch (err) {
+        console.error("Error fetching recent posts:", err);
+      }
+    };
+
     fetchChartData();
+    fetchStatsAndRecent();
   }, []);
 
   // Use fetched data - remove fallback to avoid confusion
@@ -315,8 +364,8 @@ function HomeContent() {
             </svg>
           }
           label="Người dùng mới trong tháng"
-          value="1.248"
-          growth="12.5%"
+          value={stats.newUsersCount}
+          growth={stats.newUsersGrowth}
           color="#6366f1"
         />
         <StatCard
@@ -329,8 +378,8 @@ function HomeContent() {
             </svg>
           }
           label="Bài viết mới trong tháng"
-          value="342"
-          growth="8.3%"
+          value={stats.newPostsCount}
+          growth={stats.newPostsGrowth}
           color="#10b981"
         />
         <StatCard
@@ -340,8 +389,8 @@ function HomeContent() {
             </svg>
           }
           label="Tài liệu mới trong tháng"
-          value="28"
-          growth="7.7%"
+          value={stats.newDocumentsCount}
+          growth={stats.newDocumentsGrowth}
           color="#8b5cf6"
         />
         <StatCard
@@ -352,8 +401,8 @@ function HomeContent() {
             </svg>
           }
           label="Thông báo đã gửi trong tháng"
-          value="156"
-          growth="15.2%"
+          value={stats.newNotificationsCount}
+          growth={stats.newNotificationsGrowth}
           color="#f59e0b"
           width="400px"
         />
@@ -392,16 +441,26 @@ function HomeContent() {
             <a href="/bai-viet" className="hc-see-all">Xem tất cả</a>
           </div>
           <div className="hc-recent-list">
-            {RECENT_POSTS.map((post) => (
-              <div className="hc-recent-item" key={post.id}>
-                <div className="hc-recent-info">
-                  <p className="hc-recent-post-title">{post.title}</p>
-                  <p className="hc-recent-meta">
-                    {post.author} <span className="hc-dot">•</span> {post.time}
-                  </p>
+            {recentPosts && recentPosts.length > 0 ? (
+              recentPosts.map((post) => (
+                <div 
+                  className="hc-recent-item" 
+                  key={post.id}
+                  onClick={() => navigate("/bai-viet", { state: { searchTitle: post.title } })}
+                >
+                  <div className="hc-recent-info">
+                    <p className="hc-recent-post-title">{post.title}</p>
+                    <p className="hc-recent-meta">
+                      {post.author || post.name || post.userName || "Ẩn danh"} <span className="hc-dot">•</span> {formatTimeAgo(post.createdAt || post.time)}
+                    </p>
+                  </div>
                 </div>
+              ))
+            ) : (
+              <div style={{ textAlign: "center", padding: "20px", color: "#9ca3af" }}>
+                Không có bài viết mới
               </div>
-            ))}
+            )}
           </div>
         </div>
       </div>

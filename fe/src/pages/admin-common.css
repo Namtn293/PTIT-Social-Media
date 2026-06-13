@@ -1,0 +1,122 @@
+/* Shared Admin Management Page styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.admin-page-container {
+  font-family: 'Inter', 'Typography', sans-serif;
+  background: #f5f6fa;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+/* Scrollbar */
+.admin-page-container::-webkit-scrollbar {
+  width: 6px;
+}
+.admin-page-container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+.admin-page-container::-webkit-scrollbar-thumb {
+  background: #d1d1d1;
+  border-radius: 10px;
+}
+.admin-page-container::-webkit-scrollbar-thumb:hover {
+  background: #bfbfbf;
+}
+
+/* Header Search & Actions section */
+.admin-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: white;
+  padding: 16px 24px;
+  border-radius: 14px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  border: 1px solid #eef0f6;
+}
+
+.admin-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  max-width: 600px;
+}
+
+/* Unified Table Card wrapper */
+.admin-page-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  border: 1px solid #f3f4f6;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+/* Overwrite Ant Design style details for uniform look */
+.admin-page-container .ant-table-wrapper {
+  width: 100%;
+  height: 100%;
+}
+
+.admin-page-container .ant-table {
+  font-family: 'Inter', sans-serif !important;
+  font-size: 14px !important;
+}
+
+.admin-page-container .ant-table-thead > tr > th {
+  background-color: #f8fafc !important;
+  color: #475569 !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.admin-page-container .ant-table-tbody > tr > td {
+  font-size: 14px !important;
+  color: #334155 !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+}
+
+.admin-page-container .ant-btn {
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  font-family: 'Inter', sans-serif !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.admin-page-container .ant-btn-primary {
+  background-color: #6366f1 !important;
+  border-color: #6366f1 !important;
+}
+
+.admin-page-container .ant-btn-primary:hover {
+  background-color: #4f46e5 !important;
+  border-color: #4f46e5 !important;
+}
+
+.admin-page-container .ant-input {
+  border-radius: 8px !important;
+  font-family: 'Inter', sans-serif !important;
+}
+
+.admin-page-container .ant-tag {
+  font-family: 'Inter', sans-serif !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  padding: 2px 8px !important;
+}

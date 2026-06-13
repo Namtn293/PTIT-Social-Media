@@ -1,6 +1,7 @@
 import { Table, Tag, Space, Button,Input } from "antd";
 import {useEffect,useState} from "react"
 import {PlusOutlined, EditOutlined, LockOutlined, DeleteOutlined,SearchOutlined } from "@ant-design/icons";
+import "../admin-common.css";
 import "./UserManagement.css";
 import userInfoApi from "../../api/UserInfoApi"
 
@@ -111,17 +112,46 @@ function UserManagement() {
   })
 
   return (
-    <div className="user-management-container">
-        <div style={{marginLeft:0,marginBottom:20, display:"flex"}}>
-            <Input onChange={(e)=>setSearchText(e.target.value)} size="large" style={{ width: "500px",borderRadius:"5px",fontSize:16,height:35}} placeholder="Tìm kiếm người dùng" />
-                    
-            <Button icon={<SearchOutlined/>} size="large" type="primary" style={{height:35,borderRadius:"5px", marginLeft:10 }}>
-                Tìm kiếm
-            </Button>
-
-            <Button type="primary" icon={<PlusOutlined/>} size="large" style={{marginLeft:"450px",width:"120px",borderRadius:"5px"}}>Tạo mới</Button>
+    <div className="admin-page-container">
+      <div className="admin-page-header">
+        <div className="admin-search-wrap">
+          <Input 
+            onChange={(e) => setSearchText(e.target.value)} 
+            size="large" 
+            style={{ width: "400px" }} 
+            placeholder="Tìm kiếm người dùng..." 
+          />
+          <Button 
+            icon={<SearchOutlined />} 
+            size="large" 
+            type="primary"
+          >
+            Tìm kiếm
+          </Button>
         </div>
-        <Table columns={columns} dataSource={filterData} scroll={{x:1000}} pagination={{pageSize:5,position:["bottomCenter"]}}/>
+        <Button 
+          type="primary" 
+          icon={<PlusOutlined />} 
+          size="large"
+        >
+          Tạo mới
+        </Button>
+      </div>
+
+      <div className="admin-page-card">
+        <Table 
+          columns={columns} 
+          dataSource={filterData} 
+          rowKey="userId"
+          scroll={{ x: "max-content" }} 
+          pagination={{
+            pageSize: 7,
+            position: ["bottomCenter"],
+            showLessItems: true,
+            showSizeChanger: false
+          }}
+        />
+      </div>
     </div>
   );
 }

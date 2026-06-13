@@ -1,9 +1,13 @@
 import React, {useEffect, useState} from "react";
+import { useLocation } from "react-router-dom";
 import { Button, Input, Table, Popconfirm } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined, DeleteOutlined } from "@ant-design/icons";
 import postApi from "../../api/PostAPI";
+import "../admin-common.css";
+import "./PostManagement.css";
 
 function PostManagement(){
+    const location = useLocation();
     const [searchText, setSearchText] = useState("");
     const [filterKeyWord, setFilterKeyWord] = useState("");
     const [posts, setPosts] = useState([]);
@@ -57,8 +61,9 @@ function PostManagement(){
                         cancelText="Không"
                     >
                         <Button 
-                            style={{backgroundColor:"#ff4d4f",color:"white"}}
-                        >Xóa</Button>
+                            danger 
+                            icon={<DeleteOutlined />} 
+                        />
                     </Popconfirm>
                     
                 )
@@ -74,6 +79,13 @@ function PostManagement(){
         const token = localStorage.getItem("token");
         console.log("Token",token);
     })
+
+    useEffect(() => {
+        if (location.state && location.state.searchTitle) {
+            setFilterKeyWord(location.state.searchTitle);
+            setSearchText(location.state.searchTitle);
+        }
+    }, [location.state]);
 
     const fetchPosts = async ()=>{
         try{
@@ -121,69 +133,45 @@ function PostManagement(){
         );
     });
 
-    return(
-        <div className="post-manager-container" 
-            style={{backgroundColor:"#f4f4fc",
-                height:"100vh",
-                display:"flex",
-                justifyContent:"center",
-                alignItems:"center",
-                flexDirection:"column",
-                gap:"10px",
-                padding:"30px"
-            }}>
-            <div className="filter-container" style={{width:"100%",display:"flex"}}>
-                <Input 
-                    type="text" 
-                    placeholder="Nhập từ khóa"
-                    value={filterKeyWord}
-                    onChange={(e)=> setFilterKeyWord(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && setSearchText(filterKeyWord)}
-                    style={{
-                        width:"500px",
-                        borderRadius:"5px",
-                        outline:"none",
-                        padding:"5px 10px",
-                        border: "1px solid #ccc",
-                    }}
-                />
-                <Button icon={<SearchOutlined/>} 
-                    size="large" 
-                    type="primary" 
-                    onClick={()=>setSearchText(filterKeyWord)}
-                    style={{
-                        height:35,
-                        borderRadius:"5px", 
-                        marginLeft:10,
-                    }}>
-                    Tìm kiếm
-                </Button>
+    return (
+        <div className="admin-page-container">
+            <div className="admin-page-header">
+                <div className="admin-search-wrap">
+                    <Input 
+                        type="text" 
+                        placeholder="Tìm kiếm bài viết..."
+                        value={filterKeyWord}
+                        onChange={(e) => setFilterKeyWord(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && setSearchText(filterKeyWord)}
+                        style={{ width: "400px" }}
+                        size="large"
+                    />
+                    <Button 
+                        icon={<SearchOutlined />} 
+                        size="large" 
+                        type="primary" 
+                        onClick={() => setSearchText(filterKeyWord)}
+                    >
+                        Tìm kiếm
+                    </Button>
+                </div>
             </div>
             
-            <div className="list-pages-container"
-                style={{
-                    width: "100%",
-                    height: "100%",
-                    backgroundColor:"#ffffff",
-                    borderRadius:"10px",
-                    marginBottom:"10px"
-                }}>
-
-                <Table columns={columns}
-                dataSource={filteredPosts}
-                rowKey="id"
-                pagination={{
-                    pageSize:7,
-                    position:["bottomCenter"],
-                    showLessItems: true,
-                    showSizeChanger: false
-                }}
-                >
-
-                </Table>
-
+            <div className="admin-page-card">
+                <Table 
+                    columns={columns}
+                    dataSource={filteredPosts}
+                    rowKey="id"
+                    scroll={{ x: "max-content" }} 
+                    pagination={{
+                        pageSize: 7,
+                        position: ["bottomCenter"],
+                        showLessItems: true,
+                        showSizeChanger: false
+                    }}
+                />
             </div>
         </div>
-    )
+    );
 }
 export default PostManagement;

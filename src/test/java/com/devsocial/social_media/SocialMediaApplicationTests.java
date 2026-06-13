@@ -184,4 +184,56 @@ class SocialMediaApplicationTests {
         Post postAfterDelete = postsRepository.findById(postId).orElseThrow();
         assertEquals(0L, postAfterDelete.getCommentTotal(), "Comment total should decrement back to 0");
     }
+
+    @Autowired
+    private com.devsocial.social_media.service.NotificationService notificationService;
+
+    @Autowired
+    private com.devsocial.social_media.repository.UserNotificationRepository userNotificationRepository;
+
+    @Autowired
+    private com.devsocial.social_media.repository.NotificationRepository notificationRepository;
+
+    @Autowired
+    private com.devsocial.social_media.core.auth.repository.UserRepository userRepository;
+
+    @Test
+    @Transactional
+    void testNotificationLifecycle() {
+        // Setup a real User entity for testing (matching testUser username)
+        com.devsocial.social_media.core.auth.entity.User authUser = userRepository.findByUserName(testUser.getUserName()).orElseGet(() -> {
+            com.devsocial.social_media.core.auth.entity.User u = new com.devsocial.social_media.core.auth.entity.User();
+            u.setUserName(testUser.getUserName());
+            u.setRoleEnum(com.devsocial.social_media.enumration.RoleEnum.STUDENT);
+            u.setPassword("password");
+            return userRepository.save(u);
+        });
+
+        // 1. Create a notification for specific user
+        com.devsocial.social_media.model.dto.NotificationCreateDTO createDTO = new com.devsocial.social_media.model.dto.NotificationCreateDTO();
+        createDTO.setTitle("Test Announcement");
+        createDTO.setContent("Test Message Body");
+        createDTO.setUserName(testUser.getUserName());
+
+        notificationService.createNotification(createDTO);
+
+        // 2. Retrieve My Notifications
+        var myNotifs = notificationService.getMyNotifications();
+        assertFalse(myNotifs.isEmpty(), "User should have at least one notification");
+        assertEquals("Test Announcement", myNotifs.get(0).getTitle());
+        assertEquals("Test Message Body", myNotifs.get(0).getContent());
+        assertFalse(myNotifs.get(0).getIsRead());
+
+        // 3. Retrieve All Notifications for Admin
+        var allNotifs = notificationService.getAllNotifications();
+        assertFalse(allNotifs.isEmpty(), "Admin should be able to retrieve all notifications");
+        assertTrue(allNotifs.stream().anyMatch(n -> n.getUserName().equals(testUser.getUserName())));
+
+        // 4. Delete the notification
+        Long userNotifId = myNotifs.get(0).getId();
+        notificationService.deleteNotification(userNotifId);
+
+        var myNotifsAfterDelete = notificationService.getMyNotifications();
+        assertTrue(myNotifsAfterDelete.stream().noneMatch(n -> n.getId().equals(userNotifId)), "Deleted notification should not be returned");
+    }
 }

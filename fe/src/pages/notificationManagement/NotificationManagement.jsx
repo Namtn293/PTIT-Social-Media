@@ -1,93 +1,45 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import { Button, Input, Table, Popconfirm, Flex } from "antd";
-import { SearchOutlined, PlusOutlined} from "@ant-design/icons"
-import { data } from "react-router-dom";
+import { SearchOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import NoticeCreate from "../../components/noticeCreate/noticeCreate";
+import notificationApi from "../../api/NotificationApi";
+import "../admin-common.css";
 
 function NotificationManagement(){
-    const [notifications, setNotifications] = useState([
-        {
-            id: 1,
-            userName: "user01",
-            content: "Bạn đã đăng ký tài khoản thành công.",
-            isRead: true,
-            createAt: "2026-04-01T08:30:00"
-        },
-        {
-            id: 2,
-            userName: "user02",
-            content: "Bài viết của bạn đã được phê duyệt.",
-            isRead: false,
-            createAt: "2026-04-01T09:15:00"
-        },
-        {
-            id: 3,
-            userName: "user03",
-            content: "Bạn có bình luận mới trên bài viết.",
-            isRead: false,
-            createAt: "2026-04-02T10:00:00"
-        },
-        {
-            id: 4,
-            userName: "user01",
-            content: "Mật khẩu của bạn đã được thay đổi.",
-            isRead: true,
-            createAt: "2026-04-02T11:45:00"
-        },
-        {
-            id: 5,
-            userName: "user04",
-            content: "Bạn đã nhận được một tin nhắn mới.",
-            isRead: false,
-            createAt: "2026-04-03T08:20:00"
-        },
-        {
-            id: 6,
-            userName: "user05",
-            content: "Tài khoản của bạn đã được cập nhật.",
-            isRead: true,
-            createAt: "2026-04-03T09:10:00"
-        },
-        {
-            id: 7,
-            userName: "user02",
-            content: "Bạn có thông báo hệ thống mới.",
-            isRead: false,
-            createAt: "2026-04-03T14:30:00"
-        },
-        {
-            id: 8,
-            userName: "user03",
-            content: "Đơn hàng của bạn đã được xác nhận.",
-            isRead: true,
-            createAt: "2026-04-04T08:00:00"
-        },
-        {
-            id: 9,
-            userName: "user04",
-            content: "Bạn đã được thêm vào nhóm mới.",
-            isRead: false,
-            createAt: "2026-04-04T10:40:00"
-        },
-        {
-            id: 10,
-            userName: "user05",
-            content: "Hệ thống sẽ bảo trì vào ngày mai.",
-            isRead: false,
-            createAt: "2026-04-05T07:50:00"
+    const [notifications, setNotifications] = useState([]);
+
+    const loadNotifications = async () => {
+        try {
+            const res = await notificationApi.getAllNotifications();
+            if (res.data && res.data.data) {
+                setNotifications(res.data.data);
+            }
+        } catch (err) {
+            console.error("Lỗi tải thông báo:", err);
         }
-    ]);
+    };
+
+    useEffect(() => {
+        loadNotifications();
+    }, []);
 
     const [searchText, setSearchText] = useState("");
     const [filterKeyWord, setFilterKeyWord] = useState("");
     const [popup, setPopup] = useState(false);
     const [data, setData] = useState({});
+    const [currentPage, setCurrentPage] = useState(1);
     const columns = [
         {
-            title: "ID",
-            dataIndex: "id",
-            key: "id",
-            width: 70
+            title: "STT",
+            key: "stt",
+            width: 70,
+            render: (text, record, index) => (currentPage - 1) * 7 + index + 1
+        },
+        {
+            title: "Tiêu đề",
+            dataIndex: "title",
+            key: "title",
+            width: 150
         },
         {
             title: "Nội dung",
@@ -95,22 +47,23 @@ function NotificationManagement(){
             key: "content",
         },
         {
-            title: "Trạng thái",
-            dataIndex: "isRead",
-            key:"isRead",
-            render: (status)=>{
-                return status===true?"Đã đọc":"Chưa đọc"
-            }
-        },
-        {
             title: "Người nhận",
             dataIndex: "userName",
-            key: "userName"
+            key: "userName",
+            width: 150,
+            render: (recipient) => {
+                return recipient === "Tất cả mọi người" ? (
+                    <span style={{ fontWeight: "600", color: "#1890ff" }}>Tất cả mọi người</span>
+                ) : (
+                    recipient
+                );
+            }
         },
         {
             title: "Ngày gửi",
             dataIndex: "createAt",
             key: "createAt",
+            width: 180,
             render: (date)=>{
                 return new Date(date).toLocaleString("vi-VN",{
                     hour: "2-digit",
@@ -126,6 +79,7 @@ function NotificationManagement(){
             title: "Hành động",
             dataIndex: "action",
             key: "action",
+            width: 100,
             render: (_,record)=>{
                 return (
                     <Popconfirm
@@ -135,24 +89,31 @@ function NotificationManagement(){
                         cancelText="Không"
                     >
                         <Button 
-                            style={{backgroundColor:"#ff4d4f",color:"white"}}
-                        >Xóa</Button>
+                            danger 
+                            icon={<DeleteOutlined />} 
+                        />
                     </Popconfirm>
-                    
                 )
             }
         },
     ];
 
-    const handleSaveData = (notice)=>{
-        console.log(notice)
-
-        setNotifications([...notifications,{...notice,id: notifications.length+1}]);
+    const handleSaveData = async (notice)=>{
+        try {
+            await notificationApi.createNotification(notice);
+            loadNotifications();
+        } catch (err) {
+            console.error("Lỗi tạo thông báo:", err);
+        }
     }
 
-    const handleDelete = (id)=>{
-        const newNotifications = notifications.filter(notice=>notice.id!==id);
-        setNotifications(newNotifications);
+    const handleDelete = async (id)=>{
+        try {
+            await notificationApi.deleteNotification(id);
+            loadNotifications();
+        } catch (err) {
+            console.error("Lỗi xóa thông báo:", err);
+        }
     }
 
     function removeVietnameseTones(str) {
@@ -166,6 +127,7 @@ function NotificationManagement(){
     }
 
     const searchableColumns = [
+    "title",
     "content",
     "userName"
     ];
@@ -174,93 +136,66 @@ function NotificationManagement(){
         const keyword = removeVietnameseTones(searchText);
 
         return searchableColumns.some((column) =>
-            removeVietnameseTones(notice[column]).includes(keyword)
+            removeVietnameseTones(notice[column] || "").includes(keyword)
         );
     });
 
-    return(
-        <div className="notice-manager-container" 
-            style={{backgroundColor:"#f4f4fc",
-                height:"100vh",
-                display:"flex",
-                justifyContent:"center",
-                alignItems:"center",
-                flexDirection:"column",
-                gap:"10px",
-                padding:"30px"
-            }}>
-            <div className="filter-container" style={{width:"100%",display:"flex"}}>
-                <Input 
-                    type="text" 
-                    placeholder="Nhập từ khóa"
-                    value={filterKeyWord}
-                    onChange={(e)=> setFilterKeyWord(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && setSearchText(filterKeyWord)}
-                    style={{
-                        width:"500px",
-                        borderRadius:"5px",
-                        outline:"none",
-                        padding:"5px 10px",
-                        border: "1px solid #ccc",
-                    }}
-                />
-                <Button icon={<SearchOutlined/>} 
-                    size="large" 
-                    type="primary" 
-                    onClick={()=>setSearchText(filterKeyWord)}
-                    style={{
-                        height:35,
-                        borderRadius:"5px", 
-                        marginLeft:10,
-                    }}>
-                    Tìm kiếm
-                </Button>
+    return (
+        <div className="admin-page-container">
+            <div className="admin-page-header">
+                <div className="admin-search-wrap">
+                    <Input 
+                        type="text" 
+                        placeholder="Tìm kiếm thông báo..."
+                        value={filterKeyWord}
+                        onChange={(e) => setFilterKeyWord(e.target.value)}
+                        onKeyDown={(e) => e.key === "Enter" && setSearchText(filterKeyWord)}
+                        style={{ width: "400px" }}
+                        size="large"
+                    />
+                    <Button 
+                        icon={<SearchOutlined />} 
+                        size="large" 
+                        type="primary" 
+                        onClick={() => setSearchText(filterKeyWord)}
+                    >
+                        Tìm kiếm
+                    </Button>
+                </div>
 
-                <Button icon={<PlusOutlined/>}
+                <Button 
+                    icon={<PlusOutlined />}
                     size="large" 
                     type="primary" 
-                    onClick={()=>setPopup(true)}
-                    style={{
-                        height:35,
-                        borderRadius:"5px", 
-                        marginLeft:10,
-                        backgroundColor:"#4db8ff",
-                        marginLeft:"auto"
-                    }}>
-                    Thêm thông báo</Button>
-                    {
-                        popup && 
-                        <NoticeCreate 
-                            onClose={()=> setPopup(false)}
-                            onSubmit={handleSaveData}
-                        />
-                    }
+                    onClick={() => setPopup(true)}
+                >
+                    Thêm thông báo
+                </Button>
+                {popup && (
+                    <NoticeCreate 
+                        onClose={() => setPopup(false)}
+                        onSubmit={handleSaveData}
+                    />
+                )}
             </div>
             
-            <div className="list-pages-container"
-                style={{
-                    width: "100%",
-                    height: "100%",
-                    backgroundColor:"#ffffff",
-                    borderRadius:"10px",
-                    marginBottom:"10px"
-                }}>
-
-                <Table columns={columns}
-                dataSource={filteredNotifications}
-                rowKey="id"
-                pagination={{
-                    pageSize:7,
-                    position:["bottomCenter"],
-                    showLessItems: true,
-                    showSizeChanger: false
-                }}
-                >
-
-                </Table>
-
+            <div className="admin-page-card">
+                <Table 
+                    columns={columns}
+                    dataSource={filteredNotifications}
+                    rowKey="id"
+                    scroll={{ x: "max-content" }} 
+                    pagination={{
+                        current: currentPage,
+                        pageSize: 7,
+                        onChange: (page) => setCurrentPage(page),
+                        position: ["bottomCenter"],
+                        showLessItems: true,
+                        showSizeChanger: false
+                    }}
+                />
             </div>
         </div>
-    )
+    );
 }
 export default NotificationManagement;

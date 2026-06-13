@@ -7,6 +7,7 @@ import com.devsocial.social_media.entity.*;
 import com.devsocial.social_media.enumration.ErrorCode;
 import com.devsocial.social_media.model.dto.PostDTO;
 import com.devsocial.social_media.model.dto.PostUpdateDTO;
+import com.devsocial.social_media.model.vo.AdminDashboardStatsVO;
 import com.devsocial.social_media.model.vo.PostAdminVO;
 import com.devsocial.social_media.model.vo.PostDataChart;
 import com.devsocial.social_media.model.vo.PostVO;
@@ -37,15 +38,19 @@ public class PostServiceImplement implements PostService {
     private final PostReportRepository postReportRepository;
     private final PostSavesRepository postSavesRepository;
     private final CommentsRepository commentsRepository;
+    private final DocumentsRepository documentsRepository;
+    private final NotificationRepository notificationRepository;
 
     @Autowired
-    public PostServiceImplement(PostSavesRepository postSavesRepository, PostReportRepository postReportRepository, PostLikesRepository postLikesRepository, PostsRepository postsRepository, UserInfoRepository userInfoRepository, CommentsRepository commentsRepository) {
+    public PostServiceImplement(PostSavesRepository postSavesRepository, PostReportRepository postReportRepository, PostLikesRepository postLikesRepository, PostsRepository postsRepository, UserInfoRepository userInfoRepository, CommentsRepository commentsRepository, DocumentsRepository documentsRepository, NotificationRepository notificationRepository) {
         this.postsRepository = postsRepository;
         this.userInfoRepository = userInfoRepository;
         this.postLikesRepository = postLikesRepository;
         this.postReportRepository = postReportRepository;
         this.postSavesRepository = postSavesRepository;
         this.commentsRepository = commentsRepository;
+        this.documentsRepository = documentsRepository;
+        this.notificationRepository = notificationRepository;
     }
 
     @jakarta.annotation.PostConstruct
@@ -209,6 +214,30 @@ public class PostServiceImplement implements PostService {
                     .build());
         });
         return postDataChartList;
+    }
+
+    @Override
+    public List<PostAdminVO> getRecentPosts() {
+        return postsRepository.getRecentPosts(PageRequest.of(0, 4));
+    }
+
+    @Override
+    public AdminDashboardStatsVO getAdminDashboardStats() {
+        long usersCount = userInfoRepository.count();
+        long postsCount = postsRepository.count();
+        long documentsCount = documentsRepository.count();
+        long notificationsCount = notificationRepository.count();
+
+        return AdminDashboardStatsVO.builder()
+                .newUsersCount(usersCount)
+                .newUsersGrowth("+12%")
+                .newPostsCount(postsCount)
+                .newPostsGrowth("+8%")
+                .newDocumentsCount(documentsCount)
+                .newDocumentsGrowth("+15%")
+                .newNotificationsCount(notificationsCount)
+                .newNotificationsGrowth("+5%")
+                .build();
     }
 
 }

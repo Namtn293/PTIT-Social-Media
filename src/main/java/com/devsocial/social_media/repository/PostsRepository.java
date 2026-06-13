@@ -58,6 +58,12 @@ public interface PostsRepository extends JpaRepository<Post,Long> {
             " left join UserInfo b on a.userInfoId=b.id ")
     List<PostAdminVO> getAllAdminPosts();
 
+    @Query(value = "select new com.devsocial.social_media.model.vo.PostAdminVO(a.id,a.title,a.content,a.createdAt,b.userName) " +
+            " from Post a " +
+            " left join UserInfo b on a.userInfoId=b.id " +
+            " order by a.createdAt desc ")
+    List<PostAdminVO> getRecentPosts(org.springframework.data.domain.Pageable pageable);
+
     @Modifying(clearAutomatically = true)
     @Query(value = "update Post a " +
             "set a.likeTotal = COALESCE(a.likeTotal, 0) + :valueCount " +
