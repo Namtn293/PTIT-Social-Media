@@ -25,9 +25,6 @@ public class Document extends EntityBase {
     @Column(name = "IMAGE_ID")
     private Long imageId;
 
-    @Column(name = "SUBJECT_ID")
-    private Long subjectId;
-
     @Column(name = "CREATE_BY")
     private String createBy;
 

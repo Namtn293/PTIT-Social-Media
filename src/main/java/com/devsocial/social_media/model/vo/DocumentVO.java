@@ -14,7 +14,6 @@ public class DocumentVO {
     private String title;
     private String fileURL;
     private String ImageURL;
-    private Long subjectId;
     private String uploaderName;
     private String size;
     private String createdAt;

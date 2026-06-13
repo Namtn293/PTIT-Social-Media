@@ -12,6 +12,7 @@ import java.util.Optional;
 @Repository
 public interface DocumentsRepository extends JpaRepository<Document,Long> {
     Optional<Document> findById(Long id);
+    List<Document> findByCreateBy(String createBy);
 
     @Query(value = "SELECT DISTINCT f.url"
             + " FROM main_documents d"

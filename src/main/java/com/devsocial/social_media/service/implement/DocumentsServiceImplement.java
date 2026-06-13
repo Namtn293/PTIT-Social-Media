@@ -17,9 +17,7 @@ import com.devsocial.social_media.repository.DocumentsRepository;
 import com.devsocial.social_media.repository.FilesRepository;
 import com.devsocial.social_media.repository.ImageRepository;
 import com.devsocial.social_media.service.DocumentsService;
-import com.devsocial.social_media.entity.Subject;
 import com.devsocial.social_media.entity.UserInfo;
-import com.devsocial.social_media.repository.SubjectRepository;
 import com.devsocial.social_media.repository.UserInfoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,16 +37,14 @@ public class DocumentsServiceImplement implements DocumentsService {
     private final ImageRepository imageRepository;
     private final FilesRepository filesRepository;
     private final UserRepository userRepository;
-    private final SubjectRepository subjectRepository;
     private final UserInfoRepository userInfoRepository;
 
-    public DocumentsServiceImplement(Cloudinary cloudinary, DocumentsRepository documentsRepository, ImageRepository imageRepository, FilesRepository filesRepository, UserRepository userRepository, SubjectRepository subjectRepository, UserInfoRepository userInfoRepository) {
+    public DocumentsServiceImplement(Cloudinary cloudinary, DocumentsRepository documentsRepository, ImageRepository imageRepository, FilesRepository filesRepository, UserRepository userRepository, UserInfoRepository userInfoRepository) {
         this.cloudinary = cloudinary;
         this.documentsRepository = documentsRepository;
         this.imageRepository = imageRepository;
         this.filesRepository = filesRepository;
         this.userRepository = userRepository;
-        this.subjectRepository = subjectRepository;
         this.userInfoRepository = userInfoRepository;
     }
 
@@ -77,18 +73,30 @@ public class DocumentsServiceImplement implements DocumentsService {
             }
 
             String originalName = file.getOriginalFilename();
+            if (originalName != null) {
+                originalName = originalName.replaceAll("[^a-zA-Z0-9.-]", "_");
+            }
+
+            String resourceType = "raw";
+            String publicId = originalName;
+            if (type != null && type.equalsIgnoreCase("application/pdf")) {
+                resourceType = "image";
+                if (publicId != null && publicId.toLowerCase().endsWith(".pdf")) {
+                    publicId = publicId.substring(0, publicId.length() - 4);
+                }
+            }
 
             Map fileUploadResult = cloudinary.uploader().upload(
                     file.getBytes(),
                     ObjectUtils.asMap(
-                            "resource_type","raw",
-                            "folder","documents",
-                            "public_id", originalName,
+                            "resource_type", resourceType,
+                            "folder", "documents",
+                            "public_id", publicId,
                             "use_fileName", false
                     )
             );
             Files fileSave = Files.builder()
-                    .url(fileUploadResult.get("url").toString())
+                    .url(fileUploadResult.get("secure_url").toString())
                     .public_id(fileUploadResult.get("public_id").toString())
                     .build();
             filesRepository.save(fileSave);
@@ -109,7 +117,6 @@ public class DocumentsServiceImplement implements DocumentsService {
         }
         Document document = Document.builder()
                 .title(documentDTO.getTitle())
-                .subjectId(documentDTO.getSubjectId())
                 .createBy(ThreadContext.getUserDetail().getUsername())
                 .imageId(backgroundId)
                 .fileId(fileId)
@@ -128,27 +135,35 @@ public class DocumentsServiceImplement implements DocumentsService {
         if(user.getRole() == RoleEnum.ADMIN ||
                 (user.getRole() == RoleEnum.STUDENT && user.getUsername().equals(document.getCreateBy()))
         ){
-            try {
-                Files file = filesRepository.findById(document.getFileId()).
-                        orElseThrow(()->new BusinessException(ErrorCode.FILE_NOT_EXIST));
-                Map result = cloudinary.uploader().destroy(
-                        file.getPublic_id(),
-                        ObjectUtils.asMap(
-                                "resource_type", "raw"
-                        )
-                );
-                filesRepository.delete(file);
-            } catch (IOException e) {
-                throw new RuntimeException("Can't delete file");
+            if (document.getFileId() != null) {
+                try {
+                    Files file = filesRepository.findById(document.getFileId()).
+                            orElseThrow(()->new BusinessException(ErrorCode.FILE_NOT_EXIST));
+                    String resourceType = "raw";
+                    if (file.getUrl() != null && file.getUrl().contains("/image/upload/")) {
+                        resourceType = "image";
+                    }
+                    cloudinary.uploader().destroy(
+                            file.getPublic_id(),
+                            ObjectUtils.asMap(
+                                    "resource_type", resourceType
+                            )
+                    );
+                    filesRepository.delete(file);
+                } catch (IOException e) {
+                    throw new RuntimeException("Can't delete file");
+                }
             }
 
-            try {
-                Image image = imageRepository.findById(document.getImageId()).
-                        orElseThrow(()->new BusinessException(ErrorCode.IMAGE_NOT_EXIST));
-                cloudinary.uploader().destroy(image.getPublicId(), ObjectUtils.emptyMap());
-                imageRepository.delete(image);
-            } catch (IOException e) {
-                throw new RuntimeException("Can't delete background");
+            if (document.getImageId() != null) {
+                try {
+                    Image image = imageRepository.findById(document.getImageId()).
+                            orElseThrow(()->new BusinessException(ErrorCode.IMAGE_NOT_EXIST));
+                    cloudinary.uploader().destroy(image.getPublicId(), ObjectUtils.emptyMap());
+                    imageRepository.delete(image);
+                } catch (IOException e) {
+                    throw new RuntimeException("Can't delete background");
+                }
             }
         }
         documentsRepository.delete(document);
@@ -166,14 +181,41 @@ public class DocumentsServiceImplement implements DocumentsService {
     }
 
     @Override
+    public List<DocumentVO> getMyDocumentList() {
+        String username = ThreadContext.getUserDetail().getUsername();
+        List<Document> documents = documentsRepository.findByCreateBy(username);
+        List<DocumentVO> documentVOS = new ArrayList<>();
+        documents.forEach((d)->{
+            documentVOS.add(convertToDocumentVO(d));
+        });
+        return documentVOS;
+    }
+
+    @Override
     public DocumentVO convertToDocumentVO(Document document) {
         DocumentVO documentVO = new DocumentVO();
         documentVO.setId(document.getId());
-        documentVO.setFileURL(documentsRepository.getFileURL(document.getFileId()).get(0));
-        documentVO.setImageURL(documentsRepository.getImageURL(document.getImageId()).get(0));
-        documentVO.setTitle(document.getTitle());
-        documentVO.setSubjectId(document.getSubjectId());
         
+        String fileURL = null;
+        if (document.getFileId() != null) {
+            List<String> urls = documentsRepository.getFileURL(document.getFileId());
+            if (urls != null && !urls.isEmpty()) {
+                fileURL = urls.get(0);
+            }
+        }
+        documentVO.setFileURL(fileURL);
+
+        String imageURL = null;
+        if (document.getImageId() != null) {
+            List<String> urls = documentsRepository.getImageURL(document.getImageId());
+            if (urls != null && !urls.isEmpty()) {
+                imageURL = urls.get(0);
+            }
+        }
+        documentVO.setImageURL(imageURL);
+
+        documentVO.setTitle(document.getTitle());
+
         // Find uploader display name
         String uploaderName = "Thành viên PTIT";
         Optional<UserInfo> uploaderInfo = userInfoRepository.findByUserName(document.getCreateBy());
@@ -192,13 +234,12 @@ public class DocumentsServiceImplement implements DocumentsService {
         documentVO.setCreatedAt(formattedDate);
         documentVO.setCreateBy(document.getCreateBy());
 
-        for (String i : documentsRepository.getFileURL(document.getFileId())) System.out.println(i);
-        for (String i : documentsRepository.getImageURL(document.getImageId())) System.out.println(i);
+        if (document.getFileId() != null) {
+            for (String i : documentsRepository.getFileURL(document.getFileId())) System.out.println(i);
+        }
+        if (document.getImageId() != null) {
+            for (String i : documentsRepository.getImageURL(document.getImageId())) System.out.println(i);
+        }
         return documentVO;
-    }
-
-    @Override
-    public List<Subject> getAllSubjects() {
-        return subjectRepository.findAll();
     }
 }

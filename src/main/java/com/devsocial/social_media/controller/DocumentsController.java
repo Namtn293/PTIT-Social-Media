@@ -48,11 +48,11 @@ public class DocumentsController {
         );
     }
 
-    @GetMapping("subjects")
-    SuccessResponse<List<com.devsocial.social_media.entity.Subject>> getAllSubjects(){
+    @PostMapping("mine")
+    SuccessResponse<List<DocumentVO>> getMyDocumentList(){
         return ResponseUtil.ok(
-                "Get all subjects success",
-                documentsService.getAllSubjects()
+                "Get my document list success",
+                documentsService.getMyDocumentList()
         );
     }
 }
