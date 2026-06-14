@@ -48,6 +48,10 @@ public class AuthenticationService {
         user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
         userRepository.save(user);
 
+        if (userInfoRepository.existsByEmail(registerDTO.getEmail())==true){
+            throw new BusinessException(ErrorCode.EMAIL_EXISTS);
+        }
+
         UserInfo userInfo=new UserInfo();
         userInfo.setUserName(registerDTO.getUserName());
         userInfo.setEmail(registerDTO.getEmail());

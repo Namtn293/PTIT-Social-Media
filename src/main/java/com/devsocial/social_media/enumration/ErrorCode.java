@@ -19,7 +19,8 @@ public enum ErrorCode {
     CLASS_NOT_EXIST("404","Class not exist"),
     MAJOR_NOT_EXIST("404","Major not exist"),
     NOTIFICATION_NOT_FOUND("404","Notification not found"),
-    ACCOUNT_BANNED("404","Tài khoản đã bị cấm")
+    ACCOUNT_BANNED("404","Tài khoản đã bị cấm"),
+    EMAIL_EXISTS("401","email exist")
     ;
 
     private final String code;

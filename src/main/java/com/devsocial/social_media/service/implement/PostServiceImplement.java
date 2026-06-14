@@ -282,6 +282,9 @@ public class PostServiceImplement implements PostService {
         }
 
         double percent = ((double) (current - previous) / previous) * 100;
+        if (percent > 0) {
+            return String.format("+%.0f%%", percent);
+        }
         return String.format("%.0f%%", percent);
     }
 

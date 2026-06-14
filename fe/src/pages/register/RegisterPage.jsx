@@ -22,6 +22,7 @@ function Register(){
         try{
             const response=await regiterApi.registerUser(values);
             if (response.data.status==409)  message.error("Trùng tên đăng nhập!");
+                else if (response.data.status==401)  message.error("Email đã được sử dụng!");
                 else{
                     message.success("Đăng kí tài khoản thành thông!");
                     navigate("/login");}

@@ -25,5 +25,5 @@ public interface UserInfoRepository extends JpaRepository<UserInfo,Long> {
             "where s.id= :id", nativeQuery = false)
     Optional<String> findUserNameById(@Param("id") Long id);
 
-
+    boolean existsByEmail(String email);
 }

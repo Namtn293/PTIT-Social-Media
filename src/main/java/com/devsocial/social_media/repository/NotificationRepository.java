@@ -16,8 +16,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     @Query(value = """
             select count(u)
             from main_notifications u
-            where extract(month from u.created_at)=extract(month from now())
-            and extract(year from u.created_at)=extract(year from now())
+            where extract(month from u.create_at)=extract(month from now())
+            and extract(year from u.create_at)=extract(year from now())
             """,nativeQuery = true)
     Long getNotificationTotalInThisMonth();
 
