@@ -129,9 +129,6 @@ public class AuthenticationService {
         tokenRepository.save(jwt);
     }
 
-    public Long getUserTotal(){
-        return userRepository.count();
-    }
 
     @Transactional
     public void setAdminRole(String userName) {

@@ -131,13 +131,6 @@ function UserManagement() {
             Tìm kiếm
           </Button>
         </div>
-        <Button 
-          type="primary" 
-          icon={<PlusOutlined />} 
-          size="large"
-        >
-          Tạo mới
-        </Button>
       </div>
 
       <div className="admin-page-card">

@@ -31,4 +31,21 @@ public interface DocumentsRepository extends JpaRepository<Document,Long> {
             nativeQuery = true
     )
     List<String> getImageURL(@Param("imageId") Long imageId);
+
+
+    @Query(value = """
+            select count(u)
+            from main_documents u
+            where extract(month from u.created_at)=extract(month from now())
+            and extract(year from u.created_at)=extract(year from now())
+            """,nativeQuery = true)
+    Long getDocumentTotalInThisMonth();
+
+    @Query(value = """
+            select count(u)
+            from main_documents u
+            where u.created_at>=date_trunc('month',current_date- interval'1 month')
+            and u.created_at<date_trunc('month',current_date)
+            """,nativeQuery = true)
+    Long getDocumentTotalInLastMonth();
 }

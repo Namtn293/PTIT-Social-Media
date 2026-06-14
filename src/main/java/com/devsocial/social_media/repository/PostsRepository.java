@@ -107,4 +107,21 @@ public interface PostsRepository extends JpaRepository<Post,Long> {
         order by DATE(p.created_at)
         """, nativeQuery = true)
     List<Object[]> getPostsDataChart();
+
+
+    @Query(value = """
+            select count(u)
+            from main_posts u
+            where extract(month from u.created_at)=extract(month from now())
+            and extract(year from u.created_at)=extract(year from now())
+            """,nativeQuery = true)
+    Long getPostTotalInThisMonth();
+
+    @Query(value = """
+            select count(u)
+            from main_posts u
+            where u.created_at>=date_trunc('month',current_date- interval'1 month')
+            and u.created_at<date_trunc('month',current_date)
+            """,nativeQuery = true)
+    Long getPostTotalInLastMonth();
 }

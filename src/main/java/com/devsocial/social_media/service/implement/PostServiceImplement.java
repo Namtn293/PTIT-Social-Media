@@ -40,9 +40,10 @@ public class PostServiceImplement implements PostService {
     private final CommentsRepository commentsRepository;
     private final DocumentsRepository documentsRepository;
     private final NotificationRepository notificationRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public PostServiceImplement(PostSavesRepository postSavesRepository, PostReportRepository postReportRepository, PostLikesRepository postLikesRepository, PostsRepository postsRepository, UserInfoRepository userInfoRepository, CommentsRepository commentsRepository, DocumentsRepository documentsRepository, NotificationRepository notificationRepository) {
+    public PostServiceImplement(UserRepository userRepository, PostSavesRepository postSavesRepository, PostReportRepository postReportRepository, PostLikesRepository postLikesRepository, PostsRepository postsRepository, UserInfoRepository userInfoRepository, CommentsRepository commentsRepository, DocumentsRepository documentsRepository, NotificationRepository notificationRepository) {
         this.postsRepository = postsRepository;
         this.userInfoRepository = userInfoRepository;
         this.postLikesRepository = postLikesRepository;
@@ -51,6 +52,7 @@ public class PostServiceImplement implements PostService {
         this.commentsRepository = commentsRepository;
         this.documentsRepository = documentsRepository;
         this.notificationRepository = notificationRepository;
+        this.userRepository = userRepository;
     }
 
     @jakarta.annotation.PostConstruct
@@ -249,21 +251,37 @@ public class PostServiceImplement implements PostService {
 
     @Override
     public AdminDashboardStatsVO getAdminDashboardStats() {
-        long usersCount = userInfoRepository.count();
-        long postsCount = postsRepository.count();
-        long documentsCount = documentsRepository.count();
-        long notificationsCount = notificationRepository.count();
+        long usersCount = userRepository.getUserTotalInThisMonth();
+        long lastUsersCount = userRepository.getUserTotalInLastMonth();
+
+        long postsCount = postsRepository.getPostTotalInThisMonth();
+        long lastPostsCount = postsRepository.getPostTotalInLastMonth();
+
+        long documentsCount = documentsRepository.getDocumentTotalInThisMonth();
+        long lastDocumentsCount = documentsRepository.getDocumentTotalInLastMonth();
+
+        long notificationsCount = notificationRepository.getNotificationTotalInThisMonth();
+        long lastNotificationsCount = notificationRepository.getNotificationTotalInLastMonth();
 
         return AdminDashboardStatsVO.builder()
                 .newUsersCount(usersCount)
-                .newUsersGrowth("+12%")
+                .newUsersGrowth(growth(usersCount,lastUsersCount))
                 .newPostsCount(postsCount)
-                .newPostsGrowth("+8%")
+                .newPostsGrowth(growth(postsCount,lastPostsCount))
                 .newDocumentsCount(documentsCount)
-                .newDocumentsGrowth("+15%")
+                .newDocumentsGrowth(growth(documentsCount,lastDocumentsCount))
                 .newNotificationsCount(notificationsCount)
-                .newNotificationsGrowth("+5%")
+                .newNotificationsGrowth(growth(notificationsCount,lastNotificationsCount))
                 .build();
+    }
+
+    private String growth(long current, long previous) {
+        if (previous == 0) {
+            return current > 0 ? "+100%" : "0%";
+        }
+
+        double percent = ((double) (current - previous) / previous) * 100;
+        return String.format("%.0f%%", percent);
     }
 
 }

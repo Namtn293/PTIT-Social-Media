@@ -11,6 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -30,6 +31,9 @@ public class User extends EntityBase implements UserDetails {
     @Column(name = "ROLE")
     private RoleEnum roleEnum;
 
+    @Column(name = "CREATED_AT")
+    private LocalDateTime createdAt;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_"+this.roleEnum.name()));
@@ -47,5 +51,10 @@ public class User extends EntityBase implements UserDetails {
 
     public RoleEnum getRole(){
         return this.roleEnum;
+    }
+
+    @PrePersist
+    public void prePersist(){
+        this.createdAt=LocalDateTime.now();
     }
 }

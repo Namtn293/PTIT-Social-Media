@@ -44,10 +44,7 @@ public class AuthenticationController {
         return ResponseUtil.ok("Logout success");
     }
 
-    @GetMapping("/statistic/get-user-total")
-    public SuccessResponse<Long> getUserTotal(){
-        return ResponseUtil.ok("Get user total success", authenticationService.getUserTotal());
-    }
+
 
     @PostMapping("/set-admin/{userName}")
     public SuccessResponse<String> setAdminRole(@PathVariable String userName){
