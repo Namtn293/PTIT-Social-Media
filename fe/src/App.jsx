@@ -81,6 +81,13 @@ function App() {
                         <Routes>
                             <Route path='/login' element={<LoginPage />} />
                             <Route path='/register' element={<RegisterPage />} />
+                            <Route path="/" element={
+                                !auth.token
+                                    ? <Navigate to="/login" replace />
+                                    : auth.role === "ROLE_ADMIN"
+                                        ? <Navigate to="/home" replace />
+                                        : <HomePage />
+                            } />
                             <Route path="/*" element={
                                 !auth.token ? (
                                     <Navigate to="/login" replace />
@@ -99,7 +106,6 @@ function App() {
                                     </div>
                                 ) : (
                                     <Routes>
-                                        <Route path="/" element={<HomePage />} />
                                         <Route path="/bai-viet" element={<PostPage />} />
                                         <Route path="/cong-dong" element={<CommunityPage />} />
                                         <Route path="/tai-lieu" element={<DocumentPage />} />

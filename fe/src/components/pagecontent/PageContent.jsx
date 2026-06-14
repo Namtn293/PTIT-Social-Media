@@ -10,6 +10,7 @@ function PageContent(){
         <Routes>
             {/* Dành cho home của admin và user */}
             <Route path="/" element={<HomeContent/>}/>
+            <Route path="/home" element={<HomeContent/>}/>
             <Route path="/nguoi-dung" element={<UserManagement/>}/>
             <Route path="/cong-dong" element={<Community/>}/>
             <Route path="/bai-viet" element={<PostManagement/>}/>
