@@ -162,6 +162,7 @@ const MessageContent = ({id, userId, check, avatar, name, timestamp, message, us
             okText: "Xóa",
             okType: "danger",
             cancelText: "Hủy",
+            zIndex: 4000,
             onOk() {
                 onDelete(id);
             }

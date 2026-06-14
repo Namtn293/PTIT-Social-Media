@@ -1,6 +1,7 @@
 package com.devsocial.social_media.service.implement;
 
 import com.devsocial.social_media.core.auth.entity.User;
+import com.devsocial.social_media.core.configuration.ThreadContext;
 import com.devsocial.social_media.core.auth.repository.UserRepository;
 import com.devsocial.social_media.core.util.BusinessException;
 import com.devsocial.social_media.entity.Comment;
@@ -92,12 +93,33 @@ public class CommentsServiceImplement implements CommentsService {
     public void deleteById(Long id, Long userId) {
         Comment comment = commentsRepository.findById(id)
                 .orElseThrow(()->new BusinessException(ErrorCode.COMMENT_NOT_EXIST));
-        if(!comment.getUserId().equals(userId)){
-            throw new BusinessException(ErrorCode.FORBIDDEN);
+
+        boolean isAdmin = ThreadContext.getUserDetail().getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin) {
+            Post post = postsRepository.findById(comment.getPostId())
+                    .orElseThrow(()->new BusinessException(ErrorCode.POST_NOT_EXIST));
+            
+            // Check if comment owner
+            boolean isCommentOwner = comment.getUserId().equals(userId);
+            
+            // Check if post owner
+            User user = userRepository.findById(userId)
+                    .orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST));
+            Long userInfoId = userInfoRepository.findIdByUserName(user.getUsername())
+                    .orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST));
+            boolean isPostOwner = post.getUserInfoId().equals(userInfoId);
+
+            if (!isCommentOwner && !isPostOwner) {
+                throw new BusinessException(ErrorCode.FORBIDDEN);
+            }
         }
+
         commentsRepository.delete(comment);
+        commentsRepository.flush();
         postsRepository.updateCommentPostTotal(comment.getPostId(), -1L);
-    };
+    }
 
     @Override
     public Comment updateComment(Long id, CommentUpdateDTO commentUpdateDTO) {

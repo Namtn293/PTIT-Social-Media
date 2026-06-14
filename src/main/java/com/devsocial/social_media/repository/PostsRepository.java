@@ -66,25 +66,25 @@ public interface PostsRepository extends JpaRepository<Post,Long> {
 
     @Modifying(clearAutomatically = true)
     @Query(value = "update Post a " +
-            "set a.likeTotal = COALESCE(a.likeTotal, 0) + :valueCount " +
+            "set a.likeTotal = CASE WHEN COALESCE(a.likeTotal, 0) + :valueCount < 0 THEN 0 ELSE COALESCE(a.likeTotal, 0) + :valueCount END " +
             "where a.id = :postId")
     void updateLikePostTotal(@Param("postId")Long postId, @Param("valueCount") Long valueCount);
 
     @Modifying(clearAutomatically = true)
     @Query(value = "update Post a " +
-            "set a.reportTotal = COALESCE(a.reportTotal, 0) + :valueCount " +
+            "set a.reportTotal = CASE WHEN COALESCE(a.reportTotal, 0) + :valueCount < 0 THEN 0 ELSE COALESCE(a.reportTotal, 0) + :valueCount END " +
             "where a.id = :postId")
     void updateReportPostTotal(@Param("postId")Long postId, @Param("valueCount") Long valueCount);
 
     @Modifying(clearAutomatically = true)
     @Query(value = "update Post a " +
-            "set a.saveTotal = COALESCE(a.saveTotal, 0) + :valueCount " +
+            "set a.saveTotal = CASE WHEN COALESCE(a.saveTotal, 0) + :valueCount < 0 THEN 0 ELSE COALESCE(a.saveTotal, 0) + :valueCount END " +
             "where a.id = :postId")
     void updateSavePostTotal(@Param("postId")Long postId, @Param("valueCount") Long valueCount);
 
     @Modifying(clearAutomatically = true)
     @Query(value = "update Post a " +
-            "set a.commentTotal = COALESCE(a.commentTotal, 0) + :valueCount " +
+            "set a.commentTotal = CASE WHEN COALESCE(a.commentTotal, 0) + :valueCount < 0 THEN 0 ELSE COALESCE(a.commentTotal, 0) + :valueCount END " +
             "where a.id = :postId")
     void updateCommentPostTotal(@Param("postId")Long postId, @Param("valueCount") Long valueCount);
 

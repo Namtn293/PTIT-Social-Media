@@ -10,7 +10,8 @@ import {
     UserOutlined, MailOutlined,
     IdcardOutlined, ReadOutlined,
     SendOutlined,
-    MoreOutlined, EditOutlined, DeleteOutlined
+    MoreOutlined, EditOutlined, DeleteOutlined,
+    CloseOutlined
 } from "@ant-design/icons";
 import useInfoApi from "../../api/UserInfoApi";
 import postApi from "../../api/PostApi";
@@ -43,6 +44,7 @@ const PostLayout = ({ id, report, content, avatar, title, name, time, userName, 
             okText: "Xóa",
             okType: "danger",
             cancelText: "Hủy",
+            zIndex: 4000,
             onOk: async () => {
                 try {
                     await postApi.deletePost(id);
@@ -177,6 +179,30 @@ const PostLayout = ({ id, report, content, avatar, title, name, time, userName, 
             e.preventDefault();
             handleSubmitComment();
         }
+    };
+
+    const handleDeleteComment = (commentId) => {
+        Modal.confirm({
+            title: "Xác nhận xóa bình luận",
+            content: "Bạn có chắc chắn muốn xóa bình luận này không? Thao tác này không thể hoàn tác.",
+            okText: "Xóa",
+            okType: "danger",
+            cancelText: "Hủy",
+            zIndex: 4000,
+            onOk: async () => {
+                try {
+                    const currentUserId = localStorage.getItem("userId");
+                    await postApi.deleteComment(commentId, currentUserId);
+                    message.success("Xóa bình luận thành công!");
+                    setCommentList(prev => prev.filter(cmt => cmt.id !== commentId));
+                    setCommentCount(prev => Math.max(0, prev - 1));
+                    if (onRefresh) onRefresh();
+                } catch (err) {
+                    console.error("Lỗi xóa bình luận:", err);
+                    message.error("Xóa bình luận thất bại. Vui lòng thử lại!");
+                }
+            }
+        });
     };
 
     // Interact handlers
@@ -403,7 +429,7 @@ const PostLayout = ({ id, report, content, avatar, title, name, time, userName, 
                                 </div>
                             </div>
                             <button className="cmt-modal-close" onClick={closeCommentModal} title="Đóng">
-                                ✕
+                                <CloseOutlined />
                             </button>
                         </div>
 
@@ -436,6 +462,8 @@ const PostLayout = ({ id, report, content, avatar, title, name, time, userName, 
                                 commentList.map((cmt, idx) => {
                                     const isMe = String(cmt.userId) === String(localStorage.getItem("userId"));
                                     const authorName = isMe ? "Bạn" : (cmt.fullName || cmt.name || "Thành viên PTIT");
+                                    const isAdmin = localStorage.getItem("role") === "ROLE_ADMIN";
+                                    const canDeleteComment = isMe || isOwner || isAdmin;
                                     return (
                                         <div key={cmt.id || idx} className="comment-item">
                                             <img
@@ -448,9 +476,26 @@ const PostLayout = ({ id, report, content, avatar, title, name, time, userName, 
                                                     <span className="comment-author">{authorName}</span>
                                                     <p className="comment-text">{cmt.content}</p>
                                                 </div>
-                                                {cmt.timestamp && (
-                                                    <span className="comment-time">{getFriendlyTime(cmt.timestamp)}</span>
-                                                )}
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '2px' }}>
+                                                    {cmt.timestamp && (
+                                                        <span className="comment-time">{getFriendlyTime(cmt.timestamp)}</span>
+                                                    )}
+                                                    {canDeleteComment && (
+                                                        <span 
+                                                            className="comment-delete-btn"
+                                                            style={{ 
+                                                                fontSize: '11px', 
+                                                                color: '#ef4444', 
+                                                                cursor: 'pointer',
+                                                                userSelect: 'none',
+                                                                fontWeight: '550'
+                                                            }}
+                                                            onClick={() => handleDeleteComment(cmt.id)}
+                                                        >
+                                                            • Xóa
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     );
