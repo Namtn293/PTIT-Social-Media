@@ -58,17 +58,149 @@ public class MessagesServiceImplement implements MessagesService {
         }
 
         return MessageVO.builder()
+                .id(message.getId())
                 .userId(messageDTO.getUserId() == null ? 0L : messageDTO.getUserId())
                 .content(messageDTO.getContent())
                 .timestamp(message.getCreatedAt())
                 .fullName(fullName)
                 .avatar(avatar)
                 .userName(userName)
+                .type("CREATE")
+                .isEdited(false)
                 .build();
     }
 
     @Override
     public List<MessageVO> getAllMessages() {
         return messageRepository.findAllAsVO();
+    }
+
+    @Override
+    public MessageVO editMessage(Long id, MessageDTO messageDTO) {
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MESSAGE_NOT_EXIST));
+
+        User currentUser = (User) com.devsocial.social_media.core.configuration.ThreadContext.getUserDetail();
+        if (currentUser == null) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+
+        if ("[DELETED_BY_USER]".equals(message.getContent()) || "[DELETED_BY_ADMIN]".equals(message.getContent())) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+
+        if (message.getIsEdited() != null && message.getIsEdited()) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+
+        // Only owner can edit, and it must be <= 1 hour old.
+        if (!message.getUserId().equals(currentUser.getId())) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+        if (isOlderThanOneHour(message.getCreatedAt())) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+
+        message.setContent(messageDTO.getContent());
+        message.setIsEdited(true);
+        messageRepository.save(message);
+
+        String fullName = "Cộng đồng";
+        String avatar = null;
+        String userName = currentUser.getUsername();
+
+        UserInfo userInfo = userInfoRepository.findByUserName(userName).orElse(null);
+        if (userInfo != null) {
+            if (userInfo.getFullName() != null) fullName = userInfo.getFullName();
+            if (userInfo.getImageId() != null) {
+                avatar = imageRepository.findAvatarById(userInfo.getImageId());
+            }
+        }
+
+        return MessageVO.builder()
+                .id(message.getId())
+                .userId(message.getUserId())
+                .content(message.getContent())
+                .timestamp(message.getCreatedAt())
+                .fullName(fullName)
+                .avatar(avatar)
+                .userName(userName)
+                .type("EDIT")
+                .isEdited(true)
+                .build();
+    }
+
+    @Override
+    public MessageVO deleteMessage(Long id) {
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() -> new BusinessException(ErrorCode.MESSAGE_NOT_EXIST));
+
+        User currentUser = (User) com.devsocial.social_media.core.configuration.ThreadContext.getUserDetail();
+        if (currentUser == null) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+
+        if ("[DELETED_BY_USER]".equals(message.getContent()) || "[DELETED_BY_ADMIN]".equals(message.getContent())) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+
+        boolean isOwner = message.getUserId().equals(currentUser.getId());
+        boolean isAdmin = currentUser.getRole() == com.devsocial.social_media.enumration.RoleEnum.ADMIN;
+
+        // If not ADMIN, check owner and <= 1 hour old.
+        if (!isAdmin) {
+            if (!isOwner) {
+                throw new BusinessException(ErrorCode.FORBIDDEN);
+            }
+            if (isOlderThanOneHour(message.getCreatedAt())) {
+                throw new BusinessException(ErrorCode.FORBIDDEN);
+            }
+        }
+
+        if (isOwner) {
+            message.setContent("[DELETED_BY_USER]");
+        } else {
+            message.setContent("[DELETED_BY_ADMIN]");
+        }
+        messageRepository.save(message);
+
+        String fullName = "Cộng đồng";
+        String avatar = null;
+        String userName = "";
+
+        User author = userRepository.findById(message.getUserId()).orElse(null);
+        if (author != null) {
+            userName = author.getUsername();
+            UserInfo userInfo = userInfoRepository.findByUserName(userName).orElse(null);
+            if (userInfo != null) {
+                if (userInfo.getFullName() != null) fullName = userInfo.getFullName();
+                if (userInfo.getImageId() != null) {
+                    avatar = imageRepository.findAvatarById(userInfo.getImageId());
+                }
+            }
+        }
+
+        return MessageVO.builder()
+                .id(message.getId())
+                .userId(message.getUserId())
+                .content(message.getContent())
+                .timestamp(message.getCreatedAt())
+                .fullName(fullName)
+                .avatar(avatar)
+                .userName(userName)
+                .type("EDIT")
+                .isEdited(message.getIsEdited() != null && message.getIsEdited())
+                .build();
+    }
+
+    private boolean isOlderThanOneHour(String createdAtStr) {
+        if (createdAtStr == null) return false;
+        try {
+            java.time.format.DateTimeFormatter formatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy");
+            java.time.LocalDateTime createdAt = java.time.LocalDateTime.parse(createdAtStr, formatter);
+            return createdAt.plusHours(1).isBefore(java.time.LocalDateTime.now());
+        } catch (Exception e) {
+            return true; // default to true if parsing fails to be safe
+        }
     }
 }

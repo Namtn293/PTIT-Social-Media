@@ -30,6 +30,12 @@ const postApi = {
     createComment: (data) => {
         return axiosClient.post("/api/comment/create", data);
     },
+    updatePost: (data) => {
+        return axiosClient.post("/api/posts/update", data);
+    },
+    deletePost: (id) => {
+        return axiosClient.delete(`/api/posts/delete/${id}`);
+    },
 }
 
 export default postApi;

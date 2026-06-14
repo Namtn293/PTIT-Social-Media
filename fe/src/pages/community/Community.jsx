@@ -79,7 +79,15 @@ function Community() {
 
         const subscription = stompClient.subscribe("/topic/public", (message) => {
             const newMessage = JSON.parse(message.body);
-            setMessages((prev) => [...(prev || []), newMessage]);
+            if (newMessage.type === "EDIT") {
+                setMessages((prev) =>
+                    prev.map((msg) => (msg.id === newMessage.id ? { ...msg, content: newMessage.content, isEdited: newMessage.isEdited } : msg))
+                );
+            } else if (newMessage.type === "DELETE") {
+                setMessages((prev) => prev.filter((msg) => msg.id !== newMessage.id));
+            } else {
+                setMessages((prev) => [...(prev || []), newMessage]);
+            }
         });
 
         return () => {
@@ -106,6 +114,22 @@ function Community() {
         });
         setInputValue("");
     }
+
+    const handleEditMessage = async (id, newContent) => {
+        try {
+            await MessageApi.edit(id, { content: newContent });
+        } catch (err) {
+            console.error("Lỗi khi sửa tin nhắn", err);
+        }
+    };
+
+    const handleDeleteMessage = async (id) => {
+        try {
+            await MessageApi.delete(id);
+        } catch (err) {
+            console.error("Lỗi khi xóa tin nhắn", err);
+        }
+    };
 
     const handleKeydown = (e) => {
         if (e.key === "Enter") sendMessage();
@@ -145,13 +169,18 @@ function Community() {
                             <div className="chat-messages-scroll-area" ref={chatScrollAreaRef}>
                                 {messages?.map((item, index) => (
                                     <MessageContent
-                                        key={index}
+                                        key={item.id || index}
+                                        id={item.id}
+                                        userId={item.userId}
                                         avatar={item.avatar}
                                         name={item.fullName}
                                         message={item.content}
                                         timestamp={item.timestamp}
                                         check={item.userId == localStorage.getItem("userId")}
                                         userName={item.userName}
+                                        isEdited={item.isEdited}
+                                        onEdit={handleEditMessage}
+                                        onDelete={handleDeleteMessage}
                                     />
                                 ))}
                             </div>

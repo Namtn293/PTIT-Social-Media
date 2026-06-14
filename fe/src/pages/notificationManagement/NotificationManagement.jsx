@@ -1,11 +1,55 @@
-import React, {useState, useEffect} from "react";
-import { Button, Input, Table, Popconfirm, Flex } from "antd";
+import React, { useState, useEffect } from "react";
+import { Button, Input, Table, Popconfirm, Flex, Typography } from "antd";
 import { SearchOutlined, PlusOutlined, DeleteOutlined } from "@ant-design/icons";
 import NoticeCreate from "../../components/noticeCreate/noticeCreate";
 import notificationApi from "../../api/NotificationApi";
 import "../admin-common.css";
 
-function NotificationManagement(){
+const { Paragraph } = Typography;
+
+const ExpandableContent = ({ text }) => {
+    const [expanded, setExpanded] = useState(false);
+    const contentRef = React.useRef(null);
+    const [isOverflowing, setIsOverflowing] = useState(false);
+
+    useEffect(() => {
+        if (contentRef.current) {
+            // If the scrollHeight is greater than line-height * 2 (~44px), it overflows
+            if (contentRef.current.scrollHeight > 46) {
+                setIsOverflowing(true);
+            }
+        }
+    }, [text]);
+
+    return (
+        <div
+            onClick={() => isOverflowing && setExpanded(!expanded)}
+            style={{ cursor: isOverflowing ? 'pointer' : 'default', width: '100%' }}
+        >
+            <div
+                ref={contentRef}
+                style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: expanded ? 'unset' : 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    wordBreak: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    lineHeight: '22px'
+                }}
+            >
+                {text}
+            </div>
+            {isOverflowing && (
+                <div style={{ color: '#1890ff', fontSize: '13px', marginTop: '4px', fontWeight: 500 }}>
+                    {expanded ? 'Thu gọn' : 'Xem thêm'}
+                </div>
+            )}
+        </div>
+    );
+};
+
+function NotificationManagement() {
     const [notifications, setNotifications] = useState([]);
 
     const loadNotifications = async () => {
@@ -32,18 +76,19 @@ function NotificationManagement(){
             title: "STT",
             key: "stt",
             width: 70,
-            render: (text, record, index) => (currentPage - 1) * 7 + index + 1
+            render: (text, record, index) => (currentPage - 1) * 10 + index + 1
         },
         {
             title: "Tiêu đề",
             dataIndex: "title",
             key: "title",
-            width: 150
+            render: (text) => <ExpandableContent text={text} />
         },
         {
             title: "Nội dung",
             dataIndex: "content",
             key: "content",
+            render: (text) => <ExpandableContent text={text} />
         },
         {
             title: "Người nhận",
@@ -63,8 +108,8 @@ function NotificationManagement(){
             dataIndex: "createAt",
             key: "createAt",
             width: 180,
-            render: (date)=>{
-                return new Date(date).toLocaleString("vi-VN",{
+            render: (date) => {
+                return new Date(date).toLocaleString("vi-VN", {
                     hour: "2-digit",
                     minute: "2-digit",
                     second: "2-digit",
@@ -75,11 +120,12 @@ function NotificationManagement(){
             }
         },
         {
-            title: "Hành động",
+            title: <span style={{ whiteSpace: "nowrap" }}>Hành động</span>,
             dataIndex: "action",
             key: "action",
-            width: 100,
-            render: (_,record)=>{
+            width: 120,
+            align: "center",
+            render: (_, record) => {
                 return (
                     <Popconfirm
                         title="Bạn có chắc muốn xóa không?"
@@ -87,9 +133,9 @@ function NotificationManagement(){
                         okText="Có"
                         cancelText="Không"
                     >
-                        <Button 
-                            danger 
-                            icon={<DeleteOutlined />} 
+                        <Button
+                            danger
+                            icon={<DeleteOutlined />}
                         />
                     </Popconfirm>
                 )
@@ -97,7 +143,7 @@ function NotificationManagement(){
         },
     ];
 
-    const handleSaveData = async (notice)=>{
+    const handleSaveData = async (notice) => {
         try {
             await notificationApi.createNotification(notice);
             loadNotifications();
@@ -106,7 +152,7 @@ function NotificationManagement(){
         }
     }
 
-    const handleDelete = async (id)=>{
+    const handleDelete = async (id) => {
         try {
             await notificationApi.deleteNotification(id);
             loadNotifications();
@@ -126,46 +172,46 @@ function NotificationManagement(){
         <div className="admin-page-container">
             <div className="admin-page-header">
                 <div className="admin-search-wrap">
-                    <Input 
-                        onChange={(e) => setSearchText(e.target.value)} 
-                        size="large" 
-                        style={{ width: "400px" }} 
-                        placeholder="Tìm kiếm thông báo..." 
+                    <Input
+                        onChange={(e) => setSearchText(e.target.value)}
+                        size="large"
+                        style={{ width: "400px" }}
+                        placeholder="Tìm kiếm thông báo..."
                     />
-                    <Button 
-                        icon={<SearchOutlined />} 
-                        size="large" 
+                    <Button
+                        icon={<SearchOutlined />}
+                        size="large"
                         type="primary"
                     >
                         Tìm kiếm
                     </Button>
                 </div>
 
-                <Button 
+                <Button
                     icon={<PlusOutlined />}
-                    size="large" 
-                    type="primary" 
+                    size="large"
+                    type="primary"
                     onClick={() => setPopup(true)}
                 >
                     Thêm thông báo
                 </Button>
                 {popup && (
-                    <NoticeCreate 
+                    <NoticeCreate
                         onClose={() => setPopup(false)}
                         onSubmit={handleSaveData}
                     />
                 )}
             </div>
-            
+
             <div className="admin-page-card">
-                <Table 
+                <Table
                     columns={columns}
                     dataSource={filteredNotifications}
                     rowKey="id"
-                    scroll={{ x: "max-content" }} 
+                    scroll={{ y: "calc(100vh - 310px)" }}
                     pagination={{
                         current: currentPage,
-                        pageSize: 7,
+                        pageSize: 10,
                         onChange: (page) => setCurrentPage(page),
                         position: ["bottomCenter"],
                         showLessItems: true,

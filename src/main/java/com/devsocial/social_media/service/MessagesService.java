@@ -10,4 +10,8 @@ public interface MessagesService {
     MessageVO saveMessage(MessageDTO messageDTO);
 
     List<MessageVO> getAllMessages();
+
+    MessageVO editMessage(Long id, MessageDTO messageDTO);
+
+    MessageVO deleteMessage(Long id);
 }

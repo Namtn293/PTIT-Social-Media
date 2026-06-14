@@ -1,7 +1,7 @@
 import "./PostLayout.css";
 import { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { Popover, Badge, Spin, Tooltip, message } from "antd";
+import { Popover, Badge, Spin, Tooltip, message, Dropdown, Modal, Input, Button } from "antd";
 import {
     LikeOutlined, LikeFilled,
     CommentOutlined,
@@ -10,6 +10,7 @@ import {
     UserOutlined, MailOutlined,
     IdcardOutlined, ReadOutlined,
     SendOutlined,
+    MoreOutlined, EditOutlined, DeleteOutlined
 } from "@ant-design/icons";
 import useInfoApi from "../../api/UserInfoApi";
 import postApi from "../../api/PostApi";
@@ -20,7 +21,7 @@ import "dayjs/locale/vi";
 dayjs.extend(relativeTime);
 dayjs.locale("vi");
 
-const PostLayout = ({ id, report, content, avatar, title, name, time, userName, classes, likes, comments, saves, initialLiked, initialSaved, initialReported }) => {
+const PostLayout = ({ id, report, content, avatar, title, name, time, userName, classes, likes, comments, saves, initialLiked, initialSaved, initialReported, onRefresh }) => {
     const [likeCount, setLikeCount] = useState(likes || 0);
     const [liked, setLiked] = useState(initialLiked || false);
     const [saveCount, setSaveCount] = useState(saves || 0);
@@ -28,6 +29,59 @@ const PostLayout = ({ id, report, content, avatar, title, name, time, userName, 
     const [reportCount, setReportCount] = useState(report || 0);
     const [reported, setReported] = useState(initialReported || false);
     const [userData, setUserData] = useState(null);
+
+    const [editModalOpen, setEditModalOpen] = useState(false);
+    const [editTitle, setEditTitle] = useState(title || "");
+    const [editContent, setEditContent] = useState(content || "");
+    const [updating, setUpdating] = useState(false);
+    const [optionsOpen, setOptionsOpen] = useState(false);
+
+    const handleDeletePost = () => {
+        Modal.confirm({
+            title: "Xác nhận xóa bài viết",
+            content: "Bạn có chắc chắn muốn xóa bài viết này không? Hành động này không thể hoàn tác.",
+            okText: "Xóa",
+            okType: "danger",
+            cancelText: "Hủy",
+            onOk: async () => {
+                try {
+                    await postApi.deletePost(id);
+                    message.success("Xóa bài viết thành công!");
+                    if (onRefresh) onRefresh();
+                } catch (err) {
+                    console.error("Lỗi xóa bài viết:", err);
+                    message.error("Xóa bài viết thất bại. Vui lòng thử lại!");
+                }
+            }
+        });
+    };
+
+    const handleUpdatePost = async () => {
+        if (!editTitle.trim()) {
+            message.warning("Vui lòng nhập tiêu đề bài viết!");
+            return;
+        }
+        if (!editContent.trim()) {
+            message.warning("Vui lòng nhập nội dung bài viết!");
+            return;
+        }
+        try {
+            setUpdating(true);
+            await postApi.updatePost({
+                postId: id,
+                title: editTitle.trim(),
+                content: editContent.trim()
+            });
+            message.success("Cập nhật bài viết thành công!");
+            setEditModalOpen(false);
+            if (onRefresh) onRefresh();
+        } catch (err) {
+            console.error("Lỗi cập nhật bài viết:", err);
+            message.error("Cập nhật bài viết thất bại. Vui lòng thử lại!");
+        } finally {
+            setUpdating(false);
+        }
+    };
 
     // Sync state when props change (e.g. from refetching)
     useEffect(() => {
@@ -220,9 +274,40 @@ const PostLayout = ({ id, report, content, avatar, title, name, time, userName, 
         </div>
     );
 
+    console.log("userName:", userName, "localStorage userName:", localStorage.getItem("userName"));
+    const isOwner = userName && localStorage.getItem("userName") && 
+                    userName.trim().toLowerCase() === localStorage.getItem("userName").trim().toLowerCase();
+
+    const optionsContent = (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', padding: '4px' }}>
+            <Button 
+                type="text" 
+                icon={<EditOutlined />} 
+                onClick={() => {
+                    setEditTitle(title);
+                    setEditContent(content);
+                    setEditModalOpen(true);
+                }}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', width: '120px' }}
+            >
+                Sửa bài
+            </Button>
+            <Button 
+                type="text" 
+                danger 
+                icon={<DeleteOutlined />} 
+                onClick={() => {
+                    handleDeletePost();
+                }}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-start', width: '120px' }}
+            >
+                Xóa bài
+            </Button>
+        </div>
+    );
+
     return (
         <div className="post-card">
-            {/* Header */}
             <div className="post-header">
                 <Popover
                     styles={{ body: { borderRadius: '12px', padding: '10px' } }}
@@ -252,6 +337,19 @@ const PostLayout = ({ id, report, content, avatar, title, name, time, userName, 
                     </div>
                     <span className="post-title">{title}</span>
                 </div>
+                {isOwner && (
+                    <Popover
+                        content={optionsContent}
+                        trigger="click"
+                        placement="bottomRight"
+                        arrow={false}
+                        styles={{ body: { padding: '4px', borderRadius: '8px' } }}
+                    >
+                        <div className="post-more-btn">
+                            <MoreOutlined />
+                        </div>
+                    </Popover>
+                )}
             </div>
 
             {/* Content */}
@@ -392,8 +490,55 @@ const PostLayout = ({ id, report, content, avatar, title, name, time, userName, 
                 </div>,
                 document.body
             )}
+
+            {/* Modal Sửa Bài Viết */}
+            <Modal
+                title={<span className="post-edit-modal-title">Chỉnh sửa bài viết</span>}
+                open={editModalOpen}
+                onCancel={() => !updating && setEditModalOpen(false)}
+                footer={[
+                    <Button key="cancel" onClick={() => setEditModalOpen(false)} disabled={updating}>
+                        Hủy
+                    </Button>,
+                    <Button key="submit" type="primary" onClick={handleUpdatePost} loading={updating} style={{ backgroundColor: "#b71c1c", borderColor: "#b71c1c" }}>
+                        Lưu thay đổi
+                    </Button>
+                ]}
+                centered
+            >
+                <div className="post-edit-modal-body">
+                    <div className="post-edit-field">
+                        <span className="post-edit-label">
+                            Tiêu đề bài viết <span className="post-edit-required">*</span>
+                        </span>
+                        <Input
+                            value={editTitle}
+                            onChange={(e) => setEditTitle(e.target.value)}
+                            placeholder="Nhập tiêu đề..."
+                            disabled={updating}
+                            maxLength={200}
+                            showCount
+                        />
+                    </div>
+                    <div className="post-edit-field">
+                        <span className="post-edit-label">
+                            Nội dung <span className="post-edit-required">*</span>
+                        </span>
+                        <Input.TextArea
+                            value={editContent}
+                            onChange={(e) => setEditContent(e.target.value)}
+                            placeholder="Nhập nội dung..."
+                            disabled={updating}
+                            autoSize={{ minRows: 5, maxRows: 12 }}
+                            maxLength={5000}
+                            showCount
+                        />
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };
 
 export default PostLayout;
+

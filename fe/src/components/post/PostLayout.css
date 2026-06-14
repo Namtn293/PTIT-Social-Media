@@ -557,4 +557,45 @@
         padding-left: 14px;
         padding-right: 14px;
     }
+}
+
+/* Three-dot menu and edit modal */
+.post-more-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    color: #64748b;
+    transition: all 0.2s ease;
+    font-size: 18px;
+}
+
+.post-more-btn:hover {
+    background: #f1f5f9;
+    color: #0f172a;
+}
+
+.post-edit-modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding-top: 10px;
+}
+
+.post-edit-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.post-edit-label {
+    font-weight: 500;
+    color: #334155;
+}
+
+.post-edit-required {
+    color: #ef4444;
 }

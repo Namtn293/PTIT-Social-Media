@@ -172,3 +172,52 @@
     color: #94a3b8;
     padding: 10px;
 }
+
+/* Action menu buttons inside actions Popover */
+.msg-action-menu {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.action-menu-btn {
+    border: none;
+    background: transparent;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.action-menu-btn.edit-btn {
+    color: #c02626;
+    background-color: #fef2f2;
+}
+
+.action-menu-btn.edit-btn:hover {
+    color: white;
+    background-color: #c02626;
+    transform: scale(1.05);
+}
+
+.action-menu-btn.delete-btn {
+    color: #475569;
+    background-color: #f1f5f9;
+}
+
+.action-menu-btn.delete-btn:hover {
+    color: white;
+    background-color: #ef4444;
+    transform: scale(1.05);
+}
+
+/* User interaction hold transition */
+.msg-bubble {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.msg-bubble:active {
+    transform: scale(0.98);
+}

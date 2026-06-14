@@ -6,27 +6,71 @@ import postApi from "../../api/PostAPI";
 import "../admin-common.css";
 import "./PostManagement.css";
 
+const ExpandableContent = ({ text }) => {
+    const [expanded, setExpanded] = useState(false);
+    const contentRef = React.useRef(null);
+    const [isOverflowing, setIsOverflowing] = useState(false);
+
+    useEffect(() => {
+        if (contentRef.current) {
+            if (contentRef.current.scrollHeight > 46) {
+                setIsOverflowing(true);
+            }
+        }
+    }, [text]);
+
+    return (
+        <div 
+            onClick={() => isOverflowing && setExpanded(!expanded)} 
+            style={{ cursor: isOverflowing ? 'pointer' : 'default', width: '100%' }}
+        >
+            <div 
+                ref={contentRef}
+                style={{ 
+                    display: '-webkit-box',
+                    WebkitLineClamp: expanded ? 'unset' : 2,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    wordBreak: 'break-word',
+                    whiteSpace: 'pre-wrap',
+                    lineHeight: '22px'
+                }}
+            >
+                {text}
+            </div>
+            {isOverflowing && (
+                <div style={{ color: '#1890ff', fontSize: '13px', marginTop: '4px', fontWeight: 500 }}>
+                    {expanded ? 'Thu gọn' : 'Xem thêm'}
+                </div>
+            )}
+        </div>
+    );
+};
+
 function PostManagement(){
     const location = useLocation();
     const [searchText, setSearchText] = useState("");
     const [filterKeyWord, setFilterKeyWord] = useState("");
     const [posts, setPosts] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
     const columns = [
         {
             title: "STT",
-            dataIndex: "idx",
-            key: "idx",
-            width: 70
+            key: "stt",
+            width: 70,
+            render: (text, record, index) => (currentPage - 1) * 10 + index + 1
         },
         {
             title: "Tiêu đề",
             dataIndex: "title",
-            key: "title"
+            key: "title",
+            render: (text) => <ExpandableContent text={text} />
         },
         {
             title: "Nội dung",
             dataIndex: "content",
-            key: "content"
+            key: "content",
+            render: (text) => <ExpandableContent text={text} />
         },
         {
             title: "Tác giả",
@@ -52,6 +96,8 @@ function PostManagement(){
             title: "Hành động",
             dataIndex: "action",
             key: "action",
+            width: 120,
+            align: "center",
             render: (_,record)=>{
                 return (
                     <Popconfirm
@@ -65,7 +111,6 @@ function PostManagement(){
                             icon={<DeleteOutlined />} 
                         />
                     </Popconfirm>
-                    
                 )
             }
         },
@@ -162,9 +207,11 @@ function PostManagement(){
                     columns={columns}
                     dataSource={filteredPosts}
                     rowKey="id"
-                    scroll={{ x: "max-content" }} 
+                    scroll={{ x: "max-content", y: "calc(100vh - 310px)" }} 
                     pagination={{
-                        pageSize: 7,
+                        current: currentPage,
+                        pageSize: 10,
+                        onChange: (page) => setCurrentPage(page),
                         position: ["bottomCenter"],
                         showLessItems: true,
                         showSizeChanger: false

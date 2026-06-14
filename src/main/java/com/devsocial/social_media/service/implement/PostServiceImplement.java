@@ -82,6 +82,18 @@ public class PostServiceImplement implements PostService {
         Post post = postsRepository.findById(postId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_EXIST));
 
+        String userName = ThreadContext.getUserDetail().getUsername();
+        Long currentUserId = userInfoRepository.findIdByUserName(userName).orElseThrow(
+                () -> new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST)
+        );
+
+        boolean isAdmin = ThreadContext.getUserDetail().getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin && !post.getUserInfoId().equals(currentUserId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+
         List<Comment> comments = commentsRepository.findAllByPostId(postId);
         if (!comments.isEmpty()) {
             commentsRepository.deleteAllInBatch(comments);
@@ -151,7 +163,21 @@ public class PostServiceImplement implements PostService {
 
     @Override
     public void updatePost(PostUpdateDTO dto) throws RuntimeException {
-        Post post = postsRepository.findById(dto.getPostId()).orElseThrow(() -> new RuntimeException("Post not found"));
+        Post post = postsRepository.findById(dto.getPostId())
+                .orElseThrow(() -> new BusinessException(ErrorCode.POST_NOT_EXIST));
+
+        String userName = ThreadContext.getUserDetail().getUsername();
+        Long currentUserId = userInfoRepository.findIdByUserName(userName).orElseThrow(
+                () -> new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST)
+        );
+
+        boolean isAdmin = ThreadContext.getUserDetail().getAuthorities().stream()
+                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin && !post.getUserInfoId().equals(currentUserId)) {
+            throw new BusinessException(ErrorCode.FORBIDDEN);
+        }
+
         post.setTitle(dto.getTitle());
         post.setContent(dto.getContent());
         postsRepository.save(post);

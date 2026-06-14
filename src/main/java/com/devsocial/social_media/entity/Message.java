@@ -29,6 +29,10 @@ public class Message extends EntityBase {
     @Column(name = "CREATED_AT")
     private String createdAt;
 
+    @Column(name = "IS_EDITED")
+    @Builder.Default
+    private Boolean isEdited = false;
+
     @PrePersist
     public void prePersist(){
         DateTimeFormatter dateTimeFormatter=DateTimeFormatter.ofPattern("HH:mm:ss dd-MM-yyyy");

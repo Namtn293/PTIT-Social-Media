@@ -9,6 +9,7 @@ function UserManagement() {
 
   const [data,setData]=useState([]);  
   const [searchText,setSearchText]=useState("");
+  const [currentPage,setCurrentPage]=useState(1);
   const onLock=async(record)=>{
     try{
     const newStatus=record.status==="ACTIVE"?"BANDED":"ACTIVE";
@@ -82,6 +83,7 @@ function UserManagement() {
     {
       title: "Hành động",
       key: "actions",
+      align: "center",
       render: (_, record) => (
         <Space>
           <Button icon={<LockOutlined />}  onClick={()=> onLock(record)} />
@@ -143,9 +145,11 @@ function UserManagement() {
           columns={columns} 
           dataSource={filterData} 
           rowKey="userId"
-          scroll={{ x: "max-content" }} 
+          scroll={{ x: "max-content", y: "calc(100vh - 310px)" }} 
           pagination={{
-            pageSize: 7,
+            current: currentPage,
+            pageSize: 10,
+            onChange: (page) => setCurrentPage(page),
             position: ["bottomCenter"],
             showLessItems: true,
             showSizeChanger: false

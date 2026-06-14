@@ -202,6 +202,7 @@ function PostPage() {
                                         initialLiked={post.liked}
                                         initialSaved={post.saved}
                                         initialReported={post.reported}
+                                        onRefresh={fetchPosts}
                                     />
                                 ))}
                             </div>

@@ -16,4 +16,19 @@ public class MessageVO {
     private String content;
     private Long userId;
     private String userName;
+    private Long id;
+    private String type; // CREATE, EDIT, DELETE
+    private Boolean isEdited;
+
+    public MessageVO(String avatar, String timestamp, String fullName, String content, Long userId, String userName, Long id, Boolean isEdited) {
+        this.avatar = avatar;
+        this.timestamp = timestamp;
+        this.fullName = fullName;
+        this.content = content;
+        this.userId = userId;
+        this.userName = userName;
+        this.id = id;
+        this.isEdited = isEdited != null && isEdited;
+        this.type = "CREATE";
+    }
 }

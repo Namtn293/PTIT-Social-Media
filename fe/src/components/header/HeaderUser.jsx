@@ -218,7 +218,7 @@ function HeaderUser() {
 
             <div
                 style={{
-                    maxHeight: "300px",
+                    maxHeight: "300px", /* Khoảng 4 thông báo */
                     overflowY: "auto",
                     width: "340px"
                 }}
@@ -533,6 +533,7 @@ function HeaderUser() {
                 title={<span style={{ fontWeight: 700, fontSize: "20px", color: "#b71c1c" }}>Chi tiết thông báo</span>}
                 open={detailModalOpen}
                 onCancel={() => setDetailModalOpen(false)}
+                zIndex={9999}
                 footer={[
                     <Button 
                         key="close" 
@@ -554,7 +555,7 @@ function HeaderUser() {
                             <span><strong>Người gửi:</strong> {selectedNotification.createBy}</span>
                             <span>{selectedNotification.description}</span>
                         </div>
-                        <div style={{ paddingTop: "8px", fontSize: "15px", lineHeight: "1.6", color: "#4d4d4d", whiteSpace: "pre-wrap" }}>
+                        <div style={{ paddingTop: "8px", fontSize: "15px", lineHeight: "1.6", color: "#4d4d4d", whiteSpace: "pre-wrap", maxHeight: "60vh", overflowY: "auto", paddingRight: "5px" }}>
                             {selectedNotification.content}
                         </div>
                     </div>

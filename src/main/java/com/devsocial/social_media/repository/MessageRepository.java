@@ -11,7 +11,7 @@ import java.util.List;
 @Repository
 public interface MessageRepository extends JpaRepository<Message,Long> {
     @Query("SELECT new com.devsocial.social_media.model.vo.MessageVO(" +
-            "i.url, m.createdAt, COALESCE(u.fullName, 'Thành viên PTIT'), m.content, m.userId, u.userName) " +
+            "i.url, m.createdAt, COALESCE(u.fullName, 'Thành viên PTIT'), m.content, m.userId, u.userName, m.id, m.isEdited) " +
             " FROM Message m " +
             " LEFT JOIN User usr ON m.userId = usr.id " +
             " LEFT JOIN UserInfo u ON usr.userName = u.userName " +
