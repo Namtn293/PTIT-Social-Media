@@ -52,7 +52,6 @@ public class CommentsServiceImplement implements CommentsService {
         commentsRepository.save(comment);
         postsRepository.updateCommentPostTotal(commentDTO.getPostId(), 1L);
 
-        // Build CommentVO to return to frontend immediately
         String fullName = "Thành viên PTIT";
         String avatar = null;
         if (commentDTO.getUserId() != null) {
@@ -101,10 +100,8 @@ public class CommentsServiceImplement implements CommentsService {
             Post post = postsRepository.findById(comment.getPostId())
                     .orElseThrow(()->new BusinessException(ErrorCode.POST_NOT_EXIST));
             
-            // Check if comment owner
             boolean isCommentOwner = comment.getUserId().equals(userId);
             
-            // Check if post owner
             User user = userRepository.findById(userId)
                     .orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST));
             Long userInfoId = userInfoRepository.findIdByUserName(user.getUsername())
@@ -115,7 +112,6 @@ public class CommentsServiceImplement implements CommentsService {
                 throw new BusinessException(ErrorCode.FORBIDDEN);
             }
         }
-
         commentsRepository.delete(comment);
         commentsRepository.flush();
         postsRepository.updateCommentPostTotal(comment.getPostId(), -1L);

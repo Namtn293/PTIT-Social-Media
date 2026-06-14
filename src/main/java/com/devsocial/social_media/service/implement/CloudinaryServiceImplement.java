@@ -15,13 +15,9 @@ import java.util.Map;
 @Service
 public class CloudinaryServiceImplement implements CloudinaryService {
     private final Cloudinary cloudinary;
-    private final UserInfoRepository userInfoRepository;
-    private final ImageService imageService;
 
-    public CloudinaryServiceImplement(Cloudinary cloudinary, UserInfoRepository userInfoRepository, ImageService imageService) {
+    public CloudinaryServiceImplement(Cloudinary cloudinary) {
         this.cloudinary = cloudinary;
-        this.userInfoRepository = userInfoRepository;
-        this.imageService = imageService;
     }
     @Transactional
     @Override

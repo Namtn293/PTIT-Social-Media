@@ -10,8 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface ImageRepository extends JpaRepository<Image,Long> {
-//    @Query(value = "Select url from Images where url = :url")
-//    String findPublicIdByUrl(@Param("url") String url);
 
     Optional<Image> findByUrl(String url);
     Optional<Image> findById(Long id);

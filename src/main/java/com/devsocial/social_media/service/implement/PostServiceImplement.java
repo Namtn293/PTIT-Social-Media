@@ -13,6 +13,7 @@ import com.devsocial.social_media.model.vo.PostDataChart;
 import com.devsocial.social_media.model.vo.PostVO;
 import com.devsocial.social_media.repository.*;
 import com.devsocial.social_media.service.PostService;
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +56,7 @@ public class PostServiceImplement implements PostService {
         this.userRepository = userRepository;
     }
 
-    @jakarta.annotation.PostConstruct
+    @PostConstruct
     @Transactional
     public void init() {
         try {

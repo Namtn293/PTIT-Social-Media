@@ -16,6 +16,7 @@ import com.devsocial.social_media.repository.NotificationRepository;
 import com.devsocial.social_media.repository.UserInfoRepository;
 import com.devsocial.social_media.repository.UserNotificationRepository;
 import com.devsocial.social_media.service.NotificationService;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +45,7 @@ public class NotificationServiceImplement implements NotificationService {
         this.userNotificationRepository = userNotificationRepository;
     }
 
-    @jakarta.annotation.PostConstruct
+    @PostConstruct
     public void syncSequences() {
         try {
             notificationRepository.syncSequence();

@@ -93,7 +93,6 @@ public class MessagesServiceImplement implements MessagesService {
             throw new BusinessException(ErrorCode.FORBIDDEN);
         }
 
-        // Only owner can edit, and it must be <= 1 hour old.
         if (!message.getUserId().equals(currentUser.getId())) {
             throw new BusinessException(ErrorCode.FORBIDDEN);
         }
@@ -200,7 +199,7 @@ public class MessagesServiceImplement implements MessagesService {
             java.time.LocalDateTime createdAt = java.time.LocalDateTime.parse(createdAtStr, formatter);
             return createdAt.plusHours(1).isBefore(java.time.LocalDateTime.now());
         } catch (Exception e) {
-            return true; // default to true if parsing fails to be safe
+            return true;
         }
     }
 }

@@ -25,14 +25,12 @@ import java.util.List;
 @Service
 public class UserInfoServiceImplement implements UserInfoService {
     private final UserInfoRepository userInfoRepository;
-    private final CloudinaryServiceImplement cloudinaryServiceImplement;
     private final ImagesServiceImplement imageImplement;
     private final UserRepository userRepository;
     private final ImageRepository imageRepository;
     private final PasswordEncoder passwordEncoder;
-    public UserInfoServiceImplement(UserRepository userRepository,UserInfoRepository userInfoRepository, CloudinaryServiceImplement cloudinaryServiceImplement, ImagesServiceImplement imageImplement, ImageRepository imageRepository, PasswordEncoder passwordEncoder) {
+    public UserInfoServiceImplement(UserRepository userRepository,UserInfoRepository userInfoRepository, ImagesServiceImplement imageImplement, ImageRepository imageRepository, PasswordEncoder passwordEncoder) {
         this.userInfoRepository = userInfoRepository;
-        this.cloudinaryServiceImplement = cloudinaryServiceImplement;
         this.imageImplement = imageImplement;
         this.userRepository = userRepository;
         this.imageRepository = imageRepository;

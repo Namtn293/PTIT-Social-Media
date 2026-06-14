@@ -20,12 +20,10 @@ import java.util.Optional;
 public class ImagesServiceImplement implements ImageService {
     private final Cloudinary cloudinary;
     private final ImageRepository imageRepository;
-    private final UserInfoRepository userInfoRepository;
 
-    public ImagesServiceImplement(Cloudinary cloudinary, ImageRepository imageRepository, UserInfoRepository userInfoRepository) {
+    public ImagesServiceImplement(Cloudinary cloudinary, ImageRepository imageRepository) {
         this.cloudinary = cloudinary;
         this.imageRepository = imageRepository;
-        this.userInfoRepository = userInfoRepository;
     }
 
     @Override
