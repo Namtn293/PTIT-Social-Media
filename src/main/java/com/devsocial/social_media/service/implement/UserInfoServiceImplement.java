@@ -77,6 +77,9 @@ public class UserInfoServiceImplement implements UserInfoService {
     public void updateInfo(String userName, UserInfoDTO userInfoDTO, MultipartFile file) throws IOException {
         UserInfo userInfo = userInfoRepository.findByUserName(userName)
                 .orElseThrow(()->new RuntimeException("user not found"));
+        if (userInfoRepository.existsByEmail(userInfoDTO.getEmail())==true){
+            throw new BusinessException(ErrorCode.EMAIL_EXISTS);
+        }
         if(userInfoDTO.getFullName()!=null)
             userInfo.setFullName(userInfoDTO.getFullName());
         if(userInfoDTO.getEmail()!=null)
