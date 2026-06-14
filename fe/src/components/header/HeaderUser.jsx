@@ -189,13 +189,24 @@ function HeaderUser() {
             if (password) {
                 payload.password = password;
             }
-            await userInfoApi.updateUserInfo(userName, payload, file);
+            const res = await userInfoApi.updateUserInfo(userName, payload, file);
+            // Kiểm tra nếu BE trả về lỗi trong body (HTTP 200 nhưng có status lỗi)
+            if (res?.data?.status === "401" || res?.data?.status === "409") {
+                message.error("Email này đã có người sử dụng, vui lòng chọn email khác!");
+                return;
+            }
             message.success("Cập nhật thông tin thành công!");
             setModalOpen(false);
             await fetchUserData();
         } catch (err) {
             console.error("Lỗi cập nhật:", err);
-            message.error("Cập nhật thông tin thất bại!");
+            const status = err?.response?.status;
+            const serverStatus = err?.response?.data?.status;
+            if (status === 401 || status === 409 || serverStatus === "401" || serverStatus === "409") {
+                message.error("Email này đã có người sử dụng, vui lòng chọn email khác!");
+            } else {
+                message.error("Cập nhật thông tin thất bại!");
+            }
         } finally {
             setLoading(false);
         }
