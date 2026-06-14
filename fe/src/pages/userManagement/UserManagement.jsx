@@ -12,7 +12,7 @@ function UserManagement() {
   const [currentPage,setCurrentPage]=useState(1);
   const onLock=async(record)=>{
     try{
-    const newStatus=record.status==="ACTIVE"?"BANDED":"ACTIVE";
+    const newStatus=record.status==="ACTIVE"?"BANNED":"ACTIVE";
     let response;
     const newData=data.map((item)=>{
         if (item.userId===record.userId) return {...item,status:newStatus};

@@ -149,9 +149,13 @@ function PostManagement(){
         }
     }
 
-    const handleDelete = (id)=>{
-        const newPosts = posts.filter(post=>post.id!==id);
-        setPosts(newPosts);
+    const handleDelete = async (id) => {
+        try {
+            await postApi.deletePost(id);
+            setPosts(prev => prev.filter(post => post.id !== id));
+        } catch (error) {
+            console.error("Lỗi xóa bài viết:", error);
+        }
     }
 
     function removeVietnameseTones(str) {

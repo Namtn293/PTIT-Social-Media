@@ -21,9 +21,6 @@ public class UserInfo extends EntityBase {
     @Column(name = "IMAGE_ID")
     private Long imageId;
 
-    @Column(name = "CLASS_ID")
-    private Long classId;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "STATUS")
     private StatusEnum status;

@@ -26,6 +26,8 @@ function LoginPage(){
                 message.error("Mật khẩu không đúng, vui lòng thử lại!");
             } else if (response.data.status==409){
                 message.error("Tên đăng nhập không đúng, vui lòng thử lại!");
+            } else if (response.data.status==404){
+                message.error("Tài khoản đã bị khóa!");
             } else{
                 message.success("Đăng nhập thành công!");
                 const jwt=jwtDecode(response.data.message);

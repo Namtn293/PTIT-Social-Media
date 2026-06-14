@@ -222,6 +222,12 @@ function LineChart({ data }) {
 
 // ── Stat Card ──────────────────────────────────────────────
 function StatCard({ icon, label, value, growth, color }) {
+  // Parse growth string như "+12%" hoặc "-23%" để xác định chiều mũi tên
+  const isPositive = typeof growth === "string" && growth.startsWith("+");
+  const isNegative = typeof growth === "string" && growth.startsWith("-");
+  const arrowSymbol = isNegative ? "↓" : "↑";
+  const growthColor = isNegative ? "#ef4444" : isPositive ? "#10b981" : "#6b7280";
+
   return (
     <div className="hc-stat-card">
       <div className="hc-stat-icon" style={{ background: color + "18" }}>
@@ -230,8 +236,8 @@ function StatCard({ icon, label, value, growth, color }) {
       <div className="hc-stat-info">
         <p className="hc-stat-label">{label}</p>
         <p className="hc-stat-value">{value}</p>
-        <p className="hc-stat-growth">
-          <span className="hc-arrow">↑</span> {growth} so với tháng trước
+        <p className="hc-stat-growth" style={{ color: growthColor }}>
+          <span className="hc-arrow">{arrowSymbol}</span> {growth} so với tháng trước
         </p>
       </div>
     </div>

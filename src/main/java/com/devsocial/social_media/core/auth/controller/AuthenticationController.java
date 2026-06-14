@@ -51,4 +51,5 @@ public class AuthenticationController {
         authenticationService.setAdminRole(userName);
         return ResponseUtil.ok("User " + userName + " is now ADMIN");
     }
+
 }

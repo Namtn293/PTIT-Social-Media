@@ -142,8 +142,9 @@ public class UserInfoServiceImplement implements UserInfoService {
     @Transactional
     public void delete(Long id) {
         UserInfo userInfo=userInfoRepository.findById(id).orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST));
-        userRepository.deleteUserByUserName(userInfo.getUserName());
+        String userName = userInfo.getUserName();
         userInfoRepository.deleteById(id);
+        userRepository.deleteUserByUserName(userName);
     }
 
 }

@@ -96,10 +96,14 @@ public class AuthenticationService {
         if (!passwordEncoder.matches(dto.getPassword(),user.getPassword())){
             throw new BusinessException(ErrorCode.PASSWORD_NOT_CORRECT);
         }
-        System.out.println("1");
+
+        UserInfo userInfo=userInfoRepository.findByUserName(dto.getUserName())
+                .orElseThrow(()->new BusinessException(ErrorCode.USER_NOT_ALREADY_EXIST));
+        if (userInfo.getStatus().equals(StatusEnum.BANNED)){
+            throw new BusinessException(ErrorCode.ACCOUNT_BANNED);
+        }
         String token=jwtService.buildAccessToken(user);
         revokedToken(user.getId());
-        System.out.println("2");
 
         Token token1=Token.builder()
                 .token(token)
